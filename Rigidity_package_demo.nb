@@ -3,10 +3,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[         0,          0]
-NotebookDataLength[    382889,       7428]
-NotebookOptionsPosition[    373061,       7161]
-NotebookOutlinePosition[    376007,       7228]
-CellTagsIndexPosition[    375964,       7225]
+NotebookDataLength[    400665,       7879]
+NotebookOptionsPosition[    389895,       7588]
+NotebookOutlinePosition[    392839,       7655]
+CellTagsIndexPosition[    392796,       7652]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -5542,10 +5542,11 @@ Cell["Framework data", "Subsubsection",
 Cell["\<\
 We will work with three example periodic frameworks, two in 2D, and one in \
 3D.  In each case, the position data is given as a list of coordinates for \
-the vertices in a single fundamental domain.\
+the vertices in a single unit cell (fundamental domain).\
 \>", "Text",
  CellChangeTimes->{{3.617904698678998*^9, 3.617904704653985*^9}, {
-  3.617905430934023*^9, 3.617905473084118*^9}}],
+  3.617905430934023*^9, 3.617905473084118*^9}, {3.618146918185275*^9, 
+  3.618146935584773*^9}}],
 
 Cell[BoxData[{
  RowBox[{
@@ -5601,8 +5602,7 @@ also the basis vectors of the lattice.  This is input as a list of d vectors ",
    RowBox[{"(", 
     RowBox[{
      SubscriptBox["b", "1"], ",", "...", ",", 
-     SubscriptBox["b", "d"]}], ")"}], TraditionalForm]],
-  FormatType->"TraditionalForm"],
+     SubscriptBox["b", "d"]}], ")"}], TraditionalForm]]],
  " for a d-periodic lattice: "
 }], "Text",
  CellChangeTimes->{{3.617904228020657*^9, 3.617904304752428*^9}, {
@@ -5636,36 +5636,58 @@ Cell[BoxData[{
  CellChangeTimes->{{3.6179043113876543`*^9, 3.617904351535198*^9}, {
   3.6179075481157837`*^9, 3.617907548481447*^9}}],
 
+Cell["\<\
+The edge data of a periodic framework is encoded by giving a list of edges in \
+a unit cell of the lattice.  Each edge is given as a list of three pieces of \
+data:\
+\>", "Text",
+ CellChangeTimes->{{3.61790371581001*^9, 3.6179038683807287`*^9}, {
+   3.617904191116095*^9, 3.617904225388524*^9}, {3.6179043575990973`*^9, 
+   3.617904414361794*^9}, {3.6179045268543987`*^9, 3.6179046670953207`*^9}, 
+   3.617905441012918*^9, {3.618146938954327*^9, 3.618146939704762*^9}, {
+   3.6181473988875313`*^9, 3.618147571689206*^9}}],
+
 Cell[TextData[{
- "The edge data of a periodic framework is encoded by giving a list of edges \
-in a fundamental domain of the lattice.  Each edge is given as a list of \
-three pieces of data.  The first piece is a (now ordered) pair of vertices ",
+ "The first piece is the (now ordered) pair of vertices ",
  Cell[BoxData[
   FormBox[
    RowBox[{"(", 
     RowBox[{
      SubscriptBox["p", "1"], ",", 
-     SubscriptBox["p", "2"]}], ")"}], TraditionalForm]],
-  FormatType->"TraditionalForm"],
- ", the second piece of data is ",
+     SubscriptBox["p", "2"]}], ")"}], TraditionalForm]]],
+ " joined by that edge.  "
+}], "Text",
+ CellChangeTimes->{{3.61790371581001*^9, 3.6179038683807287`*^9}, {
+   3.617904191116095*^9, 3.617904225388524*^9}, {3.6179043575990973`*^9, 
+   3.617904414361794*^9}, {3.6179045268543987`*^9, 3.6179046670953207`*^9}, 
+   3.617905441012918*^9, {3.618146938954327*^9, 3.618146939704762*^9}, {
+   3.6181473988875313`*^9, 3.6181475664544077`*^9}}],
+
+Cell[TextData[{
+ "The second piece of data is an integer vector ",
  Cell[BoxData[
   FormBox[
    RowBox[{"(", 
     RowBox[{
      SubscriptBox["m", "1"], ",", "...", ",", 
-     SubscriptBox["m", "d"]}], ")"}], TraditionalForm]],
-  FormatType->"TraditionalForm"],
- ", so that a vector pointing along the edge from ",
+     SubscriptBox["m", "d"]}], ")"}], TraditionalForm]]],
+ ", so that the vector pointing along the edge from ",
  Cell[BoxData[
   FormBox[
-   SubscriptBox["p", "1"], TraditionalForm]],
-  FormatType->"TraditionalForm"],
+   SubscriptBox["p", "1"], TraditionalForm]]],
  " to ",
  Cell[BoxData[
   FormBox[
-   SubscriptBox["p", "2"], TraditionalForm]],
-  FormatType->"TraditionalForm"],
- " is ",
+   SubscriptBox["p", "2"], TraditionalForm]]],
+ " is: "
+}], "Text",
+ CellChangeTimes->{{3.61790371581001*^9, 3.6179038683807287`*^9}, {
+   3.617904191116095*^9, 3.617904225388524*^9}, {3.6179043575990973`*^9, 
+   3.617904414361794*^9}, {3.6179045268543987`*^9, 3.6179046670953207`*^9}, 
+   3.617905441012918*^9, {3.618146938954327*^9, 3.618146939704762*^9}, {
+   3.6181473988875313`*^9, 3.618147568242466*^9}}],
+
+Cell[TextData[{
  Cell[BoxData[
   FormBox[
    RowBox[{
@@ -5680,14 +5702,42 @@ three pieces of data.  The first piece is a (now ordered) pair of vertices ",
        SubscriptBox["b", "1"]}], "+"}], "..."}], "+", 
     RowBox[{
      SubscriptBox["m", "d"], 
-     SubscriptBox["b", "d"]}]}], TraditionalForm]],
-  FormatType->"TraditionalForm"],
- ", and the third is again a dummy slot."
+     SubscriptBox["b", "d"]}]}], TraditionalForm]]],
+ " "
 }], "Text",
  CellChangeTimes->{{3.61790371581001*^9, 3.6179038683807287`*^9}, {
    3.617904191116095*^9, 3.617904225388524*^9}, {3.6179043575990973`*^9, 
    3.617904414361794*^9}, {3.6179045268543987`*^9, 3.6179046670953207`*^9}, 
-   3.617905441012918*^9}],
+   3.617905441012918*^9, {3.618146938954327*^9, 3.618146939704762*^9}, {
+   3.6181473988875313`*^9, 3.618147487819295*^9}},
+ TextAlignment->Center],
+
+Cell[TextData[{
+ "where ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["b", "1"], ",", "...", ",", 
+    SubscriptBox["b", "d"]}], TraditionalForm]]],
+ " are again the basis vectors of the lattice.  Trailing zero entries of this \
+vector can be omitted, though you might want to hold onto them anyways."
+}], "Text",
+ CellChangeTimes->{{3.61790371581001*^9, 3.6179038683807287`*^9}, {
+   3.617904191116095*^9, 3.617904225388524*^9}, {3.6179043575990973`*^9, 
+   3.617904414361794*^9}, {3.6179045268543987`*^9, 3.6179046670953207`*^9}, 
+   3.617905441012918*^9, {3.618146938954327*^9, 3.618146939704762*^9}, {
+   3.6181473988875313`*^9, 3.618147490203446*^9}, {3.618147550257984*^9, 
+   3.618147583395466*^9}, {3.6181476179618692`*^9, 3.618147630528693*^9}}],
+
+Cell["\<\
+The third piece of data is again a dummy slot.\
+\>", "Text",
+ CellChangeTimes->{{3.61790371581001*^9, 3.6179038683807287`*^9}, {
+   3.617904191116095*^9, 3.617904225388524*^9}, {3.6179043575990973`*^9, 
+   3.617904414361794*^9}, {3.6179045268543987`*^9, 3.6179046670953207`*^9}, 
+   3.617905441012918*^9, {3.618146938954327*^9, 3.618146939704762*^9}, {
+   3.6181473988875313`*^9, 3.618147490203446*^9}, {3.618147550257984*^9, 
+   3.618147588552846*^9}, {3.618147635977285*^9, 3.618147637336196*^9}}],
 
 Cell[BoxData[{
  RowBox[{
@@ -5926,7 +5976,7 @@ Cell["Making pictures", "Subsubsection",
   3.617943851525877*^9}}],
 
 Cell[TextData[{
- "These frameworks can be drawn with the ",
+ "Periodic frameworks can be drawn with the ",
  StyleBox["DrawPeriodic2DFramework",
   FontFamily->"Courier",
   FontWeight->"Bold"],
@@ -5938,7 +5988,8 @@ Cell[TextData[{
 the periodicity if we wish:"
 }], "Text",
  CellChangeTimes->{{3.617909782049609*^9, 3.617909872270178*^9}, {
-  3.618133247476461*^9, 3.618133266940504*^9}}],
+  3.618133247476461*^9, 3.618133266940504*^9}, {3.618147643017489*^9, 
+  3.618147643671844*^9}}],
 
 Cell[BoxData[{
  RowBox[{"DrawPeriodic2DFramework", "[", 
@@ -5967,13 +6018,28 @@ Cell["Rigidity matrices", "Subsubsection",
   3.617705294329216*^9, 3.6177052960255213`*^9}, {3.617943857045856*^9, 
   3.6179438601895123`*^9}}],
 
-Cell["\<\
-Two types of rigidity matrices can be computed.  The ordinary \
-\[OpenCurlyDoubleQuote]Bloch\[CloseCurlyDoubleQuote]-type [P13]:\
-\>", "Text",
+Cell[TextData[{
+ "Two types of rigidity matrices can be computed.  The ordinary \
+\[OpenCurlyDoubleQuote]Bloch\[CloseCurlyDoubleQuote]-type rigidity matrix \
+[P13] can be computed with ",
+ StyleBox["RigidityMatrix",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " as follows.  Note that the first input is the list of variables ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["z", "j"], "=", 
+    SuperscriptBox["e", 
+     RowBox[{"i", " ", 
+      SubscriptBox["k", "j"]}]]}], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ " parametrizing the momentum space:"
+}], "Text",
  CellChangeTimes->{{3.617910681804583*^9, 3.6179107035820103`*^9}, {
   3.618123315610826*^9, 3.618123322051589*^9}, {3.618123509207849*^9, 
-  3.6181235092989187`*^9}}],
+  3.6181235092989187`*^9}, {3.61814882577387*^9, 3.618148881279009*^9}, {
+  3.618148917122756*^9, 3.6181489206571407`*^9}}],
 
 Cell[BoxData[
  RowBox[{"RigidityMatrix", "[", 
@@ -5995,19 +6061,27 @@ Cell[TextData[{
   FontSlant->"Italic"],
  " to evaluate the rigidity matrix only when numerical values are inserted \
 for zx, zy.  This can often improve the numerical accuracy when plotting or \
-computing eigenvalues and determinants."
+computing eigenvalues and determinants of the rigidity matrix or dynamical \
+matrix.  Examples of its use will be shown later."
 }], "Text",
  CellChangeTimes->{{3.618120212686017*^9, 3.618120282018888*^9}, {
   3.618123950676852*^9, 3.618123957204896*^9}, {3.6181300521902323`*^9, 
-  3.61813009993928*^9}}],
+  3.61813009993928*^9}, {3.61814880259731*^9, 3.618148815918273*^9}, {
+  3.618148902576981*^9, 3.618148907535513*^9}}],
 
-Cell["\<\
-The \[OpenCurlyDoubleQuote]fixed-lattice\[CloseCurlyDoubleQuote] type [MT12]:\
-\
-\>", "Text",
+Cell[TextData[{
+ StyleBox["RigidityMatrix",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " can also compute the \[OpenCurlyDoubleQuote]fixed-lattice\
+\[CloseCurlyDoubleQuote] type [MT12] of rigidity matrix.  It contains (dim of \
+space)(dim of lattice) extra columns parametrizing the linearized change of \
+shape of the unit cell:"
+}], "Text",
  CellChangeTimes->{{3.617910705694078*^9, 3.617910709662467*^9}, {
   3.618123324939159*^9, 3.618123330290743*^9}, {3.6181233644033413`*^9, 
-  3.618123364674098*^9}, {3.618123425175817*^9, 3.618123425264135*^9}}],
+  3.618123364674098*^9}, {3.618123425175817*^9, 3.618123425264135*^9}, {
+  3.618148926200026*^9, 3.6181489906600437`*^9}}],
 
 Cell[BoxData[
  RowBox[{"RigidityMatrix", "[", 
@@ -6060,18 +6134,27 @@ Cell[BoxData[
  CellChangeTimes->{{3.6179470109075212`*^9, 3.617947043934402*^9}}],
 
 Cell[TextData[{
- "Note the use of the function ",
- StyleBox["NRigidityMatrix",
+ StyleBox["BandPlot",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " which forces ",
- StyleBox["Mathematica",
-  FontSlant->"Italic"],
- " to evaluate the determinant only after numerical values are inserted for \
-zx, zy.  This can often improve the numerical accuracy when plotting."
+ " takes as input: first, a pair of variables, corresponding to ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["z", "j"], "=", 
+    SuperscriptBox["e", 
+     RowBox[{"i", " ", 
+      SubscriptBox["k", "j"]}]]}], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ ", and then a function which depends on the ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["z", "j"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ ".  Two optional arguments follow which are {kxmin,kxmax} and {kymin,kymax} \
+(default -\[Pi] to \[Pi])."
 }], "Text",
- CellChangeTimes->{{3.618120212686017*^9, 3.618120282018888*^9}, {
-  3.618123950676852*^9, 3.618123957204896*^9}}],
+ CellChangeTimes->{{3.6181466344323273`*^9, 3.618146775634344*^9}}],
 
 Cell[BoxData[{
  RowBox[{
@@ -6113,7 +6196,161 @@ Cell[BoxData[{
    3.618129110843224*^9, 3.6181291368966513`*^9}, {3.6181292034293413`*^9, 
    3.618129237079319*^9}, {3.6181298162389*^9, 3.6181298253501787`*^9}, {
    3.618129862239841*^9, 3.618129874087385*^9}, {3.618129938146595*^9, 
-   3.618129974042594*^9}}]
+   3.618129974042594*^9}}],
+
+Cell[TextData[{
+ "Note the use of the function ",
+ StyleBox["NRigidityMatrix",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " above which forces ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " to evaluate the determinant only after numerical values are inserted for \
+zx, zy.  This can often improve the numerical accuracy when plotting."
+}], "Text",
+ CellChangeTimes->{{3.618120212686017*^9, 3.618120282018888*^9}, {
+  3.618123950676852*^9, 3.618123957204896*^9}, {3.618146742818397*^9, 
+  3.6181467433556213`*^9}}],
+
+Cell[TextData[{
+ StyleBox["BandPlot",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " also supports plotting the Brillouin zone for lattices with a non-square \
+unit cell.  Simply add the basis of the lattice after the plotting range \
+parameters. For example, the triangular lattice:"
+}], "Text",
+ CellChangeTimes->{{3.6181430754406853`*^9, 3.618143131680335*^9}, {
+  3.618146613225971*^9, 3.6181466149505157`*^9}, {3.618146781250165*^9, 
+  3.618146794044993*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"tribasis", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"1", "/", "2"}], ",", 
+       RowBox[{
+        RowBox[{"Sqrt", "[", "3", "]"}], "/", "2"}]}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"triedgedat", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", 
+         RowBox[{"-", "1"}]}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"triR", "=", 
+    RowBox[{"NRigidityMatrix", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"zx", ",", "zy"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0"}], "}"}], "}"}], ",", "tribasis", ",", 
+      "triedgedat"}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"poly", "=", 
+    RowBox[{"Eigenvalues", "[", 
+     RowBox[{
+      RowBox[{"Normal", "[", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"ConjugateTranspose", "[", "triR", "]"}], ".", "triR"}], 
+        ")"}], "]"}], ",", 
+      RowBox[{"{", "2", "}"}]}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Show", "[", 
+  RowBox[{
+   RowBox[{"BandPlot", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"zx", ",", "zy"}], "}"}], ",", 
+     RowBox[{"Abs", "[", "poly", "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "2"}], "\[Pi]"}], ",", 
+       RowBox[{"2", "\[Pi]"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "2"}], "\[Pi]"}], ",", 
+       RowBox[{"2", "\[Pi]"}]}], "}"}], ",", "tribasis"}], "]"}], ",", 
+   RowBox[{"Graphics", "[", 
+    RowBox[{"{", 
+     RowBox[{"Dashed", ",", "Red", ",", 
+      RowBox[{"Line", "[", 
+       RowBox[{"2", 
+        FractionBox["\[Pi]", 
+         RowBox[{"Sqrt", "[", "3", "]"}]], 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"1", ",", "0"}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"1", "/", "2"}], ",", 
+            RowBox[{
+             RowBox[{"Sqrt", "[", "3", "]"}], "/", "2"}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"-", "1"}], "/", "2"}], ",", 
+            RowBox[{
+             RowBox[{"Sqrt", "[", "3", "]"}], "/", "2"}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"-", "1"}], ",", "0"}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"-", "1"}], "/", "2"}], ",", 
+            RowBox[{
+             RowBox[{"-", 
+              RowBox[{"Sqrt", "[", "3", "]"}]}], "/", "2"}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"1", "/", "2"}], ",", 
+            RowBox[{
+             RowBox[{"-", 
+              RowBox[{"Sqrt", "[", "3", "]"}]}], "/", "2"}]}], "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}], "]"}]}], "}"}], "]"}]}],
+   "]"}]}], "Input",
+ CellChangeTimes->{{3.618143143549045*^9, 3.618143267992103*^9}, {
+  3.618143310314343*^9, 3.618143314447179*^9}, {3.618143468228488*^9, 
+  3.618143511047408*^9}, {3.618143546023168*^9, 3.618143547234099*^9}, {
+  3.618143637505146*^9, 3.618143637989458*^9}, {3.6181437625135193`*^9, 
+  3.6181437625942307`*^9}, {3.618144227621705*^9, 3.6181442277992477`*^9}, {
+  3.618144305970508*^9, 3.618144486985899*^9}, {3.618144542110537*^9, 
+  3.6181445736028633`*^9}}]
 }, Closed]]
 }, Closed]]
 }, Closed]],
@@ -6277,10 +6514,53 @@ Cell[TextData[{
 }, Closed]]
 }, Closed]],
 
+Cell[CellGroupData[{
+
 Cell["Built-in lattice framework functions", "Subsection",
  CellChangeTimes->{{3.565392011654352*^9, 3.565392039037265*^9}, 
    3.617946360875455*^9, {3.617949456674674*^9, 3.6179494602484093`*^9}, {
    3.617951263463318*^9, 3.617951278270973*^9}}],
+
+Cell[TextData[{
+ "The package ",
+ StyleBox["Rigidity.m",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " contains a growing number of functions that can generate 2D (and maybe in \
+the future 3D) periodic frameworks."
+}], "Text",
+ CellChangeTimes->{{3.618146811863491*^9, 3.6181468981789703`*^9}}],
+
+Cell["2D square lattice related", "Subsubsection",
+ CellChangeTimes->{{3.565385714290554*^9, 3.565385722298304*^9}, {
+  3.617705294329216*^9, 3.6177052960255213`*^9}, {3.617943866349478*^9, 
+  3.617943868420836*^9}, {3.617943950712166*^9, 3.617943962830038*^9}, {
+  3.6179463592761927`*^9, 3.617946392259803*^9}, {3.617946479938772*^9, 
+  3.617946482214526*^9}, {3.6179472534050913`*^9, 3.617947261476214*^9}, {
+  3.6179475601483297`*^9, 3.6179475611943493`*^9}, {3.617948441518923*^9, 
+  3.6179484418607187`*^9}, {3.618134850512538*^9, 3.618134851656768*^9}, {
+  3.6181469928644543`*^9, 3.6181470110397882`*^9}}],
+
+Cell["2D kagome lattice related", "Subsubsection",
+ CellChangeTimes->{{3.565385714290554*^9, 3.565385722298304*^9}, {
+  3.617705294329216*^9, 3.6177052960255213`*^9}, {3.617943866349478*^9, 
+  3.617943868420836*^9}, {3.617943950712166*^9, 3.617943962830038*^9}, {
+  3.6179463592761927`*^9, 3.617946392259803*^9}, {3.617946479938772*^9, 
+  3.617946482214526*^9}, {3.6179472534050913`*^9, 3.617947261476214*^9}, {
+  3.6179475601483297`*^9, 3.6179475611943493`*^9}, {3.617948441518923*^9, 
+  3.6179484418607187`*^9}, {3.618134850512538*^9, 3.618134851656768*^9}, {
+  3.6181469928644543`*^9, 3.618147017158848*^9}}],
+
+Cell["2D triangular lattice related", "Subsubsection",
+ CellChangeTimes->{{3.565385714290554*^9, 3.565385722298304*^9}, {
+  3.617705294329216*^9, 3.6177052960255213`*^9}, {3.617943866349478*^9, 
+  3.617943868420836*^9}, {3.617943950712166*^9, 3.617943962830038*^9}, {
+  3.6179463592761927`*^9, 3.617946392259803*^9}, {3.617946479938772*^9, 
+  3.617946482214526*^9}, {3.6179472534050913`*^9, 3.617947261476214*^9}, {
+  3.6179475601483297`*^9, 3.6179475611943493`*^9}, {3.617948441518923*^9, 
+  3.6179484418607187`*^9}, {3.618134850512538*^9, 3.618134851656768*^9}, {
+  3.6181469928644543`*^9, 3.618147020719379*^9}}]
+}, Closed]],
 
 Cell[CellGroupData[{
 
@@ -6291,43 +6571,45 @@ Cell["Covers of periodic frameworks", "Subsection",
    3.617951261303451*^9}}],
 
 Cell["\<\
-Given a periodic framework it is often useful to construct coverings of this \
+Given a periodic framework it is often useful to construct covers of this \
 framework (i.e. a periodic framework whose unit cell consists of some number \
 of copies of the original unit cell in different directions).\
 \>", "Text",
  CellChangeTimes->{{3.617951238202546*^9, 3.617951326654683*^9}, {
-  3.6179550619438353`*^9, 3.61795507168293*^9}}],
+  3.6179550619438353`*^9, 3.61795507168293*^9}, {3.618147229204811*^9, 
+  3.618147229522121*^9}}],
 
 Cell[TextData[{
  "The functions ",
- StyleBox["MakePerLattice",
+ StyleBox["CoveringFrameworkVerts",
   FontFamily->"Courier",
   FontWeight->"Bold"],
  " and ",
- StyleBox["MakePerLatticeEdges",
+ StyleBox["CoveringFrameworkEdges",
   FontFamily->"Courier",
   FontWeight->"Bold"],
  " can do this:"
 }], "Text",
- CellChangeTimes->{{3.617951334456278*^9, 3.617951425411458*^9}}],
+ CellChangeTimes->{{3.617951334456278*^9, 3.617951425411458*^9}, {
+  3.6181472422782593`*^9, 3.618147251580834*^9}}],
 
 Cell[BoxData[{
  RowBox[{
   RowBox[{"squarecover", "=", 
-   RowBox[{"MakePerLattice", "[", 
+   RowBox[{"CoveringFrameworkVerts", "[", 
     RowBox[{"squarepos2", ",", "squarebasis", ",", 
      RowBox[{"{", 
       RowBox[{"3", ",", "2"}], "}"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"squarecoveredgedat", "=", 
-   RowBox[{"MakePerLatticeEdges", "[", 
+   RowBox[{"CoveringFrameworkEdges", "[", 
     RowBox[{"squareedgedat", ",", 
      RowBox[{"{", 
       RowBox[{"3", ",", "2"}], "}"}], ",", "True"}], "]"}]}], ";"}]}], "Input",\
 
  CellChangeTimes->{{3.6179514409302807`*^9, 3.6179515074278517`*^9}, {
    3.617954465805809*^9, 3.617954466481208*^9}, 3.617960796648576*^9, 
-   3.617961361120019*^9}],
+   3.617961361120019*^9, {3.618147253807907*^9, 3.618147272095397*^9}}],
 
 Cell["\<\
 The above code creates 3 copies in the x-direction and 2 copies in the \
@@ -6345,23 +6627,29 @@ Cell[BoxData[
  CellChangeTimes->{{3.617954393418215*^9, 3.617954444295019*^9}, {
   3.618133300901389*^9, 3.6181333044922647`*^9}}],
 
-Cell["\<\
-To truncate the periodic edges at the boundary, use the following (this is \
-the default behavior if the final argument is omitted):\
-\>", "Text",
+Cell[TextData[{
+ "To truncate the periodic edges at the boundary, use ",
+ StyleBox["CoveringFrameworkEdges",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " with False instead of True (this is the default behavior if the final \
+argument is omitted):"
+}], "Text",
  CellChangeTimes->{{3.6179544806766157`*^9, 3.617954497466423*^9}, {
-  3.6179575941714077`*^9, 3.617957612457759*^9}}],
+  3.6179575941714077`*^9, 3.617957612457759*^9}, {3.618147341237447*^9, 
+  3.6181473554901876`*^9}}],
 
 Cell[BoxData[
  RowBox[{
   RowBox[{"squarecovernonperiodicedgedat", "=", 
-   RowBox[{"MakePerLatticeEdges", "[", 
+   RowBox[{"CoveringFrameworkEdges", "[", 
     RowBox[{"squareedgedat", ",", 
      RowBox[{"{", 
       RowBox[{"3", ",", "2"}], "}"}], ",", "False"}], "]"}]}], ";"}]], "Input",\
 
  CellChangeTimes->{{3.617954511686358*^9, 3.617954518974497*^9}, {
-  3.6179575574386177`*^9, 3.617957576117744*^9}}],
+  3.6179575574386177`*^9, 3.617957576117744*^9}, {3.6181473258050203`*^9, 
+  3.618147328214761*^9}}],
 
 Cell[BoxData[
  RowBox[{"Draw2DFramework", "[", 
@@ -6429,19 +6717,21 @@ conditions.  The function ",
   FontFamily->"Courier",
   FontWeight->"Bold"],
  " can be used to get boundary vertex indices of frameworks derived from ",
- StyleBox["MakePerLattice",
+ StyleBox["CoveringFrameworkVerts",
   FontFamily->"Courier",
   FontWeight->"Bold"],
  " and ",
- StyleBox["MakePerLatticeEdges",
+ StyleBox["CoveringFrameworkEdges",
   FontFamily->"Courier",
-  FontWeight->"Bold"]
+  FontWeight->"Bold"],
+ "."
 }], "Text",
  CellChangeTimes->{{3.617956808946415*^9, 3.6179568153209*^9}, {
   3.617957235490817*^9, 3.617957275667583*^9}, {3.617957352585681*^9, 
   3.617957380184819*^9}, {3.617957512642171*^9, 3.6179575224801617`*^9}, {
   3.6179580788583*^9, 3.617958136411414*^9}, {3.617958323059689*^9, 
-  3.617958323428994*^9}, {3.6179612353665543`*^9, 3.617961248686133*^9}}],
+  3.617958323428994*^9}, {3.6179612353665543`*^9, 3.617961248686133*^9}, {
+  3.618147286654232*^9, 3.6181473029721403`*^9}}],
 
 Cell["\<\
 One inputs the edge data, the size of the covering, and the vertex indices \
@@ -6504,13 +6794,16 @@ Cell[BoxData[
 
 Cell[CellGroupData[{
 
-Cell["Pebble modes", "Subsubsection",
+Cell["\<\
+Adding constraints to the rigidity matrix\
+\>", "Subsubsection",
  CellChangeTimes->{{3.565385714290554*^9, 3.565385722298304*^9}, {
   3.617705294329216*^9, 3.6177052960255213`*^9}, {3.617943866349478*^9, 
   3.617943868420836*^9}, {3.617943950712166*^9, 3.617943962830038*^9}, {
   3.6179463592761927`*^9, 3.6179463678761883`*^9}, {3.617956199426537*^9, 
   3.617956203429017*^9}, {3.617956237290607*^9, 3.6179562378216867`*^9}, {
-  3.6179574489665117`*^9, 3.617957450286158*^9}}],
+  3.6179574489665117`*^9, 3.617957450286158*^9}, {3.618148713488667*^9, 
+  3.618148721055786*^9}}],
 
 Cell[TextData[{
  "Once we have determined a set of boundary vertices, we can pin them by \
@@ -6531,19 +6824,41 @@ generated by ",
 
 Cell[TextData[{
  "This function takes as input first the total number of vertices in the \
-system, then a list of vertex indices, and finally a template for the \
-constraints at each pinned vertex. Then ",
- StyleBox["ConstraintRows",
-  FontFamily->"Courier",
-  FontWeight->"Bold"],
- " outputs a number of rows that can be directly added to the rigidity matrix:"
+system, then a list of vertex indices, and finally a list of directions ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["d", "j"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ " of the constraints at each of the pinned vertices so that vertex j is \
+constrained to move perpendicular to ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["d", "j"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ ". "
 }], "Text",
  CellChangeTimes->{{3.617961566321475*^9, 3.617961582230337*^9}, {
   3.61796190759064*^9, 3.6179619118791647`*^9}, {3.617962186139435*^9, 
   3.617962224971287*^9}, {3.617962930032868*^9, 3.6179630452449017`*^9}, {
   3.617963075705484*^9, 3.617963079711191*^9}, {3.617963267134492*^9, 
   3.617963318525166*^9}, {3.6179652894652777`*^9, 3.617965340142703*^9}, {
-  3.618127883978961*^9, 3.618127888268626*^9}}],
+  3.618127883978961*^9, 3.618127888268626*^9}, {3.6181480764164047`*^9, 
+  3.61814812831287*^9}}],
+
+Cell[TextData[{
+ StyleBox["ConstraintRows",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " then outputs a number of rows that can be directly added to the rigidity \
+matrix:"
+}], "Text",
+ CellChangeTimes->{{3.617961566321475*^9, 3.617961582230337*^9}, {
+  3.61796190759064*^9, 3.6179619118791647`*^9}, {3.617962186139435*^9, 
+  3.617962224971287*^9}, {3.617962930032868*^9, 3.6179630452449017`*^9}, {
+  3.617963075705484*^9, 3.617963079711191*^9}, {3.617963267134492*^9, 
+  3.617963318525166*^9}, {3.6179652894652777`*^9, 3.617965340142703*^9}, {
+  3.618127883978961*^9, 3.618127888268626*^9}, {3.6181480764164047`*^9, 
+  3.618148136517376*^9}}],
 
 Cell[BoxData[{
  RowBox[{
@@ -6577,7 +6892,19 @@ Cell[BoxData[{
   RowBox[{"NullSpace", "[", "newrigmat", "]"}], "]"}]}], "Input",
  CellChangeTimes->{{3.6179653420909443`*^9, 3.6179653734718533`*^9}, {
   3.6179654059531*^9, 3.617965467036902*^9}, {3.6181275629355288`*^9, 
-  3.618127574198154*^9}}],
+  3.618127574198154*^9}}]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["The pebble mode basis", "Subsubsection",
+ CellChangeTimes->{{3.565385714290554*^9, 3.565385722298304*^9}, {
+  3.617705294329216*^9, 3.6177052960255213`*^9}, {3.617943866349478*^9, 
+  3.617943868420836*^9}, {3.617943950712166*^9, 3.617943962830038*^9}, {
+  3.6179463592761927`*^9, 3.6179463678761883`*^9}, {3.617956199426537*^9, 
+  3.617956203429017*^9}, {3.617956237290607*^9, 3.6179562378216867`*^9}, {
+  3.6179574489665117`*^9, 3.617957450286158*^9}, {3.618148713488667*^9, 
+  3.618148734822294*^9}}],
 
 Cell[TextData[{
  "There\[CloseCurlyQuote]s an interpretation for the pebbles in the pebble \
@@ -6605,15 +6932,64 @@ Cell[TextData[{
  StyleBox["PebbleBasisModes",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " outputs the pebble mode basis of a system."
+ " outputs the pebble mode basis of a non-periodic framework.  The inputs are \
+the framework data, followed by a list of indices of pebbles (e.g. coming \
+from the output of ",
+ StyleBox["BoundaryVerts",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ") and finally a list of constraint directions again ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{"{", 
+    SubscriptBox["d", "j"], "}"}], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ "."
 }], "Text",
  CellChangeTimes->{{3.61812789578344*^9, 3.618127925405201*^9}, {
   3.618128171035186*^9, 3.618128189077963*^9}, {3.618128235373489*^9, 
-  3.618128236045259*^9}}],
+  3.618128236045259*^9}, {3.618147962395735*^9, 3.618147969866301*^9}, {
+  3.618148007533712*^9, 3.61814805213437*^9}, {3.618148146289257*^9, 
+  3.6181481893919353`*^9}}],
+
+Cell["\<\
+This function requires that the framework edges are independent and that the \
+pebble constraints are also independent.\
+\>", "Text",
+ CellChangeTimes->{{3.618148181270213*^9, 3.618148203691815*^9}}],
 
 Cell[BoxData[
- RowBox[{"PebbleBasisModes", "[", "]"}]], "Input",
- CellChangeTimes->{{3.618128248705924*^9, 3.61812825360048*^9}}]
+ RowBox[{"PebbleBasisModes", "[", 
+  RowBox[{"trianglepos", ",", "triangleedgedat", ",", 
+   RowBox[{"{", 
+    RowBox[{"1", ",", "2", ",", "3"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "1"}], "}"}]}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.618128248705924*^9, 3.61812825360048*^9}, {
+  3.6181482208761683`*^9, 3.618148248576161*^9}}],
+
+Cell[TextData[{
+ "Note that the ",
+ Cell[BoxData[
+  FormBox[
+   SuperscriptBox["i", "th"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ " mode has a projection of 1 onto the ",
+ Cell[BoxData[
+  FormBox[
+   SuperscriptBox["i", "th"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ " constraint and 0 onto all other constraints; consistent with the idea that \
+these are the modes that appear when each of the specified constraints is \
+lifted in turn."
+}], "Text",
+ CellChangeTimes->{{3.6181483945503397`*^9, 3.618148459850767*^9}}]
 }, Closed]]
 }, Closed]],
 
@@ -6641,9 +7017,10 @@ Cell[TextData[{
   FontFamily->"Courier",
   FontWeight->"Bold"],
  " can compute the linear response of a rigid framework to displacements \
-applied at certain vertices.  "
+applied at certain vertices."
 }], "Text",
- CellChangeTimes->{{3.6181350257618856`*^9, 3.618135130671254*^9}}],
+ CellChangeTimes->{{3.6181350257618856`*^9, 3.618135130671254*^9}, {
+  3.618147947126212*^9, 3.618147947466113*^9}}],
 
 Cell[TextData[{
  "Often, these displacements are applied at boundaries, so the functions ",
@@ -6814,10 +7191,22 @@ Cell[BoxData[{
 }, Closed]]
 }, Closed]],
 
-Cell["Local \[OpenCurlyDoubleQuote]circle\[CloseCurlyDoubleQuote] modes", \
-"Subsection",
+Cell["\<\
+The local \[OpenCurlyDoubleQuote]circle\[CloseCurlyDoubleQuote] mode basis \
+for bulk isostatic frameworks\
+\>", "Subsection",
  CellChangeTimes->{{3.565392011654352*^9, 3.565392039037265*^9}, 
-   3.617946360875455*^9, {3.617950010382969*^9, 3.617950029364482*^9}}],
+   3.617946360875455*^9, {3.617950010382969*^9, 3.617950029364482*^9}, {
+   3.618148500830448*^9, 3.618148514647105*^9}, {3.6181485884679623`*^9, 
+   3.6181485942674627`*^9}}],
+
+Cell["\<\
+The line-localized mode basis for line intersection frameworks\
+\>", "Subsection",
+ CellChangeTimes->{{3.565392011654352*^9, 3.565392039037265*^9}, 
+   3.617946360875455*^9, {3.617950010382969*^9, 3.617950029364482*^9}, {
+   3.618148500830448*^9, 3.618148514647105*^9}, {3.618148556368607*^9, 
+   3.6181485859168673`*^9}, {3.61814866991567*^9, 3.618148677808981*^9}}],
 
 Cell[CellGroupData[{
 
@@ -6848,12 +7237,13 @@ Cell["Net dipole", "Subsubsection",
 
 Cell["\<\
 In order to ensure that the quantities further below make sense, we must \
-check what the contribution of our choice of fundamental domain is.  This is \
+check what the contribution of our choice of unit cell domain is.  This is \
 given by what I\[CloseCurlyQuote]ll call the net dipole: \
 \>", "Text",
  CellChangeTimes->{{3.617944181868828*^9, 3.6179443387924356`*^9}, {
    3.6181238344623003`*^9, 3.618123915453207*^9}, {3.6181240720936832`*^9, 
-   3.618124075790373*^9}, 3.618124107052721*^9}],
+   3.618124075790373*^9}, 3.618124107052721*^9, {3.618146953641687*^9, 
+   3.618146954640633*^9}}],
 
 Cell[TextData[{
  Cell[BoxData[
@@ -7059,18 +7449,37 @@ Cell[TextData[{
  StyleBox["KLWinding",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " computes the winding of the phase of the det R on different paths in the \
-Brillouin zone."
+ " computes the winding of the phase of det ",
+ Cell[BoxData[
+  FormBox[
+   SuperscriptBox["R", "\[Dagger]"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ " on different paths in the Brillouin zone (this is minus the phase of det \
+",
+ Cell[BoxData[
+  FormBox["R", TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ ")."
 }], "Text",
  CellChangeTimes->{{3.617945353203721*^9, 3.617945354017006*^9}, {
   3.617945605296479*^9, 3.617945638631688*^9}, {3.617946497024438*^9, 
-  3.617946517005259*^9}}],
+  3.617946517005259*^9}, {3.618140581914968*^9, 3.618140606065023*^9}, {
+  3.6181409729616537`*^9, 3.618140983104908*^9}}],
+
+Cell["\<\
+The inputs are the \[OpenCurlyDoubleQuote]z\[CloseCurlyDoubleQuote] variable \
+names, the periodic framework data, and then a set of rules replacing the z \
+variables with parametric curves in a variable t, and finally the name of the \
+variable t:\
+\>", "Text",
+ CellChangeTimes->{{3.618140698269105*^9, 3.61814071734593*^9}, {
+  3.618141035616102*^9, 3.618141060302681*^9}}],
 
 Cell[BoxData[
  RowBox[{"KLWinding", "[", 
   RowBox[{
    RowBox[{"{", 
-    RowBox[{"zx", ",", "zy"}], "}"}], ",", "squarepos", ",", "squarebasis", 
+    RowBox[{"zx", ",", "zy"}], "}"}], ",", "squarepos2", ",", "squarebasis", 
    ",", "squareedgedatbalanced", ",", 
    RowBox[{"{", 
     RowBox[{
@@ -7090,21 +7499,24 @@ Cell[BoxData[
            RowBox[{"Sin", "[", " ", "t", "]"}]}]}], ")"}]}], "]"}]}]}], "}"}],
     ",", "t"}], "]"}]], "Input",
  CellChangeTimes->{{3.617945969661577*^9, 3.617946053101458*^9}, {
-  3.6179461869506283`*^9, 3.617946208628697*^9}}],
+   3.6179461869506283`*^9, 3.617946208628697*^9}, 3.61814062545508*^9}],
 
 Cell[TextData[{
  "The function ",
  StyleBox["KLPolarization",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " computes a topological polarization vector by putting together the winding \
-along orthogonal cycles in the Brillouin zone starting at a given point ",
- StyleBox["cycleorigin:",
-  FontSlant->"Italic"]
+ " computes a vector of topological polarizations by putting together the \
+winding numbers along orthogonal cycles in the Brillouin zone starting at a \
+given point ",
+ StyleBox["cycleorigin ",
+  FontSlant->"Italic"],
+ "(default {-1,-1}, which correponds to {\[Pi],\[Pi]}):"
 }], "Text",
  CellChangeTimes->{{3.6179464853430433`*^9, 3.6179464916607733`*^9}, {
   3.617946522709322*^9, 3.617946527997099*^9}, {3.617946910684669*^9, 
-  3.6179469674059753`*^9}}],
+  3.6179469674059753`*^9}, {3.618140991785487*^9, 3.618141022079164*^9}, {
+  3.618141072620263*^9, 3.618141075499237*^9}}],
 
 Cell[BoxData[
  RowBox[{"KLPolarization", "[", 
@@ -7134,34 +7546,49 @@ Bourjaily\[CloseCurlyQuote]s Positroids package: \n\
 in ",
  StyleBox["Mathematica",
   FontSlant->"Italic"],
- "\[CloseCurlyDoubleQuote]\nhttp://arxiv.org/abs/1212.6974"
+ "\[CloseCurlyDoubleQuote] available at http://arxiv.org/abs/1212.6974"
 }], "Text",
  CellChangeTimes->{{3.618123725632703*^9, 3.618123743891775*^9}, {
   3.6181237853488283`*^9, 3.618123812177477*^9}, {3.6181239743558817`*^9, 
-  3.618123985267351*^9}}],
+  3.618123985267351*^9}, {3.61814791417272*^9, 3.618147917459996*^9}}],
 
 Cell["\<\
 [KL14] C.L. Kane and T.C. Lubensky, Nature Physics 10, 39 (2014). \
-http://arxiv.org/abs/1308.0554
-[MT12] J. Malestein, L. Theran, \[OpenCurlyDoubleQuote]Generic combinatorial \
-rigidity of periodic frameworks\[CloseCurlyDoubleQuote] \
-10.1016/j.aim.2012.10.007 Adv. in Math. Volume 233, Issue 1, 30 January 2013, \
-Pages 291\[Dash]331.  http://arxiv.org/abs/1008.1837
-[P13] S. Power, \[OpenCurlyDoubleQuote]Polynomials for crystal frameworks and \
-the rigid unit mode spectrum,\[CloseCurlyDoubleQuote] 10.1098/rsta.2012.0030 \
-Phil. Trans. R. Soc. A 13 February 2014 vol. 372 no. 2008 20120030. \
-http://arxiv.org/abs/1102.2744\
+http://arxiv.org/abs/1308.0554\
 \>", "Text",
  CellChangeTimes->{{3.617944016121313*^9, 3.6179440385441647`*^9}, {
   3.618123334179324*^9, 3.618123351794261*^9}, {3.6181233890435143`*^9, 
   3.618123409732586*^9}, {3.618123522244351*^9, 3.618123625666016*^9}, {
-  3.618123676647092*^9, 3.61812371447048*^9}}]
+  3.618123676647092*^9, 3.61812371447048*^9}, {3.618147871991496*^9, 
+  3.618147891343601*^9}}],
+
+Cell["\<\
+[MT12] J. Malestein, L. Theran, \"Generic combinatorial rigidity of periodic \
+frameworks\" 10.1016/j.aim.2012.10.007 Adv. in Math. Volume 233, Issue 1, 30 \
+January 2013, Pages 291\[Dash]331.  http://arxiv.org/abs/1008.1837\
+\>", "Text",
+ CellChangeTimes->{{3.617944016121313*^9, 3.6179440385441647`*^9}, {
+  3.618123334179324*^9, 3.618123351794261*^9}, {3.6181233890435143`*^9, 
+  3.618123409732586*^9}, {3.618123522244351*^9, 3.618123625666016*^9}, {
+  3.618123676647092*^9, 3.61812371447048*^9}, {3.618147871991496*^9, 
+  3.618147893068212*^9}}],
+
+Cell["\<\
+[P13] S. Power, \"Polynomials for crystal frameworks and the rigid unit mode \
+spectrum,\" 10.1098/rsta.2012.0030 Phil. Trans. R. Soc. A 13 February 2014 \
+vol. 372 no. 2008 20120030. http://arxiv.org/abs/1102.2744\
+\>", "Text",
+ CellChangeTimes->{{3.617944016121313*^9, 3.6179440385441647`*^9}, {
+  3.618123334179324*^9, 3.618123351794261*^9}, {3.6181233890435143`*^9, 
+  3.618123409732586*^9}, {3.618123522244351*^9, 3.618123625666016*^9}, {
+  3.618123676647092*^9, 3.61812371447048*^9}, {3.618147871991496*^9, 
+  3.618147895379718*^9}}]
 }, Closed]]
 }, Open  ]]
 },
 EvaluationCompletionAction->{},
 WindowSize->{800, 691},
-WindowMargins->{{190, Automatic}, {Automatic, 25}},
+WindowMargins->{{87, Automatic}, {Automatic, 8}},
 Background->RGBColor[0.965927, 0.985016, 0.999908],
 FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
 2013)",
@@ -7246,181 +7673,205 @@ Cell[301958, 5161, 319, 4, 60, "Subsection"],
 Cell[CellGroupData[{
 Cell[302302, 5169, 156, 2, 39, "Subsubsection"],
 Cell[302461, 5173, 328, 9, 76, "Text"],
-Cell[302792, 5184, 972, 17, 171, "Text"],
-Cell[303767, 5203, 204, 4, 43, "Text"],
-Cell[303974, 5209, 807, 23, 84, "Input"],
-Cell[304784, 5234, 215, 4, 43, "Text"],
+Cell[302792, 5184, 972, 17, 267, "Text"],
+Cell[303767, 5203, 204, 4, 75, "Text"],
+Cell[303974, 5209, 807, 23, 114, "Input"],
+Cell[304784, 5234, 215, 4, 75, "Text"],
 Cell[305002, 5240, 463, 13, 53, "Input"],
-Cell[305468, 5255, 291, 8, 43, "Text"],
-Cell[305762, 5265, 257, 5, 53, "Input"]
+Cell[305468, 5255, 291, 8, 75, "Text"],
+Cell[305762, 5265, 257, 5, 84, "Input"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[306056, 5275, 210, 3, 33, "Subsubsection"],
+Cell[306056, 5275, 210, 3, 39, "Subsubsection"],
 Cell[306269, 5280, 280, 8, 75, "Text"],
-Cell[306552, 5290, 753, 14, 84, "Input"],
+Cell[306552, 5290, 753, 14, 114, "Input"],
 Cell[307308, 5306, 276, 8, 75, "Text"],
 Cell[307587, 5316, 1950, 58, 294, "Input"]
 }, Closed]],
 Cell[CellGroupData[{
 Cell[309574, 5379, 208, 3, 39, "Subsubsection"],
-Cell[309785, 5384, 346, 6, 107, "Text"],
+Cell[309785, 5384, 346, 6, 139, "Text"],
 Cell[310134, 5392, 328, 9, 75, "Text"],
-Cell[310465, 5403, 521, 10, 53, "Input"],
+Cell[310465, 5403, 521, 10, 84, "Input"],
 Cell[310989, 5415, 263, 5, 53, "Input"],
-Cell[311255, 5422, 176, 4, 43, "Text"],
+Cell[311255, 5422, 176, 4, 75, "Text"],
 Cell[311434, 5428, 138, 2, 53, "Input"],
 Cell[311575, 5432, 172, 3, 53, "Input"],
 Cell[311750, 5437, 163, 2, 43, "Text"],
-Cell[311916, 5441, 426, 8, 84, "Input"],
+Cell[311916, 5441, 426, 8, 114, "Input"],
 Cell[312345, 5451, 219, 5, 53, "Input"],
-Cell[312567, 5458, 436, 8, 139, "Text"],
+Cell[312567, 5458, 436, 8, 171, "Text"],
 Cell[313006, 5468, 596, 13, 144, "Input"],
-Cell[313605, 5483, 425, 9, 114, "Input"],
+Cell[313605, 5483, 425, 9, 144, "Input"],
 Cell[314033, 5494, 354, 12, 75, "Text"],
-Cell[314390, 5508, 771, 17, 114, "Input"]
+Cell[314390, 5508, 771, 17, 174, "Input"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[315210, 5531, 158, 2, 60, "Subsection"],
+Cell[315210, 5531, 158, 2, 52, "Subsection"],
 Cell[CellGroupData[{
 Cell[315393, 5537, 156, 2, 39, "Subsubsection"],
-Cell[315552, 5541, 337, 6, 139, "Text"],
-Cell[315892, 5549, 1400, 44, 174, "Input"],
-Cell[317295, 5595, 575, 14, 109, "Text"],
-Cell[317873, 5611, 829, 25, 114, "Input"],
-Cell[318705, 5638, 1657, 51, 241, "Text"],
-Cell[320365, 5691, 7366, 226, 954, "Input"]
+Cell[315552, 5541, 398, 7, 139, "Text"],
+Cell[315953, 5550, 1400, 44, 174, "Input"],
+Cell[317356, 5596, 542, 13, 109, "Text"],
+Cell[317901, 5611, 829, 25, 114, "Input"],
+Cell[318733, 5638, 531, 9, 107, "Text"],
+Cell[319267, 5649, 607, 14, 77, "Text"],
+Cell[319877, 5665, 801, 22, 79, "Text"],
+Cell[320681, 5689, 783, 23, 45, "Text"],
+Cell[321467, 5714, 766, 15, 109, "Text"],
+Cell[322236, 5731, 509, 8, 43, "Text"],
+Cell[322748, 5741, 7366, 226, 954, "Input"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[327768, 5922, 206, 3, 39, "Subsubsection"],
-Cell[327977, 5927, 475, 13, 107, "Text"],
-Cell[328455, 5942, 984, 17, 204, "Input"]
+Cell[330151, 5972, 206, 3, 39, "Subsubsection"],
+Cell[330360, 5977, 527, 14, 171, "Text"],
+Cell[330890, 5993, 984, 17, 204, "Input"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[329476, 5964, 210, 3, 33, "Subsubsection"],
-Cell[329689, 5969, 320, 6, 43, "Text"],
-Cell[330012, 5977, 340, 8, 84, "Input"],
-Cell[330355, 5987, 545, 14, 107, "Text"],
-Cell[330903, 6003, 315, 6, 43, "Text"],
-Cell[331221, 6011, 269, 6, 84, "Input"],
-Cell[331493, 6019, 125, 2, 53, "Input"]
+Cell[331911, 6015, 210, 3, 39, "Subsubsection"],
+Cell[332124, 6020, 856, 21, 144, "Text"],
+Cell[332983, 6043, 340, 8, 84, "Input"],
+Cell[333326, 6053, 726, 16, 203, "Text"],
+Cell[334055, 6071, 611, 12, 139, "Text"],
+Cell[334669, 6085, 269, 6, 84, "Input"],
+Cell[334941, 6093, 125, 2, 53, "Input"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[331655, 6026, 595, 9, 33, "Subsubsection"],
-Cell[332253, 6037, 407, 10, 107, "Text"],
-Cell[332663, 6049, 351, 10, 84, "Input"],
-Cell[333017, 6061, 470, 12, 139, "Text"],
-Cell[333490, 6075, 1936, 40, 264, "Input"]
+Cell[335103, 6100, 595, 9, 39, "Subsubsection"],
+Cell[335701, 6111, 407, 10, 107, "Text"],
+Cell[336111, 6123, 351, 10, 84, "Input"],
+Cell[336465, 6135, 702, 21, 149, "Text"],
+Cell[337170, 6158, 1936, 40, 264, "Input"],
+Cell[339109, 6200, 527, 13, 139, "Text"],
+Cell[339639, 6215, 468, 10, 139, "Text"],
+Cell[340110, 6227, 4111, 125, 664, "Input"]
 }, Closed]]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[335487, 6122, 269, 5, 72, "Section"],
+Cell[344282, 6359, 269, 5, 72, "Section"],
 Cell[CellGroupData[{
-Cell[335781, 6131, 198, 2, 60, "Subsection"],
-Cell[335982, 6135, 307, 8, 107, "Text"],
+Cell[344576, 6368, 198, 2, 60, "Subsection"],
+Cell[344777, 6372, 307, 8, 107, "Text"],
 Cell[CellGroupData[{
-Cell[336314, 6147, 627, 10, 39, "Subsubsection"],
-Cell[336944, 6159, 373, 12, 76, "Text"],
-Cell[337320, 6173, 552, 15, 84, "Input"],
-Cell[337875, 6190, 266, 8, 75, "Text"],
-Cell[338144, 6200, 338, 8, 114, "Input"]
+Cell[345109, 6384, 627, 10, 39, "Subsubsection"],
+Cell[345739, 6396, 373, 12, 76, "Text"],
+Cell[346115, 6410, 552, 15, 84, "Input"],
+Cell[346670, 6427, 266, 8, 75, "Text"],
+Cell[346939, 6437, 338, 8, 114, "Input"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[338519, 6213, 612, 8, 39, "Subsubsection"],
-Cell[339134, 6223, 739, 18, 172, "Text"],
-Cell[339876, 6243, 849, 21, 204, "Input"],
-Cell[340728, 6266, 383, 9, 108, "Text"]
-}, Closed]]
-}, Closed]],
-Cell[341138, 6279, 248, 3, 60, "Subsection"],
-Cell[CellGroupData[{
-Cell[341411, 6286, 293, 4, 52, "Subsection"],
-Cell[341707, 6292, 359, 6, 139, "Text"],
-Cell[342069, 6300, 296, 11, 75, "Text"],
-Cell[342368, 6313, 633, 16, 174, "Input"],
-Cell[343004, 6331, 175, 4, 75, "Text"],
-Cell[343182, 6337, 341, 8, 84, "Input"],
-Cell[343526, 6347, 275, 5, 107, "Text"],
-Cell[343804, 6354, 365, 9, 114, "Input"],
-Cell[344172, 6365, 245, 5, 84, "Input"]
-}, Closed]],
-Cell[344432, 6373, 189, 2, 60, "Subsection"]
-}, Closed]],
-Cell[CellGroupData[{
-Cell[344658, 6380, 152, 2, 72, "Section"],
-Cell[CellGroupData[{
-Cell[344835, 6386, 322, 6, 101, "Subsection"],
-Cell[345160, 6394, 242, 5, 107, "Text"],
-Cell[345405, 6401, 317, 8, 84, "Input"],
-Cell[345725, 6411, 143, 2, 53, "Input"],
-Cell[CellGroupData[{
-Cell[345893, 6417, 362, 5, 39, "Subsubsection"],
-Cell[346258, 6424, 796, 19, 139, "Text"],
-Cell[347057, 6445, 573, 9, 203, "Text"],
-Cell[347633, 6456, 758, 23, 84, "Input"],
-Cell[348394, 6481, 729, 20, 174, "Input"]
-}, Closed]],
-Cell[CellGroupData[{
-Cell[349160, 6506, 450, 6, 39, "Subsubsection"],
-Cell[349613, 6514, 749, 15, 107, "Text"],
-Cell[350365, 6531, 781, 14, 139, "Text"],
-Cell[351149, 6547, 1195, 32, 204, "Input"],
-Cell[352347, 6581, 417, 9, 107, "Text"],
-Cell[352767, 6592, 504, 8, 171, "Text"],
-Cell[353274, 6602, 333, 9, 43, "Text"],
-Cell[353610, 6613, 129, 2, 53, "Input"]
+Cell[347314, 6450, 612, 8, 39, "Subsubsection"],
+Cell[347929, 6460, 739, 18, 172, "Text"],
+Cell[348671, 6480, 849, 21, 204, "Input"],
+Cell[349523, 6503, 383, 9, 108, "Text"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[353788, 6621, 238, 3, 60, "Subsection"],
-Cell[CellGroupData[{
-Cell[354051, 6628, 382, 7, 39, "Subsubsection"],
-Cell[354436, 6637, 299, 8, 107, "Text"],
-Cell[354738, 6647, 391, 9, 107, "Text"]
+Cell[349955, 6518, 248, 3, 52, "Subsection"],
+Cell[350206, 6523, 300, 8, 107, "Text"],
+Cell[350509, 6533, 613, 8, 39, "Subsubsection"],
+Cell[351125, 6543, 611, 8, 33, "Subsubsection"],
+Cell[351739, 6553, 615, 8, 33, "Subsubsection"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[355166, 6661, 432, 7, 39, "Subsubsection"],
-Cell[355601, 6670, 483, 11, 139, "Text"],
-Cell[356087, 6683, 2204, 67, 324, "Input"],
-Cell[358294, 6752, 304, 8, 107, "Text"],
-Cell[358601, 6762, 258, 5, 84, "Input"],
-Cell[358862, 6769, 734, 14, 235, "Text"],
-Cell[359599, 6785, 1273, 27, 384, "Input"]
+Cell[352391, 6566, 293, 4, 52, "Subsection"],
+Cell[352687, 6572, 405, 7, 139, "Text"],
+Cell[353095, 6581, 358, 12, 75, "Text"],
+Cell[353456, 6595, 690, 16, 174, "Input"],
+Cell[354149, 6613, 175, 4, 75, "Text"],
+Cell[354327, 6619, 341, 8, 84, "Input"],
+Cell[354671, 6629, 436, 10, 107, "Text"],
+Cell[355110, 6641, 419, 10, 114, "Input"],
+Cell[355532, 6653, 245, 5, 84, "Input"]
+}, Closed]],
+Cell[355792, 6661, 189, 2, 52, "Subsection"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[356018, 6668, 152, 2, 72, "Section"],
+Cell[CellGroupData[{
+Cell[356195, 6674, 322, 6, 101, "Subsection"],
+Cell[356520, 6682, 242, 5, 107, "Text"],
+Cell[356765, 6689, 317, 8, 84, "Input"],
+Cell[357085, 6699, 143, 2, 53, "Input"],
+Cell[CellGroupData[{
+Cell[357253, 6705, 362, 5, 39, "Subsubsection"],
+Cell[357618, 6712, 864, 21, 171, "Text"],
+Cell[358485, 6735, 573, 9, 203, "Text"],
+Cell[359061, 6746, 758, 23, 84, "Input"],
+Cell[359822, 6771, 729, 20, 174, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[360588, 6796, 536, 9, 39, "Subsubsection"],
+Cell[361127, 6807, 749, 15, 139, "Text"],
+Cell[361879, 6824, 968, 21, 149, "Text"],
+Cell[362850, 6847, 649, 13, 75, "Text"],
+Cell[363502, 6862, 1195, 32, 324, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[364734, 6899, 508, 7, 39, "Subsubsection"],
+Cell[365245, 6908, 417, 9, 139, "Text"],
+Cell[365665, 6919, 504, 8, 203, "Text"],
+Cell[366172, 6929, 877, 23, 177, "Text"],
+Cell[367052, 6954, 209, 4, 107, "Text"],
+Cell[367264, 6960, 529, 14, 114, "Input"],
+Cell[367796, 6976, 547, 15, 140, "Text"]
 }, Closed]]
 }, Closed]],
-Cell[360899, 6816, 227, 3, 60, "Subsection"],
 Cell[CellGroupData[{
-Cell[361151, 6823, 161, 4, 52, "Subsection"],
-Cell[361315, 6829, 315, 9, 75, "Text"],
+Cell[368392, 6997, 238, 3, 52, "Subsection"],
 Cell[CellGroupData[{
-Cell[361655, 6842, 300, 4, 39, "Subsubsection"],
-Cell[361958, 6848, 429, 7, 107, "Text"],
-Cell[362390, 6857, 576, 17, 48, "Text"],
-Cell[362969, 6876, 705, 20, 80, "Text"],
-Cell[363677, 6898, 371, 8, 84, "Input"],
-Cell[364051, 6908, 167, 3, 43, "Text"],
-Cell[364221, 6913, 1872, 59, 174, "Input"]
+Cell[368655, 7004, 382, 7, 39, "Subsubsection"],
+Cell[369040, 7013, 346, 9, 107, "Text"],
+Cell[369389, 7024, 391, 9, 107, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[366130, 6977, 496, 8, 33, "Subsubsection"],
-Cell[366629, 6987, 342, 8, 75, "Text"],
-Cell[366974, 6997, 470, 12, 107, "Text"],
-Cell[367447, 7011, 1309, 34, 174, "Input"]
+Cell[369817, 7038, 432, 7, 39, "Subsubsection"],
+Cell[370252, 7047, 483, 11, 139, "Text"],
+Cell[370738, 7060, 2204, 67, 324, "Input"],
+Cell[372945, 7129, 304, 8, 107, "Text"],
+Cell[373252, 7139, 258, 5, 84, "Input"],
+Cell[373513, 7146, 734, 14, 235, "Text"],
+Cell[374250, 7162, 1273, 27, 384, "Input"]
+}, Closed]]
+}, Closed]],
+Cell[375550, 7193, 378, 7, 93, "Subsection"],
+Cell[375931, 7202, 377, 6, 93, "Subsection"],
+Cell[CellGroupData[{
+Cell[376333, 7212, 161, 4, 52, "Subsection"],
+Cell[376497, 7218, 315, 9, 75, "Text"],
+Cell[CellGroupData[{
+Cell[376837, 7231, 300, 4, 39, "Subsubsection"],
+Cell[377140, 7237, 477, 8, 139, "Text"],
+Cell[377620, 7247, 576, 17, 48, "Text"],
+Cell[378199, 7266, 705, 20, 112, "Text"],
+Cell[378907, 7288, 371, 8, 114, "Input"],
+Cell[379281, 7298, 167, 3, 75, "Text"],
+Cell[379451, 7303, 1872, 59, 234, "Input"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[368793, 7050, 367, 5, 33, "Subsubsection"],
-Cell[369163, 7057, 357, 9, 75, "Text"],
-Cell[369523, 7068, 832, 24, 144, "Input"],
-Cell[370358, 7094, 495, 12, 139, "Text"],
-Cell[370856, 7108, 430, 9, 84, "Input"]
+Cell[381360, 7367, 496, 8, 39, "Subsubsection"],
+Cell[381859, 7377, 342, 8, 107, "Text"],
+Cell[382204, 7387, 470, 12, 139, "Text"],
+Cell[382677, 7401, 1309, 34, 234, "Input"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[384023, 7440, 367, 5, 39, "Subsubsection"],
+Cell[384393, 7447, 692, 19, 109, "Text"],
+Cell[385088, 7468, 386, 7, 139, "Text"],
+Cell[385477, 7477, 855, 24, 144, "Input"],
+Cell[386335, 7503, 662, 15, 171, "Text"],
+Cell[387000, 7520, 430, 9, 84, "Input"]
 }, Closed]]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[371347, 7124, 247, 3, 72, "Section"],
-Cell[371597, 7129, 519, 11, 171, "Text"],
-Cell[372119, 7142, 914, 15, 331, "Text"]
+Cell[387491, 7536, 247, 3, 72, "Section"],
+Cell[387741, 7541, 576, 11, 139, "Text"],
+Cell[388320, 7554, 433, 8, 75, "Text"],
+Cell[388756, 7564, 559, 9, 139, "Text"],
+Cell[389318, 7575, 549, 9, 139, "Text"]
 }, Closed]]
 }, Open  ]]
 }

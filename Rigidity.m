@@ -41,9 +41,6 @@ u2=((p2[[1]]-p1[[1]])(p1[[2]]-p3[[2]])-(p2[[2]]-p1[[2]])(p1[[1]]-p3[[1]]))/((p4[
 (*   Rigidity Matrix Function *)
 
 
-Table[0,{0}]
-
-
 (* Fixed lattice matrix code *)
 (* if fixedperiodic is false how do we deal with z's?? *)
 (* convention for "lattice" columns agrees with papers *)
@@ -98,7 +95,7 @@ KLWinding[z_,latticep_,basis_,latticeE_,cycle_,t_]:=Module[{powmat,w1,w2,zz},
 powmat=RigidityMatrix[z,latticep,basis,latticeE];
 zz=Det[powmat]/.cycle;
 w1=NIntegrate[Im[D[Log[zz],t]],{t,0,2\[Pi]}];
-w1/(2\[Pi])
+-w1/(2\[Pi])
 ]
 
 
@@ -109,7 +106,7 @@ cycle=Table[z[k]->If[k!=j,cyclesorigin[[k]],Exp[I t]],{k,qdim}];
 zz=Det[powmat]/.cycle;
 NIntegrate[Im[D[Log[zz],t]],{t,0,2\[Pi]}]
 ,{j,qdim}];
-w/(2\[Pi])
+-w/(2\[Pi])
 ]
 
 
@@ -142,7 +139,7 @@ If[Length[peb]!=dim v-e,Print["wrong number of pebbles specified"];,
 pebrows=ConstraintRows[v,peb,template];
 If[MatrixRank[pebrows]<Length[peb],Print["pebble constraints not independent!"];,
 M=Join[R,pebrows];
-LinearSolve[M,ArrayFlatten[{{0},{IdentityMatrix[Length[peb]]}}]]]
+Transpose[LinearSolve[M,ArrayFlatten[{{Table[0,{Length[peb]},{Length[peb]}]},{IdentityMatrix[Length[peb]]}}]]]]
 ]]
 ]
 
@@ -159,7 +156,6 @@ Join[Table[0,{2pebloc-2}],perpvec,Table[0,{2v-2pebloc}]]
 ]*)
 
 
-
 (* Mode extraction / computation *)
 
 
@@ -167,7 +163,6 @@ Join[Table[0,{2pebloc-2}],perpvec,Table[0,{2v-2pebloc}]]
 infinitesimal2drotationmode[pos_,basis_:{},cent_:{0,0}]:=Module[{numparts=Length[pos],basisrot,posrot},
 posrot=Table[{(pos[[j,2]]-cent[[2]]),-(pos[[j,1]]-cent[[1]])},{j,numparts}];
 basisrot=Table[{basis[[j,2]],-basis[[j,1]]},{j,Length[basis]}];
-
 Join[Flatten[posrot],If[Length[basis]>0,
 Join[basisrot[[1]],
 basisrot[[2]]]
@@ -183,10 +178,8 @@ testrotk=infinitesimal2drotationmode[pos,basis];
 NullSpace[Join[pmtestk,{transx,transy,testrotk}]][[1]]]
 
 
-
-
-(* need this to be cromulent with MakePerLattice and MakePerLatticeEdges *)
-MakePerMotion[mode_,cover_,periodic_:False]:=Module[{dim=Length[cover],numparts,tabspec,m,ind},
+(* need this to be cromulent with CoveringFrameworkVerts and CoveringFrameworkEdges *)
+CoveringMotion[mode_,cover_,periodic_:False]:=Module[{dim=Length[cover],numparts,tabspec,m,ind},
 (* dim*number of particles + dim^2 = length of mode vector*)
 If[Mod[Length[mode],dim]!=0,Print["bad mode length"];Abort[]];
 numparts=(Length[mode]-dim^2)/dim; (* y then x *)
@@ -533,7 +526,6 @@ nextbondlist2=nextbondlist2[[1;;numnextbonds2]];
 ];
 
 
-
 (* getting boundary vertices *)
 
 
@@ -629,7 +621,7 @@ getatomindex2[Table[m[j],{j,qdim}],cellspec[[k,2]],cover,unitcellsize]
 
 
 (* make a list of vertex positions in any dimension *)
-MakePerLattice[unitcell_,latt_,cover_,r_:0]:=Module[{qdim=Length[latt],dim=Length[unitcell[[1]]],tabspec,m},
+CoveringFrameworkVerts[unitcell_,latt_,cover_,r_:0]:=Module[{qdim=Length[latt],dim=Length[unitcell[[1]]],tabspec,m},
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,qdim}];
 Flatten[
 Table[
@@ -642,7 +634,7 @@ qdim]
 
 
 (* this function was broken!!! *)
-MakePerLatticeEdges[edgedat_,cover_,periodic_:False]:=Module[{dim=Length[cover],ind1,ind2,p1,p2,a,m,numbonds=0,bondlist=Table[Null,{Length[edgedat](Times@@cover)}],lenedge=Length[edgedat],unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec,i},
+CoveringFrameworkEdges[edgedat_,cover_,periodic_:False]:=Module[{dim=Length[cover],ind1,ind2,p1,p2,a,m,numbonds=0,bondlist=Table[Null,{Length[edgedat](Times@@cover)}],lenedge=Length[edgedat],unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec,i},
 tabspec=Join[Table[{m[j],cover[[j]]},{j,dim}],{{i,lenedge}}];
 Do[(* loop over edges in edgedat, (i.e. copy an edge i into all cells m,n) *)
 {p1,p2}=edgedat[[i,1]];
@@ -784,9 +776,11 @@ Join[col,Table[Line[{p[[i]]+cellshift,p[[i]]+cellshift+nv[[3i-2;;3i]]}],{i,Lengt
 ]
 
 
-BandPlot[{zx_,zy_},poly_,xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},basis_:{{1,0},{0,1}}]:=Module[{qx,qy,b},
+reciprocbasis[qx_,qy_,basis_]:={qx,qy}.Inverse[basis];
 
-ContourPlot[Evaluate[(poly/.{zx->Exp[I qx],zy->Exp[I qy]})],
+BandPlot[{zx_,zy_},poly_,xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},basis_:{{1,0},{0,1}}]:=Module[{qx,qy,b,rec},
+ContourPlot[(* this seems to work, but I should rederive it to make sure... *)
+Evaluate[rec=reciprocbasis[qy,qx,LeviCivitaTensor[2].basis];(poly/.{zx->Exp[I rec[[1]]],zy->Exp[I rec[[2]]]})],
 {qx,xwind[[1]],xwind[[2]]},{qy,ywind[[1]],ywind[[2]]},MaxRecursion->Automatic]]
 
 
