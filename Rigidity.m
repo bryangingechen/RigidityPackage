@@ -263,11 +263,6 @@ d[[2loc+2]]=-(Sqrt[3]/4);,{j,Min[m+n-i,i]}];d]
 (*vertex positions*)
 
 
-(* triangular lattice in the form of rhombus *)
-TriLatticeRho[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{(*Mod[m+1/2.n,xx]*)m+1/2. n,Sqrt[3]/2. n}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
-(*triangular lattice in the form of rectangle *)
-TriLatticeRec[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{Mod[m+1/2. n,xx],Sqrt[3]/2. n}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
-
 (*square lattice*)
 SqLattice[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{m,n}+RandomReal[{-r,r},2],{m,0,xx-1},{n,0,yy-1}],1];
 
@@ -280,29 +275,27 @@ time=computeintersection[{m,0},\[Pi]/2+slopesx[[m+1]],{0,n},slopesy[[n+1]]];
 (* kagome in the form of a rhombus *)
 KagLatticeRho[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[Table[{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+RandomReal[{-r,r},2]+1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]},{i,3}],{m,1,xx},{n,0,yy-1}],2];
 
-makekaglatticerunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
-
 (* kagome in the form of a rectangle *)
 KagLatticeRec[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[Table[{m+1/2 Mod[n,2],Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],0]+1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]},{i,3}],{m,1,xx},{n,0,yy-1}],2];
 
-makekaglatticeunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[{Mod[m+1/2 n,xx],Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
+(* triangular lattice in the form of rhombus *)
+TriLatticeRho[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{(*Mod[m+1/2.n,xx]*)m+1/2. n,Sqrt[3]/2. n}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
+
+(*triangular lattice in the form of rectangle *)
+TriLatticeRec[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{Mod[m+1/2. n,xx],Sqrt[3]/2. n}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
 
 (* honeycomb in the form of a rectangle *)
 HoneycombLattice[xx_,yy_,r_:0]:=(* yy better be even? *) Module[{temp},temp=Flatten[Table[Table[If[((Mod[m+1/2 n,xx]==0)&&(i==1))||((Mod[m+1/2 n,xx]==xx-1/2)&&(i==2)),{},{Mod[m+1/2 n,xx],Sqrt[3]/2 n}+If[r>0,RandomReal[{-r,r},2],0]+(-1)^i /(2Sqrt[3]){Sqrt[3]/2,1/2}],{i,2}],{m,1,xx},{n,0,yy-1}],2];
 Replace[temp,x_List:>DeleteCases[x,{}],{0,Infinity}]
 ]
 
+makekaglatticerunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
+
+makekaglatticeunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[{Mod[m+1/2 n,xx],Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
+
 
 (* ::Subsection:: *)
 (*edge stuff*)
-
-
-(*Function to make edges for points in "lattice" closer than "dis" *)
-OverlapEdges[lattice_,dis_]:=Module[{l=Length[lattice]},
-Reap[Do[If[i!=j,
-If[Norm[lattice[[i,1;;2]]-lattice[[j,1;;2]]]<=dis,Sow[{i,j}]]
-],{i,l},{j,i,l}]][[2,1]]
-]
 
 
 (* return a list of pairs of vertices corresponding to edges, first list is NN, second list is NNN *)
@@ -328,7 +321,7 @@ nextbondlist=nextbondlist[[1;;numnextbonds]];
 {bondlist,nextbondlist,nextbondlistother}
 ];
 
-(* for rectangle only; not edited yet *)
+(* for rectangle only; finally fixed *)
 KagLatticeRecEdges[xx_,yy_]:=Module[{index=0,bondlist=Table[Null,{6xx*yy}],numbonds=0,nextbondlist=Table[Null,{3*(xx)*(yy)+xx+yy-2}],numnextbonds=0},
 Do[ (* loop over i from 1 to 3 *)
 index++; (* particle number *)
@@ -336,14 +329,28 @@ If[i==2,
 numbonds++; (* bond number *)
 bondlist[[numbonds]]={{index,index-1},{},1};
 If[(n>1),
+If[Mod[n,2]==0,
 numnextbonds++;
 nextbondlist[[numnextbonds]]={{index,index-4},{},1};
+];
 numbonds++;
-bondlist[[numbonds]]={{index,index-2},{},1};
+bondlist[[numbonds]]=If[Mod[n,2]==1,{{index,index-4},{},1},{{index,index-2},{},1}];
+If[(Mod[n,2]==0)&&(m<xx),
+numbonds++;
+bondlist[[numbonds]]={{index,index+3*yy-4},{},1};
+];
+If[(Mod[n,2]==1)&&(m>1),
+numbonds++;
+bondlist[[numbonds]]={{index,index-3*yy-2},{},1};
+];
 ];
 If[(m>1),
 numnextbonds++;
 nextbondlist[[numnextbonds]]={{index,index-3*yy+1},{},1};
+If[(Mod[n,2]==1)&&(n>1),
+numnextbonds++;
+nextbondlist[[numnextbonds]]={{index,index-3*yy-4},{},1};
+];
 ];
 ];
 If[i==3,
@@ -355,12 +362,14 @@ bondlist[[numbonds]]={{index,index-2},{},1};
 If[(i==1)&&(m>1),
 numbonds++;
 bondlist[[numbonds]]={{index,index-3*yy+2},{},1};
-If[(n<yy),
-numbonds++;
-bondlist[[numbonds]]={{index,index-3*yy+4},{},1};
+If[(n<yy)&&(Mod[n,2]==1),
 numnextbonds++;
 nextbondlist[[numnextbonds]]={{index,index-3*yy+5},{},1};
 ];
+];
+If[(i==1)&&(Mod[n,2]==0)&&(n<yy),
+numnextbonds++;
+nextbondlist[[numnextbonds]]={{index,index+5},{},1};
 ];
 ,{m,xx},{n,yy},{i,3}];
 bondlist=bondlist[[1;;numbonds]];
@@ -600,8 +609,7 @@ list=Table[
 Flatten[Table[
 (*parts[[2k-1]]+=Length[cellspec[[k,1]]];*)
 getatomindex2[Table[m[j],{j,qdim}],cellspec[[k,1]],cover,unitcellsize]
-,##]&@@tabspec]
-,
+,##]&@@tabspec],
 tabspec=Table[If[i!=k,{m[i],cover[[i]]},
 {m[k],cover[[k]],cover[[k]]}],{i,qdim}];
 Flatten[Table[
@@ -609,8 +617,7 @@ Flatten[Table[
 getatomindex2[Table[m[j],{j,qdim}],cellspec[[k,2]],cover,unitcellsize]
 ,##]&@@tabspec]
 }
-,{k,qdim}]
-(*{list,parts}*)
+,{k,qdim}](*{list,parts}*)
 ]
 
 
@@ -624,8 +631,7 @@ If[Length[basis]==0,
 Reap[Do[If[i!=j,
 If[Norm[pos[[i]]-pos[[j]]]<=dis,
 Sow[{{i,j},{},1}]]
-],{i,numverts},{j,i,numverts}]][[2,1]]
-,
+],{i,numverts},{j,i,numverts}]][[2,1]],
 cover=If[Depth[maxwinding]==1,Table[maxwinding,{qdim}],maxwinding];
 tabspec=Table[{m[i],-cover[[i]],cover[[i]]},{i,qdim}];
 Reap[Do[If[i!=j,
@@ -636,17 +642,6 @@ Sow[{{i,j},Table[m[k],{k,qdim}],1}]],
 ],{i,numverts},{j,i,numverts}]][[2,1]]
 ]
 ]
-
-(* this takes a list of vertex positions, puts periodic boundary conditions with lattice vectors l1, l2 on it, and creates an edge for every pair of vertices that is closer than "dis", generates a list suitable for use in PeriodicRigidityMatrix as E *)
-(* Obviously, l1 and l2 are VECTORS *)
-(*makeperiodicgraph[lattice_,dis_,{l1_,l2_}]:=Module[{l=Length[lattice]},
-Reap[Do[If[i\[NotEqual]j,
-Do[
-If[Norm[lattice[[i,1;;2]]-lattice[[j,1;;2]]+t1 l1+t2 l2]\[LessEqual]dis,Sow[{i,j,t1,t2}]],
-{t1,-1,1},{t2,-1,1}]
-],{i,l},{j,i,l}]][[2,1]]
-]
-*)
 
 
 (* make a list of vertex positions in any dimension *)
@@ -674,7 +669,6 @@ ind2=getatomindex2[Table[Mod[m[j]+a[[j]],cover[[j]],1],{j,dim}],p2,cover,unitcel
 cellchange=Table[
 (* ceiling -1 because we need right endpoint *)
 Ceiling[(m[j]+a[[j]])/cover[[j]]-1],{j,dim}];
-
 If[periodic||(cellchange==Table[0,{dim}]),
 numbonds++;
 bondlist[[numbonds]]={{ind1,ind2},cellchange,1}
