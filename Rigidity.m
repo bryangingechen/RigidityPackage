@@ -1,14 +1,8 @@
 (* ::Package:: *)
 
-(******************************************************************************
- *                                                                            *
- *    Rigidity and stuff                                                      *
- *                                                                            *
- *    Bryan Gin-ge Chen, August 2014                                          *
- *                                                                            *
- *                                                                            *
- ******************************************************************************)
-
+(* ::Section:: *)
+(*Rigidity and stuff*)
+(*Bryan Gin-ge Chen, August 2014*)
 
 
 BeginPackage["Rigidity`"]
@@ -16,7 +10,8 @@ BeginPackage["Rigidity`"]
 Begin["Global`"]
 
 
-(*   Internal utilities *)
+(* ::Section:: *)
+(*Internal utilities*)
 
 
 getatomindex[m_,n_,ind_,xx_,yy_,size_]:=(size yy(m-1)+size (n-1)+ind)
@@ -38,7 +33,8 @@ u2=((p2[[1]]-p1[[1]])(p1[[2]]-p3[[2]])-(p2[[2]]-p1[[2]])(p1[[1]]-p3[[1]]))/((p4[
 ]
 
 
-(*   Rigidity Matrix Function *)
+(* ::Section:: *)
+(*Rigidity Matrix Functions*)
 
 
 (* Fixed lattice matrix code *)
@@ -49,7 +45,7 @@ RigidityMatrix[z_,posns_,basis_,edgedat_,fixedperiodic_:False]:=Module[{numbonds
 SparseArray[Flatten[Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
 kb=1;(*edgedat[[j,3]];*)
-edatExtend=Join[edgedat[[j,2]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
+edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
 lattchange=If[qdim>0,edatExtend.basis,0];
 zm=Product[z[[k]]^edatExtend[[k]],{k,qdim}];
 ebond=-posns[[part1]]+(posns[[part2]]+lattchange); (* sign convention from malestein theran *)
@@ -73,7 +69,7 @@ EdgeLengthsSq[posns_,basis_,edgedat_]:=Module[{part1,part2,kb,lattchange,qdim=Le
 Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
 kb=edgedat[[j,3]];
-edatExtend=Join[edgedat[[j,2]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
+edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
 lattchange=If[qdim>0,edatExtend.basis,0];
 ebond=-posns[[part1]]+(posns[[part2]]+lattchange); (* sign convention from malestein theran *)
 Norm[ebond]^2
@@ -84,7 +80,7 @@ Norm[ebond]^2
 NetDipole[posns_,basis_,edgedat_]:=Module[{vertcont,edgecont,dim=Length[posns[[1]]],qdim=Length[basis],nsp=NullSpace[basis],edatExtend},
 vertcont=dim(Sum[posns[[j]],{j,Length[posns]}]);
 edgecont=Sum[
-edatExtend=Join[edgedat[[j,2]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
+edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
 (posns[[edgedat[[j,1,1]]]]+posns[[edgedat[[j,1,2]]]]+edatExtend.basis)/2
 ,{j,Length[edgedat]}];
 (Inverse[Transpose[Join[basis,nsp]]].(vertcont-edgecont))[[1;;qdim]]
@@ -110,7 +106,8 @@ NIntegrate[Im[D[Log[zz],t]],{t,0,2\[Pi]}]
 ]
 
 
-(* pebble game related stuff *)
+(* ::Section:: *)
+(*Constraints and Pebble related*)
 
 
 ConstraintRows[numverts_,pinnedverts_,template_]:=Module[{dim=Length[template[[1]]]},
@@ -156,7 +153,8 @@ Join[Table[0,{2pebloc-2}],perpvec,Table[0,{2v-2pebloc}]]
 ]*)
 
 
-(* Mode extraction / computation *)
+(* ::Section:: *)
+(*Mode extraction / computation*)
 
 
 (* give infinitesimal mode corresponding to CCW rotation about cent *)
@@ -169,6 +167,11 @@ basisrot[[2]]]
 ,{}
 ]]
 ]
+
+infinitesimalrotation[origin_,posns_]:=Module[{diff},
+Flatten[Table[
+diff=posns[[j]]-origin;
+{-diff[[2]],diff[[1]]},{j,Length[posns]}]]]
 
 getnontriv2D[pos_,basis_,edgedat_]:=Module[{pmtestk,testrotk,transx,transy,numatoms=Length[pos]},
 pmtestk=Normal[RigidityMatrix[{1,1},pos,basis,edgedat,True]];
@@ -211,7 +214,7 @@ matB=Lap[[dinter,cinter]];
 matC=Lap[[dinter,dinter]];
 If[Det[matC]==0,
 Print["Rank deficient; system is floppy"];,
-fI=-Inverse[matC].matB.u;
+fI=-Inverse[matC].matB.u; (* Schur complement *)
 ans=Table[0,{2l}];
 Do[ans[[dinter[[j]]]]=fI[[j]];,{j,Length[fI]}];
 Do[ans[[cinter[[j]]]]=u[[j]];,{j,Length[u]}];
@@ -227,45 +230,37 @@ matA=Lap[[cinter,cinter]];
 matB=Lap[[cinter,dinter]];
 matC=Lap[[dinter,cinter]];
 matD=Lap[[dinter,dinter]];
-matA-matB.Inverse[matD].matC
+matA-matB.Inverse[matD].matC (* Schur complement *)
 ]
 
 
-(*Function to make edges for points in "lattice" closer than "dis" *)
-DiskGraphEdges[pos_,dis_,basis_:{},maxwinding_:1]:=Module[{numverts=Length[pos],qdim=Length[basis],tabspec,m,cover},
-If[Length[basis]==0,
-Reap[Do[If[i!=j,
-If[Norm[pos[[i]]-pos[[j]]]<=dis,
-Sow[{{i,j},{},1}]]
-],{i,numverts},{j,i,numverts}]][[2,1]]
-,
-cover=If[Depth[maxwinding]==1,Table[maxwinding,{qdim}],maxwinding];
-tabspec=Table[{m[i],-cover[[i]],cover[[i]]},{i,qdim}];
-Reap[Do[If[i!=j,
-Do[
-If[Norm[pos[[i]]-pos[[j]]-Sum[basis[[k]]*m[k],{k,qdim}]]<=dis,
-Sow[{{i,j},Table[m[k],{k,qdim}],1}]],
-##]&@@tabspec
-],{i,numverts},{j,i,numverts}]][[2,1]]
-]
-]
-
-(* this takes a list of vertex positions, puts periodic boundary conditions with lattice vectors l1, l2 on it, and creates an edge for every pair of vertices that is closer than "dis", generates a list suitable for use in PeriodicRigidityMatrix as E *)
-(* Obviously, l1 and l2 are VECTORS *)
-(*makeperiodicgraph[lattice_,dis_,{l1_,l2_}]:=Module[{l=Length[lattice]},
-Reap[Do[If[i\[NotEqual]j,
-Do[
-If[Norm[lattice[[i,1;;2]]-lattice[[j,1;;2]]+t1 l1+t2 l2]\[LessEqual]dis,Sow[{i,j,t1,t2}]],
-{t1,-1,1},{t2,-1,1}]
-],{i,l},{j,i,l}]][[2,1]]
-]
-*)
+(*pos slope, zero slope, neg slope line-localized modes for untwisted kagome*)
+poslinemode[i_,m_,n_]:=Module[{d=Table[0,{6m n}],loc},
+Do[loc=3n(i-1)+3(j-1)+2;
+d[[2loc-1]]=3/4;
+d[[2loc]]=Sqrt[3]/4;
+d[[2loc+1]]=0;
+d[[2loc+2]]=Sqrt[3]/2;,{j,n}];d]
+zerolinemode[i_,m_,n_]:=Module[{d=Table[0,{6m n}],loc},
+Do[loc=3(i-1)+3n(j-1)+1;
+d[[2loc-1]]=-(3/4);
+d[[2loc]]=-(Sqrt[3]/4);
+d[[2loc+3]]=-(3/4);
+d[[2loc+4]]=Sqrt[3]/4;,{j,m}];d]
+neglinemode[i_,m_,n_]:=Module[{d=Table[0,{6m n}],loc},
+Do[loc=If[i<m+n-i,3(i-1)+3(n-1)(j-1)+1,3m n-3(m+n-i)-3(n-1)(j-1)+1];
+d[[2loc-1]]=0;
+d[[2loc]]=-(Sqrt[3]/2);
+d[[2loc+1]]=3/4;
+d[[2loc+2]]=-(Sqrt[3]/4);,{j,Min[m+n-i,i]}];d]
 
 
-(*   Some basic 2D lattices         *)
+(* ::Section:: *)
+(*Some basic 2 D lattices*)
 
 
-(* vertex positions *)
+(* ::Subsection:: *)
+(*vertex positions*)
 
 
 (* triangular lattice in the form of rhombus *)
@@ -276,7 +271,7 @@ TriLatticeRec[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{Mod[m+1/2. 
 (*square lattice*)
 SqLattice[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{m,n}+RandomReal[{-r,r},2],{m,0,xx-1},{n,0,yy-1}],1];
 
-SqlatticeSlopes[xx_,yy_,r_:0]:=(* yy better be even? *) Module[{slopesx=RandomReal[{-r,r},xx],slopesy=RandomReal[{-r,r},yy],time},
+SqLatticeSlopes[xx_,yy_,r_:0]:=(* yy better be even? *) Module[{slopesx=RandomReal[{-r,r},xx],slopesy=RandomReal[{-r,r},yy],time},
 Flatten[Table[
 time=computeintersection[{m,0},\[Pi]/2+slopesx[[m+1]],{0,n},slopesy[[n+1]]];
 {0,n}+time [[2]]{Cos[slopesy[[n+1]]],Sin[slopesy[[n+1]]]}
@@ -298,7 +293,8 @@ Replace[temp,x_List:>DeleteCases[x,{}],{0,Infinity}]
 ]
 
 
-(* edge stuff *)
+(* ::Subsection:: *)
+(*edge stuff*)
 
 
 (*Function to make edges for points in "lattice" closer than "dis" *)
@@ -315,16 +311,16 @@ Do[
 index++;
 If[n>1,
 numbonds++;
-bondlist[[numbonds]]={index,index-1};
+bondlist[[numbonds]]={{index,index-1},{},1};
 ];
 If[m>1,
 numbonds++;
-bondlist[[numbonds]]={index,index-yy};
+bondlist[[numbonds]]={{index,index-yy},{},1};
 ];
 If[(m>1)&&(n>1),
 numnextbonds++;
-nextbondlist[[numnextbonds]]={index,index-yy-1};
-nextbondlistother[[numnextbonds]]={index-1,index-yy}
+nextbondlist[[numnextbonds]]={{index,index-yy-1},{},1};
+nextbondlistother[[numnextbonds]]={{index-1,index-yy},{},1};
 ];
 ,{m,xx},{n,yy}];
 bondlist=bondlist[[1;;numbonds]];
@@ -333,37 +329,37 @@ nextbondlist=nextbondlist[[1;;numnextbonds]];
 ];
 
 (* for rectangle only; not edited yet *)
-KagRecEdges[xx_,yy_]:=Module[{index=0,bondlist=Table[Null,{6xx*yy}],numbonds=0,nextbondlist=Table[Null,{3*(xx)*(yy)+xx+yy-2}],numnextbonds=0},
+KagLatticeRecEdges[xx_,yy_]:=Module[{index=0,bondlist=Table[Null,{6xx*yy}],numbonds=0,nextbondlist=Table[Null,{3*(xx)*(yy)+xx+yy-2}],numnextbonds=0},
 Do[ (* loop over i from 1 to 3 *)
 index++; (* particle number *)
 If[i==2,
 numbonds++; (* bond number *)
-bondlist[[numbonds]]={index,index-1};
+bondlist[[numbonds]]={{index,index-1},{},1};
 If[(n>1),
 numnextbonds++;
-nextbondlist[[numnextbonds]]={index,index-4};
+nextbondlist[[numnextbonds]]={{index,index-4},{},1};
 numbonds++;
-bondlist[[numbonds]]={index,index-2};
+bondlist[[numbonds]]={{index,index-2},{},1};
 ];
 If[(m>1),
 numnextbonds++;
-nextbondlist[[numnextbonds]]={index,index-3*yy+1};
+nextbondlist[[numnextbonds]]={{index,index-3*yy+1},{},1};
 ];
 ];
 If[i==3,
 numbonds++;
-bondlist[[numbonds]]={index,index-1};
+bondlist[[numbonds]]={{index,index-1},{},1};
 numbonds++;
-bondlist[[numbonds]]={index,index-2};
+bondlist[[numbonds]]={{index,index-2},{},1};
 ];
 If[(i==1)&&(m>1),
 numbonds++;
-bondlist[[numbonds]]={index,index-3*yy+2};
+bondlist[[numbonds]]={{index,index-3*yy+2},{},1};
 If[(n<yy),
 numbonds++;
-bondlist[[numbonds]]={index,index-3*yy+4};
+bondlist[[numbonds]]={{index,index-3*yy+4},{},1};
 numnextbonds++;
-nextbondlist[[numnextbonds]]={index,index-3*yy+5};
+nextbondlist[[numnextbonds]]={{index,index-3*yy+5},{},1};
 ];
 ];
 ,{m,xx},{n,yy},{i,3}];
@@ -378,32 +374,32 @@ Do[
 index++;
 If[i==2,
 numbonds++;
-bondlist[[numbonds]]={index,index-1};
+bondlist[[numbonds]]={{index,index-1},{},1};
 If[(n>1),
 numnextbonds++;
-nextbondlist[[numnextbonds]]={index,index-4};
+nextbondlist[[numnextbonds]]={{index,index-4},{},1};
 numbonds++;
-bondlist[[numbonds]]={index,index-2};
+bondlist[[numbonds]]={{index,index-2},{},1};
 ];
 If[(m>1),
 numnextbonds++;
-nextbondlist[[numnextbonds]]={index,index-3*yy+1};
+nextbondlist[[numnextbonds]]={{index,index-3*yy+1},{},1};
 ];
 ];
 If[i==3,
 numbonds++;
-bondlist[[numbonds]]={index,index-1};
+bondlist[[numbonds]]={{index,index-1},{},1};
 numbonds++;
-bondlist[[numbonds]]={index,index-2};
+bondlist[[numbonds]]={{index,index-2},{},1};
 ];
 If[(i==1)&&(m>1),
 numbonds++;
-bondlist[[numbonds]]={index,index-3*yy+2};
+bondlist[[numbonds]]={{index,index-3*yy+2},{},1};
 If[(n<yy),
 numbonds++;
-bondlist[[numbonds]]={index,index-3*yy+4};
+bondlist[[numbonds]]={{index,index-3*yy+4},{},1};
 numnextbonds++;
-nextbondlist[[numnextbonds]]={index,index-3*yy+5};
+nextbondlist[[numnextbonds]]={{index,index-3*yy+5},{},1};
 ];
 ];
 ,{m,xx},{n,yy},{i,3}];
@@ -526,7 +522,8 @@ nextbondlist2=nextbondlist2[[1;;numnextbonds2]];
 ];
 
 
-(* getting boundary vertices *)
+(* ::Subsection:: *)
+(*getting boundary vertices*)
 
 
 (* returns list of ordered pairs of vertex indices {vertex that pebble is on, vertex that outgoing edge points to} *)
@@ -617,7 +614,39 @@ getatomindex2[Table[m[j],{j,qdim}],cellspec[[k,2]],cover,unitcellsize]
 ]
 
 
-(* Making new lattices from old *)
+(* ::Section:: *)
+(*Making new lattices from scratch and from old*)
+
+
+(*Function to make edges for points in "lattice" closer than "dis" *)
+DiskGraphEdges[pos_,dis_,basis_:{},maxwinding_:1]:=Module[{numverts=Length[pos],qdim=Length[basis],tabspec,m,cover},
+If[Length[basis]==0,
+Reap[Do[If[i!=j,
+If[Norm[pos[[i]]-pos[[j]]]<=dis,
+Sow[{{i,j},{},1}]]
+],{i,numverts},{j,i,numverts}]][[2,1]]
+,
+cover=If[Depth[maxwinding]==1,Table[maxwinding,{qdim}],maxwinding];
+tabspec=Table[{m[i],-cover[[i]],cover[[i]]},{i,qdim}];
+Reap[Do[If[i!=j,
+Do[
+If[Norm[pos[[i]]-pos[[j]]-Sum[basis[[k]]*m[k],{k,qdim}]]<=dis,
+Sow[{{i,j},Table[m[k],{k,qdim}],1}]],
+##]&@@tabspec
+],{i,numverts},{j,i,numverts}]][[2,1]]
+]
+]
+
+(* this takes a list of vertex positions, puts periodic boundary conditions with lattice vectors l1, l2 on it, and creates an edge for every pair of vertices that is closer than "dis", generates a list suitable for use in PeriodicRigidityMatrix as E *)
+(* Obviously, l1 and l2 are VECTORS *)
+(*makeperiodicgraph[lattice_,dis_,{l1_,l2_}]:=Module[{l=Length[lattice]},
+Reap[Do[If[i\[NotEqual]j,
+Do[
+If[Norm[lattice[[i,1;;2]]-lattice[[j,1;;2]]+t1 l1+t2 l2]\[LessEqual]dis,Sow[{i,j,t1,t2}]],
+{t1,-1,1},{t2,-1,1}]
+],{i,l},{j,i,l}]][[2,1]]
+]
+*)
 
 
 (* make a list of vertex positions in any dimension *)
@@ -639,7 +668,7 @@ tabspec=Join[Table[{m[j],cover[[j]]},{j,dim}],{{i,lenedge}}];
 Do[(* loop over edges in edgedat, (i.e. copy an edge i into all cells m,n) *)
 {p1,p2}=edgedat[[i,1]];
 (*a=edgedat[[i,2]];*)
-a=Join[edgedat[[i,2]],Table[0,{dim-Length[edgedat[[i,2]]]}]];
+a=Join[edgedat[[i,2,1;;Min[Length[edgedat[[i,2]]],dim]]],Table[0,{dim-Length[edgedat[[i,2]]]}]];
 ind1=getatomindex2[Table[m[j],{j,dim}],p1,cover,unitcellsize];
 ind2=getatomindex2[Table[Mod[m[j]+a[[j]],cover[[j]],1],{j,dim}],p2,cover,unitcellsize];
 cellchange=Table[
@@ -687,7 +716,8 @@ Join[botE,topE+Max[botE],connectors]
 glueverts[botV_,topV_,vec_]:=Join[botV,topV+Table[vec,{Length[topV]}]]
 
 
-(* Graphics functions *)
+(* ::Section:: *)
+(*Graphics functions*)
 
 
 Draw2DFramework[p_,E_,pointstyle_:{},linestyle_:{}]:=Module[{e=Length[E]},
@@ -701,7 +731,7 @@ Graphics[
 Table[
 cellshift=Sum[m[i]*basis[[i]],{i,dim}];
 {Join[linestyle,Table[
-edatExtend=Join[E[[j,2]],Table[0,{dim-Length[E[[j,2]]]}]];
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
 Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]]}
 ,##]&@@tabspec
@@ -720,7 +750,7 @@ Graphics[
 Table[
 cellshift=Sum[m[i]*basis[[i]],{i,dim}];
 {Join[linestyle,Table[
-edatExtend=Join[E[[j,2]],Table[0,{dim-Length[E[[j,2]]]}]];
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
 Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]],
 Join[col,Table[Line[{p[[i]]+cellshift,p[[i]]+cellshift+nv[[2i-1;;2i]]}],{i,Length[p]}]]
@@ -745,7 +775,7 @@ Graphics3D[
 Table[
 cellshift=Sum[m[i]*basis[[i]],{i,dim}];
 {Join[linestyle,Table[
-edatExtend=Join[E[[j,2]],Table[0,{dim-Length[E[[j,2]]]}]];
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
 Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]]}
 ,##]&@@tabspec
@@ -766,7 +796,7 @@ Graphics3D[
 Table[
 cellshift=Sum[m[i]*basis[[i]],{i,dim}];
 {Join[linestyle,Table[
-edatExtend=Join[E[[j,2]],Table[0,{dim-Length[E[[j,2]]]}]];
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
 Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]],
 Join[col,Table[Line[{p[[i]]+cellshift,p[[i]]+cellshift+nv[[3i-2;;3i]]}],{i,Length[p]}]]
@@ -780,8 +810,13 @@ reciprocbasis[qx_,qy_,basis_]:={qx,qy}.Inverse[basis];
 
 BandPlot[{zx_,zy_},poly_,xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},basis_:{{1,0},{0,1}}]:=Module[{qx,qy,b,rec},
 ContourPlot[(* this seems to work, but I should rederive it to make sure... *)
+(* checked with Jayson, we had to reverse qx, qy because vectors get relabeled after 90 degree rotation *)
 Evaluate[rec=reciprocbasis[qy,qx,LeviCivitaTensor[2].basis];(poly/.{zx->Exp[I rec[[1]]],zy->Exp[I rec[[2]]]})],
 {qx,xwind[[1]],xwind[[2]]},{qy,ywind[[1]],ywind[[2]]},MaxRecursion->Automatic]]
+
+
+(* ::Section:: *)
+(*End*)
 
 
 End[];
