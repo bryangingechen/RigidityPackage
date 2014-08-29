@@ -114,6 +114,13 @@ ConstraintRows[numverts_,pinnedverts_,template_]:=Module[{dim=Length[template[[1
 Table[Flatten[Table[If[k==pinnedverts[[j]],template[[j]],Table[0,{dim}]],{k,numverts}]],{j,Length[pinnedverts]}]]
 
 
+PinnedRows[numverts_,verts_,dim_]:=Module[{unitvec},
+Flatten[Table[
+unitvec=Table[UnitVector[dim,k],{Length[verts]}];
+ConstraintRows[numverts,verts,unitvec],
+{k,dim}],1]]
+
+
 (* create basis for zero modes localized on certain vertices *)
 (* pebble basis generator;
 peb is a list of ordered pairs of vertex indices {vertex that pebble is on, vertex that outgoing edge points to} *)
