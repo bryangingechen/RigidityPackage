@@ -722,7 +722,22 @@ glueverts[botV_,topV_,vec_]:=Join[botV,topV+Table[vec,{Length[topV]}]]
 
 
 Draw2DFramework[p_,E_,pointstyle_:{},linestyle_:{}]:=Module[{e=Length[E]},
-Graphics[{Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]]}]]
+Graphics[{
+Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
+Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]]
+}]]
+
+
+Draw2DFrameworkStress[p_,E_,stress_,mthick_:.01,colors_:{Purple,Orange}]:=Module[{e=Length[E],nstr=mthick stress/Max[Abs[stress]]},
+Graphics[{Table[{If[nstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[nstr[[j]]]],Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}]},{j,e}]}]]
+
+
+Draw2DFrameworkMode[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E]},
+Graphics[{
+Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
+Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
+Join[col,Table[Line[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{i,Length[p]}]]
+}]]
 
 
 DrawPeriodic2DFramework[p_,basis_,E_,copies_:{},pointstyle_:{},linestyle_:{}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
@@ -740,8 +755,17 @@ Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]]}
 ]
 
 
-Draw2DFrameworkMode[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E]},
-Graphics[{Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],Join[col,Table[Line[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{i,Length[p]}]]}]]
+DrawPeriodic2DFrameworkStress[p_,basis_,E_,stress_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=Module[{e=Length[E],nstr=mthick stress/Max[Abs[stress]],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics[
+Table[
+cellshift=Sum[m[i]*basis[[i]],{i,dim}];
+Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+{If[nstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[nstr[[j]]]],Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}]},{j,e}]
+,##]&@@tabspec
+]]
 
 
 DrawPeriodic2DFrameworkMode[p_,basis_,E_,nv_,copies_:{},pointstyle_:{},linestyle_:{},col_:Red]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
@@ -761,12 +785,28 @@ Join[col,Table[Line[{p[[i]]+cellshift,p[[i]]+cellshift+nv[[2i-1;;2i]]}],{i,Lengt
 ]
 
 
-Draw2DFrameworkStress[p_,E_,stress_,mthick_:.01,colors_:{Purple,Orange}]:=Module[{e=Length[E],nstr=mthick stress/Max[Abs[stress]]},
-Graphics[{Table[{If[nstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[nstr[[j]]]],Line[{p[[E[[j,1]]]],p[[E[[j,2]]]]}]},{j,e}]}]]
-
-
 Draw3DFramework[p_,E_,pointstyle_:{},linestyle_:{}]:=Module[{e=Length[E]},
-Graphics3D[{Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]]}]]
+Graphics3D[{
+Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
+Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]]
+}]]
+
+
+Draw3DFrameworkStress[p_,E_,stress_,mthick_:.01,colors_:{Purple,Orange}]:=Module[{e=Length[E],nstr=mthick stress/Max[Abs[stress]]},
+Graphics3D[{
+Table[{
+If[nstr[[j]]>0,colors[[1]],colors[[2]]],
+AbsoluteThickness[Abs[nstr[[j]]]],
+Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}]},{j,e}]
+}]]
+
+
+Draw3DFrameworkMode[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E]},
+Graphics3D[{
+Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
+Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
+Join[col,Table[Line[{p[[i]],p[[i]]+nv[[3i-2;;3i]]}],{i,Length[p]}]]
+}]]
 
 
 DrawPeriodic3DFramework[p_,basis_,E_,copies_:{},pointstyle_:{},linestyle_:{}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
@@ -784,10 +824,17 @@ Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]]}
 ]
 
 
-Draw3DFrameworkMode[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E]},
-Graphics3D[{Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
-Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
-Join[col,Table[Line[{p[[i]],p[[i]]+nv[[3i-2;;3i]]}],{i,Length[p]}]]}]]
+DrawPeriodic3DFrameworkStress[p_,basis_,E_,stress_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=Module[{e=Length[E],nstr=mthick stress/Max[Abs[stress]],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics3D[
+Table[
+cellshift=Sum[m[i]*basis[[i]],{i,dim}];
+Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+{If[nstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[nstr[[j]]]],Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}]},{j,e}]
+,##]&@@tabspec
+]]
 
 
 DrawPeriodic3DFrameworkMode[p_,basis_,E_,nv_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
@@ -809,11 +856,11 @@ Join[col,Table[Line[{p[[i]]+cellshift,p[[i]]+cellshift+nv[[3i-2;;3i]]}],{i,Lengt
 
 reciprocbasis[qx_,qy_,basis_]:={qx,qy}.Inverse[basis];
 
-BandPlot[{zx_,zy_},poly_,xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},basis_:{{1,0},{0,1}}]:=Module[{qx,qy,b,rec},
+BandPlot[{zx_,zy_},poly_,basis_:{{1,0},{0,1}},xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},opts_:{MaxRecursion->Automatic}]:=Module[{qx,qy,b,rec},
 ContourPlot[(* this seems to work, but I should rederive it to make sure... *)
 (* checked with Jayson, we had to reverse qx, qy because vectors get relabeled after 90 degree rotation *)
 Evaluate[rec=reciprocbasis[qy,qx,LeviCivitaTensor[2].basis];(poly/.{zx->Exp[I rec[[1]]],zy->Exp[I rec[[2]]]})],
-{qx,xwind[[1]],xwind[[2]]},{qy,ywind[[1]],ywind[[2]]},MaxRecursion->Automatic]]
+{qx,xwind[[1]],xwind[[2]]},{qy,ywind[[1]],ywind[[2]]},opts]]
 
 
 (* ::Section:: *)
