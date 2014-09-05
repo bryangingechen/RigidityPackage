@@ -271,7 +271,7 @@ d[[2loc+2]]=-(Sqrt[3]/4);,{j,Min[m+n-i,i]}];d]
 
 
 (*square lattice*)
-SqLattice[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{m,n}+RandomReal[{-r,r},2],{m,0,xx-1},{n,0,yy-1}],1];
+SqLattice[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{m,n}+If[r>0,RandomReal[{-r,r},2],{0,0}],{m,0,xx-1},{n,0,yy-1}],1];
 
 SqLatticeSlopes[xx_,yy_,r_:0]:=(* yy better be even? *) Module[{slopesx=RandomReal[{-r,r},xx],slopesy=RandomReal[{-r,r},yy],time},
 Flatten[Table[
@@ -280,25 +280,25 @@ time=computeintersection[{m,0},\[Pi]/2+slopesx[[m+1]],{0,n},slopesy[[n+1]]];
 ,{m,0,xx-1},{n,0,yy-1}],1]];
 
 (* kagome in the form of a rhombus *)
-KagLatticeRho[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[Table[{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+RandomReal[{-r,r},2]+1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]},{i,3}],{m,1,xx},{n,0,yy-1}],2];
+KagLatticeRho[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[Table[{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],{0,0}]+1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]},{i,3}],{m,1,xx},{n,0,yy-1}],2];
 
 (* kagome in the form of a rectangle *)
-KagLatticeRec[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[Table[{m+1/2 Mod[n,2],Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],0]+1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]},{i,3}],{m,1,xx},{n,0,yy-1}],2];
+KagLatticeRec[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[Table[{m+1/2 Mod[n,2],Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],{0,0}]+1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]},{i,3}],{m,1,xx},{n,0,yy-1}],2];
 
 (* triangular lattice in the form of rhombus *)
-TriLatticeRho[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{(*Mod[m+1/2.n,xx]*)m+1/2. n,Sqrt[3]/2. n}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
+TriLatticeRho[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{(*Mod[m+1/2.n,xx]*)m+1/2. n,Sqrt[3]/2. n}+If[r>0,RandomReal[{-r,r},2],{0,0}],{m,1,xx},{n,0,yy-1}],1];
 
 (*triangular lattice in the form of rectangle *)
-TriLatticeRec[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{Mod[m+1/2. n,xx],Sqrt[3]/2. n}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
+TriLatticeRec[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{Mod[m+1/2. n,xx],Sqrt[3]/2. n}+If[r>0,RandomReal[{-r,r},2],{0,0}],{m,1,xx},{n,0,yy-1}],1];
 
 (* honeycomb in the form of a rectangle *)
-HoneycombLattice[xx_,yy_,r_:0]:=(* yy better be even? *) Module[{temp},temp=Flatten[Table[Table[If[((Mod[m+1/2 n,xx]==0)&&(i==1))||((Mod[m+1/2 n,xx]==xx-1/2)&&(i==2)),{},{Mod[m+1/2 n,xx],Sqrt[3]/2 n}+If[r>0,RandomReal[{-r,r},2],0]+(-1)^i /(2Sqrt[3]){Sqrt[3]/2,1/2}],{i,2}],{m,1,xx},{n,0,yy-1}],2];
+HoneycombLattice[xx_,yy_,r_:0]:=(* yy better be even? *) Module[{temp},temp=Flatten[Table[Table[If[((Mod[m+1/2 n,xx]==0)&&(i==1))||((Mod[m+1/2 n,xx]==xx-1/2)&&(i==2)),{},{Mod[m+1/2 n,xx],Sqrt[3]/2 n}+If[r>0,RandomReal[{-r,r},2],{0,0}]+(-1)^i /(2Sqrt[3]){Sqrt[3]/2,1/2}],{i,2}],{m,1,xx},{n,0,yy-1}],2];
 Replace[temp,x_List:>DeleteCases[x,{}],{0,Infinity}]
 ]
 
-makekaglatticerunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
+makekaglatticerunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],{0,0}],{m,1,xx},{n,0,yy-1}],1];
 
-makekaglatticeunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[{Mod[m+1/2 n,xx],Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+RandomReal[{-r,r},2],{m,1,xx},{n,0,yy-1}],1];
+makekaglatticeunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[{Mod[m+1/2 n,xx],Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],{0,0}],{m,1,xx},{n,0,yy-1}],1];
 
 
 (* ::Subsection:: *)
@@ -657,7 +657,7 @@ tabspec=Table[{m[i],0,cover[[i]]-1},{i,qdim}];
 Flatten[
 Table[
 Table[
-Sum[latt[[i]]*m[i],{i,qdim}]+RandomReal[{-r,r},dim]+unitcell[[i]],
+Sum[latt[[i]]*m[i],{i,qdim}]+If[r>0, RandomReal[{-r,r},dim],Table[0,{dim}]]+unitcell[[i]],
 {i,Length[unitcell]}],
 ##]&@@tabspec,(* specification of table, dim copies of loops from 0 to cover-1 *)
 qdim]
