@@ -740,6 +740,14 @@ Join[col,Table[Line[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{i,Length[p]}]]
 }]]
 
 
+Draw2DFrameworkModeAmp[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E]},
+Graphics[{
+Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
+Join[pointstyle,Table[{Point[p[[i]]]},{i,Length[p]}]],
+Join[col,Table[{PointSize->Norm[nv[[2i-1;;2i]]],Point[{p[[i]]}]},{i,Length[p]}]]
+}]]
+
+
 DrawPeriodic2DFramework[p_,basis_,E_,copies_:{},pointstyle_:{},linestyle_:{}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
@@ -785,6 +793,23 @@ Join[col,Table[Line[{p[[i]]+cellshift,p[[i]]+cellshift+nv[[2i-1;;2i]]}],{i,Lengt
 ]
 
 
+DrawPeriodic2DFrameworkModeAmp[p_,basis_,E_,nv_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics[
+Table[
+cellshift=Sum[m[i]*basis[[i]],{i,dim}];
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
+Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]],
+Join[col,Table[{PointSize->Norm[nv[[2i-2;;2i]]],Point[{p[[i]]+cellshift}]},{i,Length[p]}]]
+}
+,##]&@@tabspec
+]
+]
+
+
 Draw3DFramework[p_,E_,pointstyle_:{},linestyle_:{}]:=Module[{e=Length[E]},
 Graphics3D[{
 Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
@@ -806,6 +831,14 @@ Graphics3D[{
 Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
 Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
 Join[col,Table[Line[{p[[i]],p[[i]]+nv[[3i-2;;3i]]}],{i,Length[p]}]]
+}]]
+
+
+Draw3DFrameworkModeAmp[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E]},
+Graphics3D[{
+Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
+Join[pointstyle,Table[{Point[p[[i]]]},{i,Length[p]}]],
+Join[col,Table[{PointSize->Norm[nv[[3i-2;;3i]]],Point[{p[[i]]}]},{i,Length[p]}]]
 }]]
 
 
@@ -848,6 +881,23 @@ edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2
 Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
 Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]],
 Join[col,Table[Line[{p[[i]]+cellshift,p[[i]]+cellshift+nv[[3i-2;;3i]]}],{i,Length[p]}]]
+}
+,##]&@@tabspec
+]
+]
+
+
+DrawPeriodic3DFrameworkModeAmp[p_,basis_,E_,nv_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics3D[
+Table[
+cellshift=Sum[m[i]*basis[[i]],{i,dim}];
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
+Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]],
+Join[col,Table[{PointSize->Norm[nv[[3i-2;;3i]]],Point[{p[[i]]+cellshift}]},{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]
