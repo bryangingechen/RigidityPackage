@@ -5285,7 +5285,9 @@ Cell[BoxData[{
 
 Cell[CellGroupData[{
 
-Cell["Rigidity matrices", "Subsubsection"],
+Cell["\<\
+Rigidity matrices and plotting modes\
+\>", "Subsubsection"],
 
 Cell["\<\
 The linear rigidity of a framework is completely determined by the properties \
@@ -5325,7 +5327,10 @@ Cell[BoxData[
  RowBox[{"NullSpace", "[", 
   RowBox[{"Transpose", "[", "triangleR", "]"}], "]"}]], "Input"],
 
-Cell["For a 3D non-periodic framework:", "Text"],
+Cell["\<\
+Here\[CloseCurlyQuote]s an example of computing the rigidity matrix for a 3D \
+non-periodic framework:\
+\>", "Text"],
 
 Cell[BoxData[
  RowBox[{"tetrahedronR", "=", 
@@ -5368,7 +5373,8 @@ Cell[BoxData[{
   RowBox[{"[", "1", "]"}], "]"}]}], "Input"],
 
 Cell[TextData[{
- "The modes can be plotted with ",
+ "The modes (and more generally, any infinitesimal displacements) can be \
+plotted with ",
  StyleBox["Draw2DFrameworkMode",
   FontFamily->"Courier",
   FontWeight->"Bold"],
@@ -5376,7 +5382,8 @@ Cell[TextData[{
  StyleBox["Draw3DFrameworkMode",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- ":"
+ ", which shows a vector of length dim*numvertices as lines coming off the \
+vertices:"
 }], "Text"],
 
 Cell[BoxData[
@@ -5392,7 +5399,40 @@ Cell[BoxData[
     RowBox[{"Thickness", "\[Rule]", ".02"}], "}"}], ",", 
    RowBox[{"{", 
     RowBox[{"Red", ",", 
-     RowBox[{"Thickness", "\[Rule]", ".02"}]}], "}"}]}], "]"}]], "Input"]
+     RowBox[{"Thickness", "\[Rule]", ".02"}]}], "}"}]}], "]"}]], "Input"],
+
+Cell[TextData[{
+ "Or alternatively with ",
+ StyleBox["Draw2DFrameworkModeAmp",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " and ",
+ StyleBox["Draw3DFrameworkModeAmp",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ", which shows the amplitudes of the modes as disks at the vertices:"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{"Draw3DFrameworkModeAmp", "[", 
+  RowBox[{"tetrahedronpos", ",", "tetrahedronedgedat", ",", 
+   RowBox[{".1", 
+    RowBox[{"tetrahedronModes", "[", 
+     RowBox[{"[", "1", "]"}], "]"}]}], ",", 
+   RowBox[{"{", 
+    RowBox[{"Blue", ",", 
+     RowBox[{"PointSize", "\[Rule]", ".06"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"Thickness", "\[Rule]", ".02"}], "}"}], ",", 
+   RowBox[{"{", "Purple", "}"}]}], "]"}]], "Input"],
+
+Cell["\<\
+Stresses and self-stresses can be plotted as well -- see the section \
+\[OpenCurlyDoubleQuote]Plotting stresses and self-stresses\
+\[CloseCurlyDoubleQuote] under \[OpenCurlyDoubleQuote]Linear response and \
+stresses\[CloseCurlyDoubleQuote] in \[OpenCurlyDoubleQuote]Other computations\
+\[CloseCurlyDoubleQuote].\
+\>", "Text"]
 }, Closed]]
 }, Closed]],
 
@@ -5829,7 +5869,27 @@ Cell[BoxData[{
  RowBox[{"DrawPeriodic3DFramework", "[", 
   RowBox[{"cubepos", ",", "cubebasis", ",", "cubeedgedat", ",", 
    RowBox[{"{", 
-    RowBox[{"5", ",", "2", ",", "3"}], "}"}]}], "]"}]}], "Input"]
+    RowBox[{"5", ",", "2", ",", "3"}], "}"}]}], "]"}]}], "Input"],
+
+Cell[TextData[{
+ "There are periodic variants of all the non-periodic plotting functions, \
+e.g. ",
+ StyleBox["DrawPeriodic3DFrameworkMode",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ", ",
+ StyleBox["DrawPeriodic3DFrameworkModeAmp",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ", and ",
+ StyleBox["DrawPeriodic3DFrameworkStress",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ".  They take the same arguments except that the periodic variants have 3 \
+slots: positions, basis, edgedata, where the non-periodic functions have 2: \
+positions, edgedata, and the periodic variants also include a slot for the \
+number of copies to be plotted before the other graphics options."
+}], "Text"]
 }, Closed]],
 
 Cell[CellGroupData[{
@@ -7285,8 +7345,17 @@ Cell[TextData[{
  Cell[BoxData[
   FormBox[
    SubscriptBox["p", "j"], TraditionalForm]]],
- " are the positions of the (centers of masses) of the edges.  Naturally, \
-this is calculated by a function called ",
+ " are the positions of the (centers of masses) of the edges.  "
+}], "Text"],
+
+Cell["\<\
+[KL14] claim that this net dipole will always be an integer combination of \
+unit cell basis vectors for an isostatic system with uniform coordination.  \
+\>", "Text"],
+
+Cell[TextData[{
+ "The coefficients of such a linear combination are calculated by a function \
+called ",
  StyleBox["NetDipole",
   FontFamily->"Courier",
   FontWeight->"Bold"],
@@ -7301,7 +7370,8 @@ Cell[BoxData[{
   RowBox[{"cubepos", ",", "cubebasis", ",", "cubeedgedat"}], "]"}]}], "Input"],
 
 Cell["\<\
-With a different choice of the edge data, this can often be made to vanish.\
+With a different choice of the edge data, these coefficients can often be \
+made to vanish.\
 \>", "Text"],
 
 Cell[BoxData[{
@@ -7362,7 +7432,70 @@ Cell[BoxData[{
   ";"}], "\[IndentingNewLine]", 
  RowBox[{"NetDipole", "[", 
   RowBox[{"squarepos", ",", "squarebasis", ",", "squareedgedatbalanced"}], 
-  "]"}]}], "Input"]
+  "]"}]}], "Input"],
+
+Cell["\<\
+The claim of [KL14] that the net dipole is such an integer linear combination \
+may also require the assumption that the number of periodic dimensions of the \
+lattice is equal to the dimensionality of the space the lattice is embedded \
+in.  For example, for an isostatic periodic 1D chain embedded in 2D, the net \
+dipole seems to a non-integral multiple of the basis vector:\
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"chainpos", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "1"}], "}"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"chainedgedat", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", "1", "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", "1", "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", "1", "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"chainbasis", "=", 
+   RowBox[{"{", 
+    RowBox[{"{", 
+     RowBox[{"1", ",", "0"}], "}"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"DrawPeriodic2DFramework", "[", 
+  RowBox[{"chainpos", ",", "chainbasis", ",", "chainedgedat", ",", 
+   RowBox[{"{", "3", "}"}]}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"NetDipole", "[", 
+  RowBox[{"chainpos", ",", "chainbasis", ",", "chainedgedat"}], 
+  "]"}]}], "Input"],
+
+Cell[TextData[{
+ "In any case, the coefficients from ",
+ StyleBox["NetDipole",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " seem to be the contribution to the winding numbers defining the \
+topological polarization from the choice of unit cell."
+}], "Text"]
 }, Closed]],
 
 Cell[CellGroupData[{
@@ -7586,3 +7719,4 @@ StyleDefinitions->Notebook[{
   "9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, 2013)", 
   StyleDefinitions -> "PrivateStylesheetFormatting.nb"]
 ]
+
