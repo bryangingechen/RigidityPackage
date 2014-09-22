@@ -776,7 +776,7 @@ edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2
 ]]
 
 
-DrawPeriodic2DFrameworkMode[p_,basis_,E_,nv_,copies_:{},pointstyle_:{},linestyle_:{},col_:Red]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
+DrawPeriodic2DFrameworkMode[p_,basis_,E_,nv_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
 Graphics[
