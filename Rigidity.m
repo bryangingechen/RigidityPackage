@@ -803,7 +803,7 @@ cellshift=Sum[m[i]*basis[[i]],{i,dim}];
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
 Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]],
-Join[col,Table[{PointSize->Norm[nv[[2i-2;;2i]]],Point[{p[[i]]+cellshift}]},{i,Length[p]}]]
+Join[col,Table[{PointSize->Norm[nv[[2i-1;;2i]]],Point[{p[[i]]+cellshift}]},{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]
