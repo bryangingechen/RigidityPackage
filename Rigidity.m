@@ -41,7 +41,9 @@ u2=((p2[[1]]-p1[[1]])(p1[[2]]-p3[[2]])-(p2[[2]]-p1[[2]])(p1[[1]]-p3[[1]]))/((p4[
 (* if fixedperiodic is false how do we deal with z's?? *)
 (* convention for "lattice" columns agrees with papers *)
 
-RigidityMatrix[z_,posns_,basis_,edgedat_,fixedperiodic_:False]:=Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],numpart=Length[posns],part1,part2,ebond,kb,lattchange,zm,edatExtend},
+RigidityMatrix[z_,posns_,basis_,edgedat_,fixedperiodic_:False]:=
+Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],
+numpart=Length[posns],part1,part2,ebond,kb,lattchange,zm,edatExtend},
 SparseArray[Flatten[Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
 kb=1;(*edgedat[[j,3]];*)
@@ -53,19 +55,69 @@ ebond=-posns[[part1]]+(posns[[part2]]+lattchange); (* sign convention from males
 If[part1!=part2,(Join[
 Table[{j,dim (part1-1)+k}->-ebond[[k]],{k,dim}],
 Table[{j,dim (part2-1)+k}->ebond[[k]] zm,{k,dim}],
-If[fixedperiodic,Flatten[Table[{j,dim numpart+(bvec-1) qdim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]]),{bvec,qdim},{bcomponent,dim}]],{}]
+If[fixedperiodic,Flatten[
+Table[{j,dim numpart+(bvec-1) qdim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
+,{bvec,qdim},{bcomponent,dim}]]
+,{}]
 ]),
 (* part1\[Equal]part2*)
-Join[Table[{j,dim (part1-1)+k}->-ebond[[k]](1-zm),{k,dim}],If[fixedperiodic,Flatten[Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]](ebond[[bcomponent]]),{bvec,dim},{bcomponent,dim}]],{}]]
+Join[Table[{j,dim (part1-1)+k}->-ebond[[k]](1-zm),{k,dim}],
+If[fixedperiodic,Flatten[
+Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]](ebond[[bcomponent]])
+,{bvec,dim},{bcomponent,dim}]]
+,{}]]
 ],
 {j,numbonds}]]
 ,{numbonds,dim numpart+If[fixedperiodic,qdim*dim,0]}]
 ]
 
-NRigidityMatrix[z_?(VectorQ[#,NumericQ]&),posns_,basis_,edgedat_,fixedperiodic_:False]:=RigidityMatrix[z,posns,basis,edgedat,fixedperiodic]
+NRigidityMatrix[z_?(VectorQ[#,NumericQ]&),posns_,basis_,edgedat_,fixedperiodic_:False]:=
+RigidityMatrix[z,posns,basis,edgedat,fixedperiodic]
 
 
-EdgeLengthsSq[posns_,basis_,edgedat_]:=Module[{part1,part2,kb,lattchange,qdim=Length[basis],ebond,numbonds=Length[edgedat],edatExtend},
+(* Fixed lattice matrix code *)
+(* if fixedperiodic is false how do we deal with z's?? *)
+(* convention for "lattice" columns agrees with papers *)
+(* general transformations, expressed as affine transformations *)
+
+RigidityMatrixT[z_,posns_,transformations_,edgedat_,fixedperiodic_:False]:=
+Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],
+numpart=Length[posns],part1,part2,ebond,kb,lattchange,zm,edatExtend,tmat,pv},
+SparseArray[Flatten[Table[part1=edgedat[[j,1,1]];
+part2=edgedat[[j,1,2]];
+kb=1;(*edgedat[[j,3]];*)
+edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
+zm=Product[z[[k]]^edatExtend[[k]],{k,qdim}];
+(* assuming that all matrices in transf commute... *)
+tmat=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,qdim}]; (* maybe could memoize *)
+pv=tmat.Join[posns[[part2]],{1}];
+ebond=-posns[[part1]]+pv[[1;;dim]]; (* sign convention from malestein theran *)
+(* ebond=ebond/Norm[ebond];*)
+If[part1!=part2,(Join[
+Table[{j,dim (part1-1)+k}->-ebond[[k]],{k,dim}],
+Table[{j,dim (part2-1)+k}->ebond[[k]] zm,{k,dim}],
+If[fixedperiodic,Flatten[
+Table[{j,dim numpart+(bvec-1) qdim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
+,{bvec,qdim},{bcomponent,dim}]]
+,{}]
+]),
+(* part1\[Equal]part2*)
+Join[Table[{j,dim (part1-1)+k}->-ebond[[k]](1-zm),{k,dim}],
+If[fixedperiodic,Flatten[
+Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]](ebond[[bcomponent]])
+,{bvec,dim},{bcomponent,dim}]]
+,{}]]
+],
+{j,numbonds}]]
+,{numbonds,dim numpart+If[fixedperiodic,qdim*dim,0]}]
+]
+
+NRigidityMatrixT[z_?(VectorQ[#,NumericQ]&),posns_,transformations_,edgedat_,fixedperiodic_:False]:=
+RigidityMatrixT[z,posns,transformations,edgedat,fixedperiodic]
+
+
+EdgeLengthsSq[posns_,basis_,edgedat_]:=Module[{part1,part2,kb,lattchange,qdim=Length[basis],ebond,
+numbonds=Length[edgedat],edatExtend},
 Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
 kb=edgedat[[j,3]];
@@ -77,7 +129,8 @@ Norm[ebond]^2
 {j,numbonds}]]
 
 
-NetDipole[posns_,basis_,edgedat_]:=Module[{vertcont,edgecont,dim=Length[posns[[1]]],qdim=Length[basis],nsp=NullSpace[basis],edatExtend},
+NetDipole[posns_,basis_,edgedat_]:=Module[{vertcont,edgecont,dim=Length[posns[[1]]],qdim=Length[basis],
+nsp=NullSpace[basis],edatExtend},
 vertcont=dim(Sum[posns[[j]],{j,Length[posns]}]);
 edgecont=Sum[
 edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
@@ -95,7 +148,8 @@ w1=NIntegrate[Im[D[Log[zz],t]],{t,0,2\[Pi]}];
 ]
 
 
-KLPolarization[latticep_,basis_,latticeEdat_,cyclesorigin_:{-1,-1}]:=Module[{powmat,w,zz,k,qdim=Length[basis],z,cycle,t},
+KLPolarization[latticep_,basis_,latticeEdat_,cyclesorigin_:{-1,-1}]:=
+Module[{powmat,w,zz,k,qdim=Length[basis],z,cycle,t},
 powmat=RigidityMatrix[Table[z[j],{j,qdim}],latticep,basis,latticeEdat];
 w=Table[
 cycle=Table[z[k]->If[k!=j,cyclesorigin[[k]],Exp[I t]],{k,qdim}];
@@ -271,34 +325,70 @@ d[[2loc+2]]=-(Sqrt[3]/4);,{j,Min[m+n-i,i]}];d]
 
 
 (*square lattice*)
-SqLattice[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{m,n}+If[r>0,RandomReal[{-r,r},2],{0,0}],{m,0,xx-1},{n,0,yy-1}],1];
+SqLattice[xx_,yy_,r_:0]:=(* yy better be even? *) 
+Flatten[Table[
+{m,n}+If[r>0,RandomReal[{-r,r},2],{0,0}]
+,{m,0,xx-1},{n,0,yy-1}],1];
 
-SqLatticeSlopes[xx_,yy_,r_:0]:=(* yy better be even? *) Module[{slopesx=RandomReal[{-r,r},xx],slopesy=RandomReal[{-r,r},yy],time},
+SqLatticeSlopes[xx_,yy_,r_:0]:=(* yy better be even? *) 
+Module[{slopesx=RandomReal[{-r,r},xx],slopesy=RandomReal[{-r,r},yy],time},
 Flatten[Table[
 time=computeintersection[{m,0},\[Pi]/2+slopesx[[m+1]],{0,n},slopesy[[n+1]]];
 {0,n}+time [[2]]{Cos[slopesy[[n+1]]],Sin[slopesy[[n+1]]]}
 ,{m,0,xx-1},{n,0,yy-1}],1]];
 
 (* kagome in the form of a rhombus *)
-KagLatticeRho[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[Table[{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],{0,0}]+1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]},{i,3}],{m,1,xx},{n,0,yy-1}],2];
+KagLatticeRho[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *)
+Flatten[Table[Table[
+{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}
++If[r>0,RandomReal[{-r,r},2],{0,0}]
++1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]}
+,{i,3}],{m,1,xx},{n,0,yy-1}],2];
 
 (* kagome in the form of a rectangle *)
-KagLatticeRec[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[Table[{m+1/2 Mod[n,2],Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],{0,0}]+1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]},{i,3}],{m,1,xx},{n,0,yy-1}],2];
+KagLatticeRec[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) 
+Flatten[Table[Table[
+{m+1/2 Mod[n,2],Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}
++If[r>0,RandomReal[{-r,r},2],{0,0}]
++1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]}
+,{i,3}],{m,1,xx},{n,0,yy-1}],2];
 
 (* triangular lattice in the form of rhombus *)
-TriLatticeRho[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{(*Mod[m+1/2.n,xx]*)m+1/2. n,Sqrt[3]/2. n}+If[r>0,RandomReal[{-r,r},2],{0,0}],{m,1,xx},{n,0,yy-1}],1];
+TriLatticeRho[xx_,yy_,r_:0]:=(* yy better be even? *) 
+Flatten[Table[
+{(*Mod[m+1/2.n,xx]*)m+1/2. n,Sqrt[3]/2. n}
++If[r>0,RandomReal[{-r,r},2],{0,0}]
+,{m,1,xx},{n,0,yy-1}],1];
 
 (*triangular lattice in the form of rectangle *)
-TriLatticeRec[xx_,yy_,r_:0]:=(* yy better be even? *) Flatten[Table[{Mod[m+1/2. n,xx],Sqrt[3]/2. n}+If[r>0,RandomReal[{-r,r},2],{0,0}],{m,1,xx},{n,0,yy-1}],1];
+TriLatticeRec[xx_,yy_,r_:0]:=(* yy better be even? *) 
+Flatten[Table[
+{Mod[m+1/2. n,xx],Sqrt[3]/2. n}
++If[r>0,RandomReal[{-r,r},2],{0,0}]
+,{m,1,xx},{n,0,yy-1}],1];
 
 (* honeycomb in the form of a rectangle *)
-HoneycombLattice[xx_,yy_,r_:0]:=(* yy better be even? *) Module[{temp},temp=Flatten[Table[Table[If[((Mod[m+1/2 n,xx]==0)&&(i==1))||((Mod[m+1/2 n,xx]==xx-1/2)&&(i==2)),{},{Mod[m+1/2 n,xx],Sqrt[3]/2 n}+If[r>0,RandomReal[{-r,r},2],{0,0}]+(-1)^i /(2Sqrt[3]){Sqrt[3]/2,1/2}],{i,2}],{m,1,xx},{n,0,yy-1}],2];
+HoneycombLattice[xx_,yy_,r_:0]:=(* yy better be even? *) Module[{temp},
+temp=Flatten[Table[Table[
+If[((Mod[m+1/2 n,xx]==0)&&(i==1))||((Mod[m+1/2 n,xx]==xx-1/2)&&(i==2)),
+{},
+{Mod[m+1/2 n,xx],Sqrt[3]/2 n}
++If[r>0,RandomReal[{-r,r},2],{0,0}]+(-1)^i /(2Sqrt[3]){Sqrt[3]/2,1/2}]
+,{i,2}],{m,1,xx},{n,0,yy-1}],2];
 Replace[temp,x_List:>DeleteCases[x,{}],{0,Infinity}]
 ]
 
-makekaglatticerunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],{0,0}],{m,1,xx},{n,0,yy-1}],1];
+makekaglatticerunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) 
+Flatten[Table[
+{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}
++{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],{0,0}]
+,{m,1,xx},{n,0,yy-1}],1];
 
-makekaglatticeunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[{Mod[m+1/2 n,xx],Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],{0,0}],{m,1,xx},{n,0,yy-1}],1];
+makekaglatticeunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) 
+Flatten[Table[
+{Mod[m+1/2 n,xx],Sqrt[3]/2 n}
++{-1/4,-Sqrt[3]/12}+If[r>0,RandomReal[{-r,r},2],{0,0}]
+,{m,1,xx},{n,0,yy-1}],1];
 
 
 (* ::Subsection:: *)
@@ -306,7 +396,9 @@ makekaglatticeunit[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Flatten[Table[{
 
 
 (* return a list of pairs of vertices corresponding to edges, first list is NN, second list is NNN *)
-SqLatticeEdges[xx_,yy_]:=(* yy better be even? *) Module[{index=0,bondlist=Table[Null,{2xx*yy-xx-yy}],numbonds=0,nextbondlist=Table[Null,{(xx-1)*(yy-1)}],numnextbonds=0,nextbondlistother=Table[Null,{(xx-1)*(yy-1)}]},
+SqLatticeEdges[xx_,yy_]:=(* yy better be even? *) 
+Module[{index=0,bondlist=Table[Null,{2xx*yy-xx-yy}],numbonds=0,
+nextbondlist=Table[Null,{(xx-1)*(yy-1)}],numnextbonds=0,nextbondlistother=Table[Null,{(xx-1)*(yy-1)}]},
 Do[
 index++;
 If[n>1,
@@ -329,7 +421,9 @@ nextbondlist=nextbondlist[[1;;numnextbonds]];
 ];
 
 (* for rectangle only; finally fixed *)
-KagLatticeRecEdges[xx_,yy_]:=Module[{index=0,bondlist=Table[Null,{6xx*yy}],numbonds=0,nextbondlist=Table[Null,{3*(xx)*(yy)+xx+yy-2}],numnextbonds=0},
+KagLatticeRecEdges[xx_,yy_]:=
+Module[{index=0,bondlist=Table[Null,{6xx*yy}],numbonds=0,
+nextbondlist=Table[Null,{3*(xx)*(yy)+xx+yy-2}],numnextbonds=0},
 Do[ (* loop over i from 1 to 3 *)
 index++; (* particle number *)
 If[i==2,
@@ -385,7 +479,9 @@ nextbondlist=nextbondlist[[1;;numnextbonds]];
 ];
 
 (* for rhombus only *)
-KagLatticeRhoEdges[xx_,yy_]:=Module[{index=0,bondlist=Table[Null,{6xx*yy}],numbonds=0,nextbondlist=Table[Null,{3*(xx)*(yy)+xx+yy-2}],numnextbonds=0},
+KagLatticeRhoEdges[xx_,yy_]:=
+Module[{index=0,bondlist=Table[Null,{6xx*yy}],numbonds=0,
+nextbondlist=Table[Null,{3*(xx)*(yy)+xx+yy-2}],numnextbonds=0},
 Do[
 index++;
 If[i==2,
@@ -428,7 +524,9 @@ nextbondlist=nextbondlist[[1;;numnextbonds]];
 periodic version !  ! make periodic in horizontal direction first
  return a list of pairs of vertices corresponding to edges, first list is NN, second list is NNN *)
 (*this function generates two lists of edges relevant for a square lattice with periodic boundary conditions in the x-direction,the first is nearest neighbors,and the second is next nearest neighbors*)
-SqLatticexperEdges[xx_,yy_]:=(* yy better be even? *) Module[{index=0,bondlist=Table[Null,{2xx*yy-xx}],numbonds=0,nextbondlist=Table[Null,{(xx)*(yy-1)}],numnextbonds=0,nextbondlistother=Table[Null,{(xx)*(yy-1)}]},
+SqLatticexperEdges[xx_,yy_]:=(* yy better be even? *) 
+Module[{index=0,bondlist=Table[Null,{2xx*yy-xx}],numbonds=0,
+nextbondlist=Table[Null,{(xx)*(yy-1)}],numnextbonds=0,nextbondlistother=Table[Null,{(xx)*(yy-1)}]},
 Do[
 index++;
 If[n>1,
@@ -464,7 +562,10 @@ nextbondlist=nextbondlist[[1;;numnextbonds]];
 {bondlist,nextbondlist,nextbondlistother}
 ];
 
-KagLatticexperEdges[xx_,yy_]:=(* 1,2,3, go around counter clockwise from 5\[Pi]/6*)Module[{index=0,bondlist=Table[Null,{6xx*yy+2yy-1}],numbonds=0,nextbondlist=Table[Null,{3*(xx)*(yy)+xx+yy-2}],nextbondlist2=Table[Null,{3*(xx)*(yy)+xx+yy-2}],numnextbonds=0,numnextbonds2=0},
+KagLatticexperEdges[xx_,yy_]:=(* 1,2,3, go around counter clockwise from 5\[Pi]/6*)
+Module[{index=0,bondlist=Table[Null,{6xx*yy+2yy-1}],numbonds=0,
+nextbondlist=Table[Null,{3*(xx)*(yy)+xx+yy-2}],nextbondlist2=Table[Null,{3*(xx)*(yy)+xx+yy-2}],
+numnextbonds=0,numnextbonds2=0},
 Do[
 index++;
 If[i==2,
@@ -608,7 +709,8 @@ shearbvsq[lx_,ly_,u_:{1,0}]:={(* site indices *) Join[Table[ly(j-1)+1,{j,lx}],Ta
 (* applied displacement components; 0 on bottom, u on top *) Join[Table[0,{2lx}],Flatten[Table[u,{lx}]]]}
 
 
-BoundaryVerts[edgedat_,cover_,cellspec_]:=Module[{qdim=Length[cover],tabspec,m,list,unitcellsize=Max[edgedat[[All,1]]](*,parts*)},
+BoundaryVerts[edgedat_,cover_,cellspec_]:=
+Module[{qdim=Length[cover],tabspec,m,list,unitcellsize=Max[edgedat[[All,1]]](*,parts*)},
 (*parts=Table[0,{2qdim}];*)
 list=Table[
 {tabspec=Table[If[i!=k,{m[i],cover[[i]]},
@@ -633,7 +735,8 @@ getatomindex2[Table[m[j],{j,qdim}],cellspec[[k,2]],cover,unitcellsize]
 
 
 (*Function to make edges for points in "lattice" closer than "dis" *)
-DiskGraphEdges[pos_,dis_,basis_:{},maxwinding_:1]:=Module[{numverts=Length[pos],qdim=Length[basis],tabspec,m,cover},
+DiskGraphEdges[pos_,dis_,basis_:{},maxwinding_:1]:=
+Module[{numverts=Length[pos],qdim=Length[basis],tabspec,m,cover},
 If[Length[basis]==0,
 Reap[Do[If[i!=j,
 If[Norm[pos[[i]]-pos[[j]]]<=dis,
@@ -652,7 +755,8 @@ Sow[{{i,j},Table[m[k],{k,qdim}],1}]],
 
 
 (* make a list of vertex positions in any dimension *)
-CoveringFrameworkVerts[unitcell_,latt_,cover_,r_:0]:=Module[{qdim=Length[latt],dim=Length[unitcell[[1]]],tabspec,m},
+CoveringFrameworkVerts[unitcell_,latt_,cover_,r_:0]:=
+Module[{qdim=Length[latt],dim=Length[unitcell[[1]]],tabspec,m},
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,qdim}];
 Flatten[
 Table[
@@ -664,8 +768,31 @@ qdim]
 ];
 
 
+CoveringTFrameworkVerts[unitcell_,transf_,cover_]:=
+Module[{qdim=Length[transf],dim=Length[unitcell[[1]]],tabspec,m,tmat},
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,qdim}];
+Flatten[
+Table[
+(* assuming that all matrices in transf commute... *)
+tmat=Dot@@Table[MatrixPower[transf[[i]],m[i]],{i,qdim}];
+Dot[tmat,Join[#,{1}]][[1;;dim]]&/@unitcell,
+##]&@@tabspec,(* specification of table, dim copies of loops from 0 to cover-1 *)
+qdim]
+]
+
+
+CoveringTransformations[transf_,cover_]:=
+Module[{qdim=Length[transf],tmat},
+(* assuming that all matrices in transf commute... *)
+tmat=Dot@@Table[MatrixPower[transf[[i]],cover[i]],{i,qdim}]
+]
+
+
 (* this function was broken!!! *)
-CoveringFrameworkEdges[edgedat_,cover_,periodic_:False]:=Module[{dim=Length[cover],ind1,ind2,p1,p2,a,m,numbonds=0,bondlist=Table[Null,{Length[edgedat](Times@@cover)}],lenedge=Length[edgedat],unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec,i},
+CoveringFrameworkEdges[edgedat_,cover_,periodic_:False]:=
+Module[{dim=Length[cover],ind1,ind2,p1,p2,a,m,numbonds=0,
+bondlist=Table[Null,{Length[edgedat](Times@@cover)}],lenedge=Length[edgedat],
+unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec,i},
 tabspec=Join[Table[{m[j],cover[[j]]},{j,dim}],{{i,lenedge}}];
 Do[(* loop over edges in edgedat, (i.e. copy an edge i into all cells m,n) *)
 {p1,p2}=edgedat[[i,1]];
@@ -684,18 +811,22 @@ bondlist[[numbonds]]={{ind1,ind2},cellchange,1}
 bondlist[[1;;numbonds]]
 ]
 
+
 (* slice; remove vertices, edges under a certain condition *)
 (* return new edgedat and list of vertex indices *)
-SliceOffVerts[pos_,edgedat_,poscond_,indexcond_:False]:=Module[{edgenew,keepers,numpartsold=Length[pos],throwers},
+SliceOffVerts[pos_,edgedat_,poscond_,indexcond_:False]:=
+Module[{edgenew,keepers,numpartsold=Length[pos],throwers},
 keepers=Flatten[Position[pos,_?(poscond),{1},Heads->False]];
 keepers=Select[keepers,Not[indexcond]];
 throwers=Complement[Table[i,{i,numpartsold}],keepers];
 edgenew=Select[edgedat,Flatten[Intersection[#[[1]],throwers]]=={}&]; (* need to reindex ... *)
-edgenew=Table[{edgenew[[j,1]]/.Table[keepers[[j]]->j,{j,Length[keepers]}],edgenew[[j,2]],edgenew[[j,3]]},{j,Length[edgenew]}];
+edgenew=Table[{edgenew[[j,1]]/.Table[keepers[[j]]->j,{j,Length[keepers]}],
+edgenew[[j,2]],edgenew[[j,3]]},{j,Length[edgenew]}];
 {edgenew,keepers}]
 
 
-glueedges[botE_,topE_,botdims_,botsize_,topdims_,topsize_,face_,cellglue_]:=Module[{dim=Length[topdims],connectors,tabspec,ind,indbot,indtop,m,k},
+glueedges[botE_,topE_,botdims_,botsize_,topdims_,topsize_,face_,cellglue_]:=
+Module[{dim=Length[topdims],connectors,tabspec,ind,indbot,indtop,m,k},
 tabspec=Table[
 If[j<face,ind=j,ind=j+1];
 {m[j],botdims[[ind]]},{j,dim-1}];
@@ -728,8 +859,11 @@ Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]]
 }]]
 
 
-Draw2DFrameworkStress[p_,E_,stress_,mthick_:.01,colors_:{Purple,Orange}]:=Module[{e=Length[E],nstr=mthick stress/Max[Abs[stress]]},
-Graphics[{Table[{If[nstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[nstr[[j]]]],Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}]},{j,e}]}]]
+Draw2DFrameworkStress[p_,E_,stress_,mthick_:.01,colors_:{Purple,Orange}]:=
+Module[{e=Length[E],nstr=mthick stress/Max[Abs[stress]]},
+Graphics[{
+Table[{If[nstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[nstr[[j]]]],
+Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}]},{j,e}]}]]
 
 
 Draw2DFrameworkMode[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E]},
@@ -748,66 +882,193 @@ Join[col,Table[{PointSize->Norm[nv[[2i-1;;2i]]],Point[{p[[i]]}]},{i,Length[p]}]]
 }]]
 
 
-DrawPeriodic2DFramework[p_,basis_,E_,copies_:{},pointstyle_:{},linestyle_:{}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
+DrawPeriodic2DFramework[p_,basis_,E_,copies_:{},pointstyle_:{},linestyle_:{}]:=
+Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
 Graphics[
 Table[
-cellshift=Sum[m[i]*basis[[i]],{i,dim}];
+unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
 {Join[linestyle,Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
-Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
-Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]]}
-,##]&@@tabspec
-]
-]
-
-
-DrawPeriodic2DFrameworkStress[p_,basis_,E_,stress_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=Module[{e=Length[E],nstr=mthick stress/Max[Abs[stress]],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
-cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
-tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
-Graphics[
-Table[
-cellshift=Sum[m[i]*basis[[i]],{i,dim}];
-Table[
-edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
-{If[nstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[nstr[[j]]]],Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}]},{j,e}]
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]]}
 ,##]&@@tabspec
 ]]
 
 
-DrawPeriodic2DFrameworkMode[p_,basis_,E_,nv_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
+DrawTPeriodic2DFramework[p_,transformations_,E_,copies_:{},pointstyle_:{},linestyle_:{}]:=
+Module[{e=Length[E],dim=Length[transformations],tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2},
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
 Graphics[
 Table[
-cellshift=Sum[m[i]*basis[[i]],{i,dim}];
+tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
+(* shifted unit cell positions *)
+(*unitcell=Table[pv=tmat.Join[p[[i]],{1}];pv[[1;;2]],{i,Length[p]}];*)
+unitcell=Dot[tmat,Join[#,{1}]][[1;;2]]&/@p;
 {Join[linestyle,Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
-Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
-Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]],
-Join[col,Table[Line[{p[[i]]+cellshift,p[[i]]+cellshift+nv[[2i-1;;2i]]}],{i,Length[p]}]]
-}
+Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
+(* apply appropriate transformation again to get line to second particle *)
+tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
+pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
+pv[[1;;2]]]}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]]}
 ,##]&@@tabspec
-]
-]
+]]
 
 
-DrawPeriodic2DFrameworkModeAmp[p_,basis_,E_,nv_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
+(* allow complex stresses(?), if so need qvec *)
+DrawPeriodic2DFrameworkStress[p_,basis_,E_,stressinput_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=
+Module[{e=Length[E],stress,qvec,nstr,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend,realnstr},
+(* dumb trick for backwards compatibility *)
+If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),qvec=stressinput[[2]];stress=stressinput[[1]];,
+qvec=Table[0,{dim}];stress=stressinput;
+];
+nstr=mthick stress/Max[Abs[stress]];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
 Graphics[
 Table[
-cellshift=Sum[m[i]*basis[[i]],{i,dim}];
+unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
+Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+realnstr=Re[nstr Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]];
+{If[realnstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[realnstr[[j]]]],
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}]},{j,e}]
+,##]&@@tabspec
+]]
+
+
+DrawTPeriodic2DFrameworkStress[p_,transformations_,E_,stressinput_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=
+Module[{e=Length[E],stress,qvec,nstr,dim=Length[transformations],
+tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnstr},
+(* dumb trick for backwards compatibility *)
+If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),qvec=stressinput[[2]];stress=stressinput[[1]];,
+qvec=Table[0,{dim}];stress=stressinput;
+];
+nstr=mthick stress/Max[Abs[stress]];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics[
+Table[
+tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
+(* shifted unit cell positions *)
+unitcell=Dot[tmat,Join[#,{1}]][[1;;2]]&/@p;
+Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+realnstr=Re[nstr Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]];
+{If[realnstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[realnstr[[j]]]],
+Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
+(* apply appropriate transformation again to get line to second particle *)
+tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
+pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
+pv[[1;;2]]]}]},{j,e}]
+,##]&@@tabspec
+]]
+
+
+DrawPeriodic2DFrameworkMode[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[0,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics[
+Table[
+unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
+realnv=Re[nv Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]];
 {Join[linestyle,Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
-Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
-Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]],
-Join[col,Table[{PointSize->Norm[nv[[2i-1;;2i]]],Point[{p[[i]]+cellshift}]},{i,Length[p]}]]
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
-]
-]
+]]
+
+
+DrawTPeriodic2DFrameworkMode[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{e=Length[E],nv,qvec,dim=Length[transformations],
+tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[0,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics[
+Table[
+tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
+(* shifted unit cell positions *)
+unitcell=Dot[tmat,Join[#,{1}]][[1;;2]]&/@p;
+realnv=Re[tmat[[;;2,;;2]].nv Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]];
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
+(* apply appropriate transformation again to get line to second particle *)
+tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
+pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
+pv[[1;;2]]]}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{i,Length[p]}]]
+}
+,##]&@@tabspec
+]]
+
+
+DrawPeriodic2DFrameworkModeAmp[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[0,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics[
+Table[
+unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+realnv=Re[nv Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]];
+Join[col,Table[{PointSize->Norm[realnv[[2i-1;;2i]]],Point[{unitcell[[i]]}]},{i,Length[p]}]]
+}
+,##]&@@tabspec
+]]
+
+
+DrawTPeriodic2DFrameworkModeAmp[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{e=Length[E],nv,qvec,dim=Length[transformations],
+tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[0,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics[
+Table[
+tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
+(* shifted unit cell positions *)
+unitcell=Dot[tmat,Join[#,{1}]][[1;;2]]&/@p;
+realnv=Re[nv Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]]; (* no need to rotate by tmat for just amplitude *)
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
+(* apply appropriate transformation again to get line to second particle *)
+tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
+pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
+pv[[1;;2]]]}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+Join[col,Table[{PointSize->Norm[realnv[[2i-1;;2i]]],Point[{unitcell[[i]]}]},{i,Length[p]}]]
+}
+,##]&@@tabspec
+]]
 
 
 Draw3DFramework[p_,E_,pointstyle_:{},linestyle_:{}]:=Module[{e=Length[E]},
@@ -817,7 +1078,8 @@ Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]]
 }]]
 
 
-Draw3DFrameworkStress[p_,E_,stress_,mthick_:.01,colors_:{Purple,Orange}]:=Module[{e=Length[E],nstr=mthick stress/Max[Abs[stress]]},
+Draw3DFrameworkStress[p_,E_,stress_,mthick_:.01,colors_:{Purple,Orange}]:=
+Module[{e=Length[E],nstr=mthick stress/Max[Abs[stress]]},
 Graphics3D[{
 Table[{
 If[nstr[[j]]>0,colors[[1]],colors[[2]]],
@@ -842,71 +1104,198 @@ Join[col,Table[{PointSize->Norm[nv[[3i-2;;3i]]],Point[{p[[i]]}]},{i,Length[p]}]]
 }]]
 
 
-DrawPeriodic3DFramework[p_,basis_,E_,copies_:{},pointstyle_:{},linestyle_:{}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
+DrawPeriodic3DFramework[p_,basis_,E_,copies_:{},pointstyle_:{},linestyle_:{}]:=
+Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
 Graphics3D[
 Table[
-cellshift=Sum[m[i]*basis[[i]],{i,dim}];
+unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
 {Join[linestyle,Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
-Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
-Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]]}
-,##]&@@tabspec
-]
-]
-
-
-DrawPeriodic3DFrameworkStress[p_,basis_,E_,stress_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=Module[{e=Length[E],nstr=mthick stress/Max[Abs[stress]],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
-cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
-tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
-Graphics3D[
-Table[
-cellshift=Sum[m[i]*basis[[i]],{i,dim}];
-Table[
-edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
-{If[nstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[nstr[[j]]]],Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}]},{j,e}]
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]]}
 ,##]&@@tabspec
 ]]
 
 
-DrawPeriodic3DFrameworkMode[p_,basis_,E_,nv_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
+DrawTPeriodic3DFramework[p_,transformations_,E_,copies_:{},pointstyle_:{},linestyle_:{}]:=
+Module[{e=Length[E],dim=Length[transformations],tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2},
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
 Graphics3D[
 Table[
-cellshift=Sum[m[i]*basis[[i]],{i,dim}];
+tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
+(* shifted unit cell positions *)
+unitcell=Dot[tmat,Join[#,{1}]][[1;;3]]&/@p;
 {Join[linestyle,Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
-Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
-Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]],
-Join[col,Table[Line[{p[[i]]+cellshift,p[[i]]+cellshift+nv[[3i-2;;3i]]}],{i,Length[p]}]]
-}
+Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
+(* apply appropriate transformation again to get line to second particle *)
+tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
+pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
+pv[[1;;3]]]}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]]}
 ,##]&@@tabspec
-]
-]
+]]
 
 
-DrawPeriodic3DFrameworkModeAmp[p_,basis_,E_,nv_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{e=Length[E],dim=Length[basis],tabspec,m,cover,cellshift,edatExtend},
+(* allow complex stresses(?), if so need qvec *)
+DrawPeriodic3DFrameworkStress[p_,basis_,E_,stressinput_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=
+Module[{e=Length[E],stress,qvec,nstr,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend,realnstr},
+(* dumb trick for backwards compatibility *)
+If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),qvec=stressinput[[2]];stress=stressinput[[1]];,
+qvec=Table[0,{dim}];stress=stressinput;
+];
+nstr=mthick stress/Max[Abs[stress]];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
 Graphics3D[
 Table[
-cellshift=Sum[m[i]*basis[[i]],{i,dim}];
+unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
+Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+realnstr=Re[nstr Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]];
+{If[realnstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[realnstr[[j]]]],
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}]},{j,e}]
+,##]&@@tabspec
+]]
+
+
+DrawTPeriodic3DFrameworkStress[p_,transformations_,E_,stressinput_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=
+Module[{e=Length[E],stress,qvec,nstr,dim=Length[transformations],
+tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnstr},
+(* dumb trick for backwards compatibility *)
+If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),qvec=stressinput[[2]];stress=stressinput[[1]];,
+qvec=Table[0,{dim}];stress=stressinput;
+];
+nstr=mthick stress/Max[Abs[stress]];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics3D[
+Table[
+tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
+(* shifted unit cell positions *)
+unitcell=Dot[tmat,Join[#,{1}]][[1;;3]]&/@p;
+Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+realnstr=Re[nstr Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]];
+{If[realnstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[realnstr[[j]]]],
+Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
+(* apply appropriate transformation again to get line to second particle *)
+tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
+pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
+pv[[1;;3]]]}]},{j,e}]
+,##]&@@tabspec
+]]
+
+
+DrawPeriodic3DFrameworkMode[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[0,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics3D[
+Table[
+unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
+realnv=Re[nv Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]];
 {Join[linestyle,Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
-Line[{p[[E[[j,1,1]]]]+cellshift,p[[E[[j,1,2]]]]+edatExtend.basis+cellshift}],{j,e}]],
-Join[pointstyle,Table[{Point[p[[i]]+cellshift]},{i,Length[p]}]],
-Join[col,Table[{PointSize->Norm[nv[[3i-2;;3i]]],Point[{p[[i]]+cellshift}]},{i,Length[p]}]]
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
-]
-]
+]]
+
+
+DrawTPeriodic3DFrameworkMode[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{e=Length[E],nv,qvec,dim=Length[transformations],
+tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[0,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics3D[
+Table[
+tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
+(* shifted unit cell positions *)
+unitcell=Dot[tmat,Join[#,{1}]][[1;;3]]&/@p;
+realnv=Re[tmat[[;;3,;;3]].nv Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]];
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
+(* apply appropriate transformation again to get line to second particle *)
+tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
+pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
+pv[[1;;3]]]}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{i,Length[p]}]]
+}
+,##]&@@tabspec
+]]
+
+
+DrawPeriodic3DFrameworkModeAmp[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[0,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics3D[
+Table[
+unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+realnv=Re[nv Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]];
+Join[col,Table[{PointSize->Norm[realnv[[3i-2;;3i]]],Point[{unitcell[[i]]}]},{i,Length[p]}]]
+}
+,##]&@@tabspec
+]]
+
+
+DrawTPeriodic3DFrameworkModeAmp[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{e=Length[E],nv,qvec,dim=Length[transformations],
+tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[0,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics3D[
+Table[
+tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
+(* shifted unit cell positions *)
+unitcell=Dot[tmat,Join[#,{1}]][[1;;3]]&/@p;
+realnv=Re[nv Exp[I Sum[qvec[[i]]*m[i],{i,dim}]]]; (* no need to rotate by tmat for just amplitude *)
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
+(* apply appropriate transformation again to get line to second particle *)
+tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
+pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
+pv[[1;;3]]]}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+Join[col,Table[{PointSize->Norm[realnv[[3i-2;;3i]]],Point[{unitcell[[i]]}]},{i,Length[p]}]]
+}
+,##]&@@tabspec
+]]
 
 
 reciprocbasis[qx_,qy_,basis_]:={qx,qy}.Inverse[basis];
 
-BandPlot[{zx_,zy_},poly_,basis_:{{1,0},{0,1}},xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},opts_:{MaxRecursion->Automatic}]:=Module[{qx,qy,b,rec},
+BandPlot[{zx_,zy_},poly_,basis_:{{1,0},{0,1}},xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},opts_:{MaxRecursion->Automatic}]:=
+Module[{qx,qy,b,rec},
 ContourPlot[(* this seems to work, but I should rederive it to make sure... *)
 (* checked with Jayson, we had to reverse qx, qy because vectors get relabeled after 90 degree rotation *)
 (* also a flip of sign of qy so that when basis = {{1,0},{0,1}} want to get just qx, qy again *)
