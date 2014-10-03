@@ -6428,7 +6428,9 @@ Cell[BoxData[{
 
 Cell[CellGroupData[{
 
-Cell["Rigidity matrices and plotting modes", "Subsubsection"],
+Cell["\<\
+Rigidity matrices and drawing modes\
+\>", "Subsubsection"],
 
 Cell["\<\
 The linear rigidity of a framework is completely determined by the properties \
@@ -6441,8 +6443,8 @@ Cell[TextData[{
  StyleBox["RigidityMatrix",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " computes this matrix.  For 2D non-periodic frameworks it should be called \
-as below."
+ " computes this matrix, as a sparse matrix in mathematica.  For 2D \
+non-periodic frameworks it should be called as below."
 }], "Text"],
 
 Cell[BoxData[
@@ -6979,7 +6981,20 @@ Cell[BoxData[{
         RowBox[{"8", ",", "5"}], "}"}], ",", 
        RowBox[{"{", 
         RowBox[{"0", ",", "0", ",", "1"}], "}"}], ",", "1"}], "}"}]}], 
-    "}"}]}], ";"}]}], "Input"]
+    "}"}]}], ";"}]}], "Input"],
+
+Cell[TextData[{
+ "The function ",
+ StyleBox["EdgeLengthsSq",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " outputs the squared lengths of each of the edges:"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{"EdgeLengthsSq", "[", 
+  RowBox[{"chainpos", ",", "chainbasis", ",", "chainedgedat"}], 
+  "]"}]], "Input"]
 }, Closed]],
 
 Cell[CellGroupData[{
@@ -7026,10 +7041,28 @@ e.g. ",
  StyleBox["DrawPeriodic3DFrameworkStress",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- ".  They take the same arguments except that the periodic variants have 3 \
-slots: positions, basis, edgedata, where the non-periodic functions have 2: \
-positions, edgedata, and the periodic variants also include a slot for the \
-number of copies to be plotted before the other graphics options."
+ " (as well as the 2D variants).  They take the same arguments except that \
+the periodic variants have 3 slots: positions, basis, edgedata, where the \
+non-periodic functions have 2: positions, edgedata, and the periodic variants \
+also include a slot for the number of copies to be plotted before the other \
+graphics options."
+}], "Text"],
+
+Cell[TextData[{
+ "Note that ",
+ StyleBox["DrawPeriodic2DFrameworkMode",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ", ",
+ StyleBox["DrawPeriodic2DFrameworkModeAmp",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ", and ",
+ StyleBox["DrawPeriodic2DFrameworkStress",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " (and their 3D variants) can plot complex-valued modes (i.e. Bloch waves).  \
+Examples are given in the next section."
 }], "Text"]
 }, Closed]],
 
@@ -7038,7 +7071,7 @@ Cell[CellGroupData[{
 Cell["Rigidity matrices", "Subsubsection"],
 
 Cell[TextData[{
- "Two types of rigidity matrices can be computed.  The ordinary \
+ "Two types of periodic rigidity matrices can be computed.  The ordinary \
 \[OpenCurlyDoubleQuote]Bloch\[CloseCurlyDoubleQuote]-type rigidity matrix \
 [P13] can be computed with ",
  StyleBox["RigidityMatrix",
@@ -7055,16 +7088,21 @@ Cell[TextData[{
  " parametrizing the momentum space:"
 }], "Text"],
 
-Cell[BoxData[
- RowBox[{"RigidityMatrix", "[", 
-  RowBox[{
-   RowBox[{"{", 
-    RowBox[{"Exp", "[", 
-     RowBox[{"I", " ", "k"}], "]"}], "}"}], ",", "chainpos", ",", 
-   "chainbasis", ",", "chainedgedat"}], "]"}]], "Input"],
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"chainrig", "=", 
+   RowBox[{"RigidityMatrix", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"Exp", "[", 
+       RowBox[{"I", " ", "k"}], "]"}], "}"}], ",", "chainpos", ",", 
+     "chainbasis", ",", "chainedgedat"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Normal", "[", "chainrig", "]"}], "//", "MatrixForm"}]}], "Input"],
 
 Cell[TextData[{
- "The function ",
+ "The associated function ",
  StyleBox["NRigidityMatrix",
   FontFamily->"Courier",
   FontWeight->"Bold"],
@@ -7074,8 +7112,165 @@ Cell[TextData[{
  " to evaluate the rigidity matrix only when numerical values are inserted \
 for zx, zy.  This can often improve the numerical accuracy when plotting or \
 computing eigenvalues and determinants of the rigidity matrix or dynamical \
-matrix.  Examples of its use will be shown later."
+matrix."
 }], "Text"],
+
+Cell["\<\
+For example, it's not hard to compute the dynamical matrix and hence the band \
+structure for this 1D system: \
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"nchainrig", "=", 
+   RowBox[{"NRigidityMatrix", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"Exp", "[", 
+       RowBox[{"I", " ", "k"}], "]"}], "}"}], ",", "chainpos", ",", 
+     "chainbasis", ",", "chainedgedat"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"chaindyn", "=", 
+    RowBox[{
+     RowBox[{"ConjugateTranspose", "[", "nchainrig", "]"}], ".", 
+     "nchainrig"}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{"useful", " ", "function", " ", 
+     RowBox[{"from", " ", ":", " ", "http", ":"}]}], "//", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"mathematica", ".", "stackexchange", ".", "com"}], "/", "a"}], 
+     "/", "8644"}]}], " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"splitstyle", "[", "styles__", "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"st", "=", 
+       RowBox[{"Directive", "/@", 
+        RowBox[{"{", "styles", "}"}]}]}], "}"}], ",", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"Last", "[", 
+          RowBox[{"st", "=", 
+           RowBox[{"RotateLeft", "@", "st"}]}], "]"}], ",", "#"}], "}"}], 
+       "}"}], "&"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{
+   RowBox[{"Evaluate", "[", 
+    RowBox[{"Sqrt", "[", 
+     RowBox[{"Eigenvalues", "[", "chaindyn", "]"}], "]"}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"k", ",", 
+     RowBox[{"-", "\[Pi]"}], ",", "\[Pi]"}], "}"}], ",", 
+   RowBox[{"PlotStyle", "\[Rule]", 
+    RowBox[{"splitstyle", "@@", 
+     RowBox[{
+      RowBox[{"ColorData", "[", "1", "]"}], "/@", 
+      RowBox[{"Range", "[", 
+       RowBox[{"1", ",", "4"}], "]"}]}]}]}]}], "]"}]}], "Input"],
+
+Cell[TextData[{
+ "For higher-dimensional systems, the function ",
+ StyleBox["BandPathPlot",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " may be useful. It takes as input a vector of complex variables \
+\[OpenCurlyDoubleQuote]z\[CloseCurlyDoubleQuote], then a function depending \
+on z (e.g. the mode energies), and then the vertices of a (piecewise-linear) \
+path one wants to plot this function on in the Brillouin zone (expressed in \
+terms of z), and finally graphical options:"
+}], "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"nsquarerig", "=", 
+   RowBox[{"NRigidityMatrix", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"zx", ",", "zy"}], "}"}], ",", "squarepos", ",", "squarebasis", 
+     ",", "squareedgedat"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"squaredyn", "=", 
+   RowBox[{
+    RowBox[{"ConjugateTranspose", "[", "nsquarerig", "]"}], ".", 
+    "nsquarerig"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"squareband", "=", 
+   RowBox[{"Sqrt", "[", 
+    RowBox[{"Eigenvalues", "[", "squaredyn", "]"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"BandPathPlot", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{"zx", ",", "zy"}], "}"}], ",", "squareband", ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "\[Pi]"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"\[Pi]", ",", "\[Pi]"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "0"}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"PlotRange", "\[Rule]", "All"}], ",", 
+     RowBox[{"PlotStyle", "\[Rule]", 
+      RowBox[{"splitstyle", "@@", 
+       RowBox[{
+        RowBox[{"ColorData", "[", "1", "]"}], "/@", 
+        RowBox[{"Range", "[", 
+         RowBox[{"1", ",", "8"}], "]"}]}]}]}]}], "}"}]}], "]"}]}], "Input"],
+
+Cell[TextData[{
+ "In the next section, the function ",
+ StyleBox["BandPlot",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " is discussed, which can be applied to plot contours of bands in 2D.",
+ StyleBox[" ",
+  FontFamily->"Courier",
+  FontWeight->"Bold"]
+}], "Text"],
+
+Cell[TextData[{
+ "Here is the calculation of a normal mode and a picture of it using ",
+ StyleBox["DrawPeriodic2DFrameworkMode",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ". Note that the depicted eigenvector is complex at a value of k=2\[Pi]/7; \
+this data is thus input as a pair {eigenvector, list of z-values}:"
+}], "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"chainv", "=", 
+   RowBox[{
+    RowBox[{"Eigenvectors", "[", 
+     RowBox[{"chaindyn", "/.", 
+      RowBox[{"{", 
+       RowBox[{"k", "\[Rule]", 
+        RowBox[{"N", "[", 
+         RowBox[{"2", 
+          RowBox[{"\[Pi]", "/", "7"}]}], "]"}]}], "}"}]}], "]"}], "[", 
+    RowBox[{"[", "1", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"DrawPeriodic2DFrameworkMode", "[", 
+  RowBox[{"chainpos", ",", "chainbasis", ",", "chainedgedat", ",", 
+   RowBox[{"{", 
+    RowBox[{"chainv", ",", 
+     RowBox[{"{", 
+      RowBox[{"Exp", "[", 
+       RowBox[{"I", " ", "2", 
+        RowBox[{"\[Pi]", "/", "7"}]}], "]"}], "}"}]}], "}"}], ",", 
+   RowBox[{"{", "13", "}"}]}], "]"}]}], "Input"],
 
 Cell[TextData[{
  StyleBox["RigidityMatrix",
@@ -7336,30 +7531,42 @@ ordinary periodic frameworks.  See e.g. [KPK11] for a discussion of Bloch\
 
 Cell[BoxData[{
  RowBox[{
-  RowBox[{"chainpos", "=", 
-   RowBox[{"{", 
+  RowBox[{
+   RowBox[{"stretchpos", "=", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"0", ",", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{".2", ",", 
+        RowBox[{"-", "1"}]}], "}"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+  
+  RowBox[{"(*", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Construction", " ", "of", " ", 
+     RowBox[{"tetrahelix", ":", "\[IndentingNewLine]", "http", ":"}]}], "//", 
+    
     RowBox[{
-     RowBox[{"{", 
-      RowBox[{"1", ",", "0"}], "}"}], ",", 
-     RowBox[{"{", 
+     RowBox[{
       RowBox[{
-       RowBox[{"1", "/", "2"}], ",", 
-       RowBox[{"1", "/", "2"}]}], "}"}]}], "}"}]}], 
-  ";"}], "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"www", ".", "rwgrayprojects", ".", "com"}], "/", "rbfnotes"}],
+        "/", "helix"}], "/", 
+      RowBox[{"helix01", ".", "html"}]}], "\[IndentingNewLine]", 
+     "\[IndentingNewLine]", "This", " ", "example", " ", "made", " ", "with", 
+     " ", "help", " ", "from", " ", "Yujie", " ", "Zhou"}]}], 
+   "\[IndentingNewLine]", "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"squarepos", "=", 
+  RowBox[{"tetrahelixpos", "=", 
    RowBox[{"{", 
-    RowBox[{
-     RowBox[{"{", 
-      RowBox[{"0", ",", "0"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{"1", ",", "0"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{"0", ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{"1", ",", "1"}], "}"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"3", 
+       RowBox[{
+        RowBox[{"Sqrt", "[", "3", "]"}], "/", "10"}]}], ",", "0", ",", "0"}], 
+     "}"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"cubepos", "=", 
+  RowBox[{"cylinderpos", "=", 
    RowBox[{"{", 
     RowBox[{
      RowBox[{"{", 
@@ -7369,15 +7576,7 @@ Cell[BoxData[{
      RowBox[{"{", 
       RowBox[{"0", ",", "1", ",", "0"}], "}"}], ",", 
      RowBox[{"{", 
-      RowBox[{"0", ",", "0", ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{"1", ",", "1", ",", "0"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{"1", ",", "0", ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{"0", ",", "1", ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{"1", ",", "1", ",", "1"}], "}"}]}], "}"}]}], ";"}]}], "Input"],
+      RowBox[{"1", ",", "1", ",", "0"}], "}"}]}], "}"}]}], ";"}]}], "Input"],
 
 Cell["\<\
 In generalized periodic frameworks, a set of symmetry transformations plays \
@@ -7391,8 +7590,26 @@ Cell[TextData[{
   FontFamily->"Courier",
   FontWeight->"Bold"],
  " package allows these symmetry transformations to be any commuting set of \
-affine transformations.  This is input as a list of d (D+1 by D+1)-matrices \
 ",
+ StyleBox["affine transformations",
+  FontSlant->"Italic"],
+ ".  Recall that an affine transformation is a composition of a linear map on \
+Euclidean space with a translation.  Explicitly, if x is a point in Euclidean \
+space, then x\[CloseCurlyQuote]=Ax+v after an affine transformation, where A \
+must be an invertible matrix.  This means that affine transformations include \
+all isometries (A in rotation group), similarity transformations (A rotation \
+or scaling), and in general can include skew transformations as well."
+}], "Text"],
+
+Cell["\<\
+To get from a unit cell to another, we act on the particles in it by affine \
+transformations in each of the periodic dimensions.  In order for this to \
+make sense, the transformations must commute.\
+\>", "Text"],
+
+Cell[TextData[{
+ "In this package, the affine transformations are input as a list of d (D+1 \
+by D+1)-matrices ",
  Cell[BoxData[
   FormBox[
    RowBox[{"(", 
@@ -7403,30 +7620,176 @@ affine transformations.  This is input as a list of d (D+1 by D+1)-matrices \
 represent affine transformations of the form Ax+v as {{A,v},{0,1}}: "
 }], "Text"],
 
-Cell[BoxData[{
+Cell[BoxData[
  RowBox[{
-  RowBox[{"chainbasis", "=", 
-   RowBox[{"{", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "this", " ", "function", " ", "generates", " ", "3", " ", "x", " ", "3", 
+    " ", "matrices", " ", "for", " ", "similarity", " ", "transforms", " ", 
+    "in", " ", "2", "D"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{"a", " ", "is", " ", "scale", " ", "factor"}], ",", " ", 
+    RowBox[{"t", " ", "is", " ", "rotation", " ", "angle"}], ",", " ", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"bx", ",", "by"}], "}"}], " ", "is", " ", "translation", " ", 
+     "vector"}]}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"similaritytransform2D", "[", 
+     RowBox[{"a_", ",", "t_", ",", 
+      RowBox[{"{", 
+       RowBox[{"bx_", ",", "by_"}], "}"}]}], "]"}], ":=", 
     RowBox[{"{", 
-     RowBox[{"2", ",", "0"}], "}"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"squarebasis", "=", 
-   RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"a", " ", 
+         RowBox[{"Cos", "[", "t", "]"}]}], ",", 
+        RowBox[{
+         RowBox[{"-", "a"}], " ", 
+         RowBox[{"Sin", "[", "t", "]"}]}], ",", "bx"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"a", " ", 
+         RowBox[{"Sin", "[", "t", "]"}]}], ",", 
+        RowBox[{"a", " ", 
+         RowBox[{"Cos", "[", "t", "]"}]}], ",", "by"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", "0", ",", "1"}], "}"}]}], "}"}]}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"(*", " ", 
     RowBox[{
-     RowBox[{"{", 
-      RowBox[{"2", ",", "0"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{"0", ",", "2"}], "}"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"cubebasis", "=", 
-   RowBox[{"{", 
+    "some", " ", "parameters", " ", "for", " ", "the", " ", "\"\<stretch\>\"",
+      " ", "example"}], " ", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"r1", "=", 
+     RowBox[{"-", ".1"}]}], ";", 
+    RowBox[{"ay", "=", "2"}], ";", 
+    RowBox[{"ax", "=", "1"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"cx", "=", ".2"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Mx", "=", 
+     RowBox[{"similaritytransform2D", "[", 
+      RowBox[{"1", ",", "r1", ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "0"}], "}"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", " ", 
     RowBox[{
+    "parameters", " ", "of", " ", "My", " ", "come", " ", "from", " ", 
+     "solving", " ", "for", " ", "the", " ", "most", " ", "general", " ", 
+     "possible", " ", "matrix", " ", "that", " ", "commutes", " ", "with", 
+     " ", "Mx"}], " ", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"My", "=", 
+     RowBox[{"similaritytransform2D", "[", 
+      RowBox[{
+       RowBox[{"\[Sqrt]", 
+        RowBox[{"(", 
+         RowBox[{
+          SuperscriptBox[
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"ay", " ", 
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{"-", "1"}], "+", 
+                RowBox[{"Cos", "[", "r1", "]"}]}], ")"}]}], "+", 
+             RowBox[{"ax", " ", 
+              RowBox[{"Sin", "[", "r1", "]"}]}]}], ")"}], "2"], "+", 
+          SuperscriptBox[
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "1"}], "+", "ax", "-", 
+             RowBox[{"ax", " ", 
+              RowBox[{"Cos", "[", "r1", "]"}]}], "+", 
+             RowBox[{"ay", " ", 
+              RowBox[{"Sin", "[", "r1", "]"}]}]}], ")"}], "2"]}], ")"}]}], 
+       ",", 
+       RowBox[{"ArcCot", "[", 
+        FractionBox[
+         RowBox[{
+          RowBox[{"-", "1"}], "+", "ax", "-", 
+          RowBox[{"ax", " ", 
+           RowBox[{"Cos", "[", "r1", "]"}]}], "+", 
+          RowBox[{"ay", " ", 
+           RowBox[{"Sin", "[", "r1", "]"}]}]}], 
+         RowBox[{"ay", "-", 
+          RowBox[{"ay", " ", 
+           RowBox[{"Cos", "[", "r1", "]"}]}], "-", 
+          RowBox[{"ax", " ", 
+           RowBox[{"Sin", "[", "r1", "]"}]}]}]], "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"ax", ",", "ay"}], "}"}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"stretchtransf", "=", 
      RowBox[{"{", 
-      RowBox[{"2", ",", "0", ",", "0"}], "}"}], ",", 
+      RowBox[{"Mx", ",", "My"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"tetrahelixtransf", "=", 
      RowBox[{"{", 
-      RowBox[{"0", ",", "2", ",", "0"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{"0", ",", "0", ",", "2"}], "}"}]}], "}"}]}], ";"}]}], "Input"],
+      RowBox[{"ArrayFlatten", "[", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"RotationMatrix", "[", 
+            RowBox[{
+             RowBox[{"ArcCos", "[", 
+              RowBox[{
+               RowBox[{"-", "2"}], "/", "3"}], "]"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"0", ",", "0", ",", "1"}], "}"}]}], "]"}], ",", 
+           RowBox[{"Transpose", "[", 
+            RowBox[{"{", 
+             RowBox[{"{", 
+              RowBox[{"0", ",", "0", ",", 
+               RowBox[{"1", "/", 
+                RowBox[{"Sqrt", "[", "10", "]"}]}]}], "}"}], "}"}], "]"}]}], 
+          "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"0", ",", "1"}], "}"}]}], "}"}], "]"}], "}"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"cylindertransf", "=", 
+     RowBox[{"{", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"ArrayFlatten", "[", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"IdentityMatrix", "[", "3", "]"}], ",", 
+            RowBox[{"Transpose", "[", 
+             RowBox[{"{", 
+              RowBox[{"{", 
+               RowBox[{"2", ",", "0", ",", "0"}], "}"}], "}"}], "]"}]}], 
+           "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"0", ",", "1"}], "}"}]}], "}"}], "]"}], ",", 
+       RowBox[{"ArrayFlatten", "[", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"RotationMatrix", "[", 
+             RowBox[{
+              RowBox[{"\[Pi]", "/", "4"}], ",", 
+              RowBox[{"{", 
+               RowBox[{"1", ",", "0", ",", "0"}], "}"}]}], "]"}], ",", 
+            RowBox[{"Transpose", "[", 
+             RowBox[{"{", 
+              RowBox[{"{", 
+               RowBox[{"0", ",", "1", ",", "0"}], "}"}], "}"}], "]"}]}], 
+           "}"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"0", ",", "1"}], "}"}]}], "}"}], "]"}]}], "}"}]}], 
+    ";"}]}]}]], "Input"],
 
 Cell["\<\
 The edge data of a generalized periodic framework is encoded in precisely the \
@@ -7435,22 +7798,70 @@ same way as for a periodic framework.\
 
 Cell[BoxData[{
  RowBox[{
-  RowBox[{"chainedgedat", "=", 
+  RowBox[{"stretchedgedat", "=", 
    RowBox[{"{", 
     RowBox[{
      RowBox[{"{", 
       RowBox[{
        RowBox[{"{", 
         RowBox[{"1", ",", "2"}], "}"}], ",", 
-       RowBox[{"{", "0", "}"}], ",", "1"}], "}"}], ",", 
+       RowBox[{"{", "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
      RowBox[{"{", 
       RowBox[{
        RowBox[{"{", 
         RowBox[{"1", ",", "2"}], "}"}], ",", 
-       RowBox[{"{", "1", "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "1"}], ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", 
+         RowBox[{"-", "1"}]}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", 
+         RowBox[{"-", "1"}]}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
   ";"}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"squareedgedat", "=", 
+  RowBox[{"tetrahelixedgedat", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", "1", "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", "2", "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", "3", "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"cylinderedgedat", "=", 
    RowBox[{"{", 
     RowBox[{
      RowBox[{"{", 
@@ -7501,159 +7912,20 @@ Cell[BoxData[{
         RowBox[{"4", ",", "3"}], "}"}], ",", 
        RowBox[{"{", 
         RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
-  ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"cubeedgedat", "=", 
-   RowBox[{"{", 
-    RowBox[{
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"1", ",", "2"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"1", ",", "3"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"1", ",", "4"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"2", ",", "5"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"2", ",", "6"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"3", ",", "5"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"3", ",", "7"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"4", ",", "6"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"4", ",", "7"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"5", ",", "8"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"6", ",", "8"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"7", ",", "8"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     "\[IndentingNewLine]", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"2", ",", "1"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"1", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"5", ",", "3"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"1", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"6", ",", "4"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"1", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"8", ",", "7"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"1", ",", "0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     "\[IndentingNewLine]", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"3", ",", "1"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"5", ",", "2"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"7", ",", "4"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"8", ",", "6"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
-     "\[IndentingNewLine]", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"4", ",", "1"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"6", ",", "2"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"7", ",", "3"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
-     RowBox[{"{", 
-      RowBox[{
-       RowBox[{"{", 
-        RowBox[{"8", ",", "5"}], "}"}], ",", 
-       RowBox[{"{", 
-        RowBox[{"0", ",", "0", ",", "1"}], "}"}], ",", "1"}], "}"}]}], 
-    "}"}]}], ";"}]}], "Input"]
+  ";"}]}], "Input"],
+
+Cell[TextData[{
+ "The function ",
+ StyleBox["EdgeLengthsSqT",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " outputs the squared lengths of each of the edges:"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{"EdgeLengthsSqT", "[", 
+  RowBox[{"stretchpos", ",", "stretchtransf", ",", "stretchedgedat"}], 
+  "]"}]], "Input"]
 }, Closed]],
 
 Cell[CellGroupData[{
@@ -7661,7 +7933,17 @@ Cell[CellGroupData[{
 Cell["Making pictures", "Subsubsection"],
 
 Cell[TextData[{
- "Periodic frameworks can be drawn with the ",
+ "Generalized periodic frameworks can be drawn with the ",
+ StyleBox["DrawTPeriodic2DFramework",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " and ",
+ StyleBox["DrawTPeriodic3DFramework",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " functions (the \[OpenCurlyDoubleQuote]T\[CloseCurlyDoubleQuote] stands for \
+\[OpenCurlyDoubleQuote]transformation\[CloseCurlyDoubleQuote]).  These \
+functions work very much like ",
  StyleBox["DrawPeriodic2DFramework",
   FontFamily->"Courier",
   FontWeight->"Bold"],
@@ -7669,41 +7951,38 @@ Cell[TextData[{
  StyleBox["DrawPeriodic3DFramework",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " functions.  We can plot multiple copies of each unit cell to better depict \
-the periodicity if we wish:"
+ ":"
 }], "Text"],
 
 Cell[BoxData[{
- RowBox[{"DrawPeriodic2DFramework", "[", 
-  RowBox[{"chainpos", ",", "chainbasis", ",", "chainedgedat", ",", 
-   RowBox[{"{", "3", "}"}]}], "]"}], "\[IndentingNewLine]", 
- RowBox[{"DrawPeriodic2DFramework", "[", 
-  RowBox[{"squarepos", ",", "squarebasis", ",", "squareedgedat", ",", 
+ RowBox[{"DrawTPeriodic2DFramework", "[", 
+  RowBox[{"stretchpos", ",", "stretchtransf", ",", "stretchedgedat", ",", 
    RowBox[{"{", 
-    RowBox[{"3", ",", "2"}], "}"}]}], "]"}], "\[IndentingNewLine]", 
- RowBox[{"DrawPeriodic3DFramework", "[", 
-  RowBox[{"cubepos", ",", "cubebasis", ",", "cubeedgedat", ",", 
+    RowBox[{"3", ",", "3"}], "}"}]}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"DrawTPeriodic3DFramework", "[", 
+  RowBox[{
+  "tetrahelixpos", ",", "tetrahelixtransf", ",", "tetrahelixedgedat", ",", 
+   RowBox[{"{", "15", "}"}]}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"DrawTPeriodic3DFramework", "[", 
+  RowBox[{"cylinderpos", ",", "cylindertransf", ",", "cylinderedgedat", ",", 
    RowBox[{"{", 
-    RowBox[{"5", ",", "2", ",", "3"}], "}"}]}], "]"}]}], "Input"],
+    RowBox[{"5", ",", "7"}], "}"}]}], "]"}]}], "Input"],
 
 Cell[TextData[{
- "There are periodic variants of all the non-periodic plotting functions, \
-e.g. ",
- StyleBox["DrawPeriodic3DFrameworkMode",
+ "Note also that there are generalized variants of all the periodic plotting \
+functions, e.g. ",
+ StyleBox["DrawTPeriodic3DFrameworkMode",
   FontFamily->"Courier",
   FontWeight->"Bold"],
  ", ",
- StyleBox["DrawPeriodic3DFrameworkModeAmp",
+ StyleBox["DrawTPeriodic3DFrameworkModeAmp",
   FontFamily->"Courier",
   FontWeight->"Bold"],
  ", and ",
- StyleBox["DrawPeriodic3DFrameworkStress",
+ StyleBox["DrawTPeriodic3DFrameworkStress",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- ".  They take the same arguments except that the periodic variants have 3 \
-slots: positions, basis, edgedata, where the non-periodic functions have 2: \
-positions, edgedata, and the periodic variants also include a slot for the \
-number of copies to be plotted before the other graphics options."
+ " (as well as the 2D variants).  "
 }], "Text"]
 }, Closed]],
 
@@ -7712,13 +7991,18 @@ Cell[CellGroupData[{
 Cell["Rigidity matrices", "Subsubsection"],
 
 Cell[TextData[{
- "Two types of rigidity matrices can be computed.  The ordinary \
-\[OpenCurlyDoubleQuote]Bloch\[CloseCurlyDoubleQuote]-type rigidity matrix \
-[P13] can be computed with ",
+ "For generalized periodic frameworks, ",
+ StyleBox["RigidityMatrixT",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " computes the generalized \[OpenCurlyDoubleQuote]Bloch\
+\[CloseCurlyDoubleQuote]-type rigidity matrix [KPK11,P13] in a similar way as \
+",
  StyleBox["RigidityMatrix",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " as follows.  Note that the first input is the list of variables ",
+ " for ordinary periodic frameworks.  Now the first input is the list of \
+variables ",
  Cell[BoxData[
   FormBox[
    RowBox[{
@@ -7726,49 +8010,103 @@ Cell[TextData[{
     SuperscriptBox["e", 
      RowBox[{"i", " ", 
       SubscriptBox["k", "j"]}]]}], TraditionalForm]]],
- " parametrizing the momentum space:"
+ " parametrizing the generalized momentum space:"
 }], "Text"],
 
-Cell[BoxData[
- RowBox[{"RigidityMatrix", "[", 
-  RowBox[{
-   RowBox[{"{", 
-    RowBox[{"Exp", "[", 
-     RowBox[{"I", " ", "k"}], "]"}], "}"}], ",", "chainpos", ",", 
-   "chainbasis", ",", "chainedgedat"}], "]"}]], "Input"],
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"tetrahelixrig", "=", 
+   RowBox[{"RigidityMatrixT", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"Exp", "[", 
+       RowBox[{"I", " ", "k"}], "]"}], "}"}], ",", "tetrahelixpos", ",", 
+     "tetrahelixtransf", ",", "tetrahelixedgedat"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Normal", "[", "tetrahelixrig", "]"}], "//", 
+  "MatrixForm"}]}], "Input"],
 
 Cell[TextData[{
- "The function ",
- StyleBox["NRigidityMatrix",
+ "The associated function ",
+ StyleBox["NRigidityMatrixT",
   FontFamily->"Courier",
   FontWeight->"Bold"],
  " forces ",
  StyleBox["Mathematica",
   FontSlant->"Italic"],
  " to evaluate the rigidity matrix only when numerical values are inserted \
-for zx, zy.  This can often improve the numerical accuracy when plotting or \
-computing eigenvalues and determinants of the rigidity matrix or dynamical \
-matrix.  Examples of its use will be shown later."
+for zx, zy.  "
 }], "Text"],
+
+Cell["\<\
+Here\[CloseCurlyQuote]s the band structure of the tetrahelix:\
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ntetrahelixrig", "=", 
+   RowBox[{"NRigidityMatrixT", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"Exp", "[", 
+       RowBox[{"I", " ", "k"}], "]"}], "}"}], ",", "tetrahelixpos", ",", 
+     "tetrahelixtransf", ",", "tetrahelixedgedat"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"tetrahelixdyn", "=", 
+    RowBox[{
+     RowBox[{"ConjugateTranspose", "[", "ntetrahelixrig", "]"}], ".", 
+     "ntetrahelixrig"}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{"useful", " ", "function", " ", 
+     RowBox[{"from", " ", ":", " ", "http", ":"}]}], "//", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"mathematica", ".", "stackexchange", ".", "com"}], "/", "a"}], 
+     "/", "8644"}]}], " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"splitstyle", "[", "styles__", "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"st", "=", 
+       RowBox[{"Directive", "/@", 
+        RowBox[{"{", "styles", "}"}]}]}], "}"}], ",", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"Last", "[", 
+          RowBox[{"st", "=", 
+           RowBox[{"RotateLeft", "@", "st"}]}], "]"}], ",", "#"}], "}"}], 
+       "}"}], "&"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Plot", "[", 
+  RowBox[{
+   RowBox[{"Evaluate", "[", 
+    RowBox[{"Sqrt", "[", 
+     RowBox[{"Eigenvalues", "[", "tetrahelixdyn", "]"}], "]"}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"k", ",", 
+     RowBox[{"-", "\[Pi]"}], ",", "\[Pi]"}], "}"}], ",", 
+   RowBox[{"PlotStyle", "\[Rule]", 
+    RowBox[{"splitstyle", "@@", 
+     RowBox[{
+      RowBox[{"ColorData", "[", "1", "]"}], "/@", 
+      RowBox[{"Range", "[", 
+       RowBox[{"1", ",", "8"}], "]"}]}]}]}]}], "]"}]}], "Input"],
 
 Cell[TextData[{
- StyleBox["RigidityMatrix",
+ StyleBox["RigidityMatrixT",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " can also compute the \[OpenCurlyDoubleQuote]fixed-lattice\
-\[CloseCurlyDoubleQuote] type [MT12] of rigidity matrix.  It contains (dim of \
-space)(dim of lattice) extra columns parametrizing the linearized change of \
-shape of the unit cell:"
-}], "Text"],
-
-Cell[BoxData[
- RowBox[{"RigidityMatrix", "[", 
-  RowBox[{
-   RowBox[{"{", "1", "}"}], ",", "chainpos", ",", "chainbasis", ",", 
-   "chainedgedat", ",", "True"}], "]"}]], "Input"],
-
-Cell[BoxData[
- RowBox[{"Normal", "[", "%", "]"}]], "Input"]
+ " currently does not compute the \[OpenCurlyDoubleQuote]fixed-lattice\
+\[CloseCurlyDoubleQuote] type [MT12] of rigidity matrix.  When I figure out \
+how this works, I\[CloseCurlyQuote]ll add it."
+}], "Text"]
 }, Closed]]
 }, Closed]]
 }, Closed]],
@@ -8941,13 +9279,23 @@ Cell[BoxData[{
      RowBox[{"Length", "[", "periodicselfstressList", "]"}]}], "}"}]}], 
   "]"}]}], "Input"],
 
-Cell["\<\
-These also allow the stress vectors to take complex values -- corresponding \
+Cell[TextData[{
+ "These also allow the stress vectors to take complex values -- corresponding \
 to periodic stress vectors with different phases.  This requires the data in \
 the \[OpenCurlyDoubleQuote]stress input\[CloseCurlyDoubleQuote] slot to be a \
-list {vector of stresses, q}, where q is the momentum vector corresponding to \
-the periodicity of the stress.\
-\>", "Text"],
+list {vector of stresses, vector of z}, where ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["z", "i"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ "=Exp[I ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["q", "i"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ "] are the components of the Bloch multiplier vector corresponding to the \
+periodicity of the stress."
+}], "Text"],
 
 Cell[BoxData[{
  RowBox[{
@@ -8974,8 +9322,10 @@ Cell[BoxData[{
         RowBox[{"[", "j", "]"}], "]"}], ",", 
        RowBox[{"{", 
         RowBox[{
-         RowBox[{"2", 
-          RowBox[{"\[Pi]", "/", "3"}]}], ",", "0"}], "}"}]}], "}"}], ",", 
+         RowBox[{"Exp", "[", 
+          RowBox[{"I", " ", "2", 
+           RowBox[{"\[Pi]", "/", "3"}]}], "]"}], ",", "1"}], "}"}]}], "}"}], 
+     ",", 
      RowBox[{"{", 
       RowBox[{"6", ",", "6"}], "}"}], ",", "5", ",", 
      RowBox[{"{", 
@@ -9382,7 +9732,7 @@ vol. 372 no. 2008 20120030. http://arxiv.org/abs/1102.2744\
 },
 EvaluationCompletionAction->{},
 WindowSize->{800, 691},
-WindowMargins->{{Automatic, 90}, {Automatic, 109}},
+WindowMargins->{{Automatic, 85}, {Automatic, 36}},
 PrivateNotebookOptions->{"FileOutlineCache"->False},
 TrackCellChangeTimes->False,
 Background->RGBColor[0.965927, 0.985016, 0.999908],
