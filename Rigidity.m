@@ -44,7 +44,7 @@ u2=((p2[[1]]-p1[[1]])(p1[[2]]-p3[[2]])-(p2[[2]]-p1[[2]])(p1[[1]]-p3[[1]]))/((p4[
 (* convention for "lattice" columns agrees with papers *)
 
 RigidityMatrix[z_,posns_,basis_,edgedat_,fixedperiodic_:False]:=
-Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],
+Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],bcomponent,bvec,
 numpart=Length[posns],part1,part2,ebond,kb,lattchange,zm,edatExtend,k,j},
 SparseArray[Flatten[Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
@@ -81,8 +81,8 @@ RigidityMatrix[z,posns,basis,edgedat,fixedperiodic];
 (* fixed periodicity is not yet implemented *)
 
 RigidityMatrixT[z_,posns_,transformations_,edgedat_(*,fixedperiodic_:False*)]:=
-Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],
-numpart=Length[posns],part1,part2,ebond,kb,lattchange,zm,edatExtend,tmat,pv,fixedperiodic=False,k,j,i},
+Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],bcomponent,bvec,
+numpart=Length[posns],part1,part2,ebond,kb,lattchange,zm,edatExtend,tmat,pv,fixedperiodic=False,k,j,i,ebondrot},
 SparseArray[Flatten[Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
 kb=1;(*edgedat[[j,3]];*)
@@ -92,17 +92,18 @@ zm=Product[z[[k]]^edatExtend[[k]],{k,qdim}];
 tmat=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,qdim}]; (* maybe could memoize *)
 pv=tmat.Join[posns[[part2]],{1}];
 ebond=-posns[[part1]]+pv[[1;;dim]]; (* sign convention from malestein theran *)
+ebondrot=ebond.tmat[[;;dim,;;dim]];
 (* ebond=ebond/Norm[ebond];*)
 If[part1!=part2,(Join[
 Table[{j,dim (part1-1)+k}->-ebond[[k]],{k,dim}],
-Table[{j,dim (part2-1)+k}->ebond[[k]] zm,{k,dim}],
+Table[{j,dim (part2-1)+k}->zm ebondrot[[k]],{k,dim}],
 If[fixedperiodic,Flatten[
 Table[{j,dim numpart+(bvec-1) qdim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
 ,{bvec,qdim},{bcomponent,dim}]]
 ,{}]
 ]),
 (* part1\[Equal]part2*)
-Join[Table[{j,dim (part1-1)+k}->-ebond[[k]](1-zm),{k,dim}],
+Join[Table[{j,dim (part1-1)+k}->-ebond[[k]]+zm ebondrot[[k]],{k,dim}],
 If[fixedperiodic,Flatten[
 Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]](ebond[[bcomponent]])
 ,{bvec,dim},{bcomponent,dim}]]

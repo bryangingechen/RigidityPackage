@@ -9731,8 +9731,8 @@ vol. 372 no. 2008 20120030. http://arxiv.org/abs/1102.2744\
 }, Open  ]]
 },
 EvaluationCompletionAction->{},
-WindowSize->{800, 691},
-WindowMargins->{{Automatic, 85}, {Automatic, 36}},
+WindowSize->{867, 826},
+WindowMargins->{{Automatic, 307}, {Automatic, 0}},
 PrivateNotebookOptions->{"FileOutlineCache"->False},
 TrackCellChangeTimes->False,
 Background->RGBColor[0.965927, 0.985016, 0.999908],
