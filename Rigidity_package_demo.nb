@@ -6173,17 +6173,15 @@ Cell[TextData[{
 }], "Text"],
 
 Cell[BoxData[{
- FormBox[
-  StyleBox[
+ StyleBox[
+  RowBox[{
    RowBox[{
-    RowBox[{
-     RowBox[{"SetDirectory", "[", 
-      RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ";"}], " "}],
-   FontWeight->"Bold"], InputForm], "\n", 
- FormBox[
-  StyleBox[
-   RowBox[{"<<", "\"\<Rigidity.m\>\""}],
-   FontWeight->"Bold"], InputForm]}], "Text"],
+    RowBox[{"SetDirectory", "[", 
+     RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ";"}], " "}],
+  FontWeight->"Bold"], "\n", 
+ StyleBox[
+  RowBox[{"<<", "\"\<Rigidity.m\>\""}],
+  FontWeight->"Bold"]}], "Text"],
 
 Cell[TextData[{
  "If the file \[OpenCurlyDoubleQuote]Rigidity.m\[CloseCurlyDoubleQuote] is \
@@ -6254,9 +6252,7 @@ Cell["Basic Operations", "Section"],
 
 Cell[CellGroupData[{
 
-Cell["\<\
-Working with non-periodic frameworks\
-\>", "Subsection"],
+Cell["Working with non-periodic frameworks", "Subsection"],
 
 Cell[CellGroupData[{
 
@@ -6428,9 +6424,7 @@ Cell[BoxData[{
 
 Cell[CellGroupData[{
 
-Cell["\<\
-Rigidity matrices and drawing modes\
-\>", "Subsubsection"],
+Cell["Rigidity matrices and drawing modes", "Subsubsection"],
 
 Cell["\<\
 The linear rigidity of a framework is completely determined by the properties \
@@ -6443,8 +6437,10 @@ Cell[TextData[{
  StyleBox["RigidityMatrix",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " computes this matrix, as a sparse matrix in mathematica.  For 2D \
-non-periodic frameworks it should be called as below."
+ " computes this matrix, as a sparse matrix in ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ ".  For 2D non-periodic frameworks it should be called as below."
 }], "Text"],
 
 Cell[BoxData[
@@ -6516,6 +6512,28 @@ Cell[BoxData[{
   RowBox[{"[", "1", "]"}], "]"}]}], "Input"],
 
 Cell[TextData[{
+ "The function ",
+ StyleBox["DynMat",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " is shorthand for this (in fact, it applies a conjugate transpose so that \
+it will work for Fourier-transformed matrices). If the second argument is \
+omitted, the resulting matrix will represent a system whose spring constants \
+are proportional to the squared bond lengths:"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{"tetrahedronD", "\[Equal]", 
+  RowBox[{"DynMat", "[", 
+   RowBox[{"tetrahedronR", ",", 
+    RowBox[{"DiagonalMatrix", "[", 
+     RowBox[{"1", "/", 
+      RowBox[{"EdgeLengthsSq", "[", 
+       RowBox[{"tetrahedronpos", ",", 
+        RowBox[{"{", "}"}], ",", "tetrahedronedgedat"}], "]"}]}], "]"}]}], 
+   "]"}]}]], "Input"],
+
+Cell[TextData[{
  "The modes (and more generally, any infinitesimal displacements) can be \
 plotted with ",
  StyleBox["Draw2DFrameworkMode",
@@ -6570,7 +6588,7 @@ Cell[BoxData[
    RowBox[{"{", "Purple", "}"}]}], "]"}]], "Input"],
 
 Cell["\<\
-Stresses and self-stresses can be plotted as well -- see the section \
+Stresses and self-stresses can be drawn as well -- see the section \
 \[OpenCurlyDoubleQuote]Plotting stresses and self-stresses\
 \[CloseCurlyDoubleQuote] under \[OpenCurlyDoubleQuote]Linear response and \
 stresses\[CloseCurlyDoubleQuote] in \[OpenCurlyDoubleQuote]Other computations\
@@ -7133,9 +7151,7 @@ Cell[BoxData[{
  RowBox[{
   RowBox[{
    RowBox[{"chaindyn", "=", 
-    RowBox[{
-     RowBox[{"ConjugateTranspose", "[", "nchainrig", "]"}], ".", 
-     "nchainrig"}]}], ";"}], "\[IndentingNewLine]", 
+    RowBox[{"DynMat", "[", "nchainrig", "]"}]}], ";"}], "\[IndentingNewLine]", 
   RowBox[{"(*", " ", 
    RowBox[{
     RowBox[{"useful", " ", "function", " ", 
@@ -7198,9 +7214,7 @@ Cell[BoxData[{
      ",", "squareedgedat"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"squaredyn", "=", 
-   RowBox[{
-    RowBox[{"ConjugateTranspose", "[", "nsquarerig", "]"}], ".", 
-    "nsquarerig"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"DynMat", "[", "nsquarerig", "]"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"squareband", "=", 
    RowBox[{"Sqrt", "[", 
@@ -7356,9 +7370,7 @@ Cell[BoxData[{
      RowBox[{
       RowBox[{"Normal", "[", 
        RowBox[{"(", 
-        RowBox[{
-         RowBox[{"ConjugateTranspose", "[", "squareR", "]"}], ".", 
-         "squareR"}], ")"}], "]"}], ",", 
+        RowBox[{"DynMat", "[", "squareR", "]"}], ")"}], "]"}], ",", 
       RowBox[{"{", "8", "}"}]}], "]"}]}], ";"}], 
   "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
  RowBox[{"BandPlot", "[", 
@@ -7444,9 +7456,7 @@ Cell[BoxData[{
      RowBox[{
       RowBox[{"Normal", "[", 
        RowBox[{"(", 
-        RowBox[{
-         RowBox[{"ConjugateTranspose", "[", "triR", "]"}], ".", "triR"}], 
-        ")"}], "]"}], ",", 
+        RowBox[{"DynMat", "[", "triR", "]"}], ")"}], "]"}], ",", 
       RowBox[{"{", "2", "}"}]}], "]"}]}], ";"}], 
   "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
  RowBox[{"Show", "[", 
@@ -7465,7 +7475,11 @@ Cell[BoxData[{
       RowBox[{
        RowBox[{
         RowBox[{"-", "2"}], "\[Pi]"}], ",", 
-       RowBox[{"2", "\[Pi]"}]}], "}"}]}], "]"}], ",", 
+       RowBox[{"2", "\[Pi]"}]}], "}"}]}], "]"}], ",", "\[IndentingNewLine]", 
+   RowBox[{"(*", " ", 
+    RowBox[{
+     RowBox[{"Draw", " ", "red"}], ",", " ", 
+     RowBox[{"dashed", " ", "hexagon"}]}], " ", "*)"}], 
    RowBox[{"Graphics", "[", 
     RowBox[{"{", 
      RowBox[{"Dashed", ",", "Red", ",", 
@@ -7512,9 +7526,7 @@ Cell[BoxData[{
 
 Cell[CellGroupData[{
 
-Cell["\<\
-Generalized periodic frameworks\
-\>", "Subsection"],
+Cell["Generalized periodic frameworks", "Subsection"],
 
 Cell[CellGroupData[{
 
@@ -8056,9 +8068,8 @@ Cell[BoxData[{
  RowBox[{
   RowBox[{
    RowBox[{"tetrahelixdyn", "=", 
-    RowBox[{
-     RowBox[{"ConjugateTranspose", "[", "ntetrahelixrig", "]"}], ".", 
-     "ntetrahelixrig"}]}], ";"}], "\[IndentingNewLine]", 
+    RowBox[{"DynMat", "[", "ntetrahelixrig", "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
   RowBox[{"(*", " ", 
    RowBox[{
     RowBox[{"useful", " ", "function", " ", 
@@ -8518,9 +8529,7 @@ Cell["2D triangular lattice related", "Subsubsection"]
 
 Cell[CellGroupData[{
 
-Cell["\<\
-Covers of (generalized) periodic frameworks\
-\>", "Subsection"],
+Cell["Covers of (generalized) periodic frameworks", "Subsection"],
 
 Cell["\<\
 Given a (generalized) periodic framework it is often useful to construct \
@@ -9286,13 +9295,11 @@ the \[OpenCurlyDoubleQuote]stress input\[CloseCurlyDoubleQuote] slot to be a \
 list {vector of stresses, vector of z}, where ",
  Cell[BoxData[
   FormBox[
-   SubscriptBox["z", "i"], TraditionalForm]],
-  FormatType->"TraditionalForm"],
+   SubscriptBox["z", "i"], TraditionalForm]]],
  "=Exp[I ",
  Cell[BoxData[
   FormBox[
-   SubscriptBox["q", "i"], TraditionalForm]],
-  FormatType->"TraditionalForm"],
+   SubscriptBox["q", "i"], TraditionalForm]]],
  "] are the components of the Bloch multiplier vector corresponding to the \
 periodicity of the stress."
 }], "Text"],

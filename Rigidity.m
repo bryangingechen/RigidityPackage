@@ -175,6 +175,11 @@ NIntegrate[Im[D[Log[zz],t]],{t,0,2\[Pi]}]
 ];
 
 
+(* "dynamical matrix" shorthand function *)
+DynMat[rig_,kmat_:{}]:=Module[{},If[kmat=={},ConjugateTranspose[rig].rig,
+ConjugateTranspose[rig].kmat.rig]]
+
+
 (* ::Section:: *)
 (*Constraints and Pebble related*)
 
