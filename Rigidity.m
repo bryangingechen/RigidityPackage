@@ -820,7 +820,7 @@ tmat=Dot@@Table[MatrixPower[transf[[i]],cover[i]],{i,qdim}]
 CoveringFrameworkEdges[edgedat_,cover_,periodic_:False]:=
 Module[{i,j,dim=Length[cover],ind1,ind2,p1,p2,a,m,numbonds=0,
 bondlist=Table[Null,{Length[edgedat](Times@@cover)}],lenedge=Length[edgedat],
-unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec,i},
+unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec},
 tabspec=Join[Table[{m[j],cover[[j]]},{j,dim}],{{i,lenedge}}];
 Do[(* loop over edges in edgedat, (i.e. copy an edge i into all cells m,n) *)
 {p1,p2}=edgedat[[i,1]];
@@ -842,10 +842,10 @@ bondlist[[1;;numbonds]]
 
 (* slice; remove vertices, edges under a certain condition *)
 (* return new edgedat and list of vertex indices *)
-SliceOffVerts[pos_,edgedat_,poscond_,indexcond_:False]:=
+SliceOffVerts[pos_,edgedat_,poscond_,indexcond_:(False&)]:=
 Module[{i,j,edgenew,keepers,numpartsold=Length[pos],throwers},
 keepers=Flatten[Position[pos,_?(poscond),{1},Heads->False]];
-keepers=Select[keepers,Not[indexcond]];
+keepers=Select[keepers,Not/@indexcond]; (* is this right ? *)
 throwers=Complement[Table[i,{i,numpartsold}],keepers];
 edgenew=Select[edgedat,Flatten[Intersection[#[[1]],throwers]]=={}&]; (* need to reindex ... *)
 edgenew=Table[{edgenew[[j,1]]/.Table[keepers[[j]]->j,{j,Length[keepers]}],
