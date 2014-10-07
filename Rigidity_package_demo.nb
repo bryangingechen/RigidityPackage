@@ -7741,9 +7741,7 @@ Cell[BoxData[{
   RowBox[{"kslice", ",", 
    RowBox[{"kaglatt", "*", "kcopies"}], ",", "ksliceE"}], "]"}]}], "Input"],
 
-Cell["\<\
-Observe that this new system has 4 zero modes:\
-\>", "Text"],
+Cell["Observe that this new system has 4 zero modes:", "Text"],
 
 Cell[BoxData[{
  RowBox[{
@@ -8047,8 +8045,8 @@ Cell[BoxData[{
    RowBox[{"{", 
     RowBox[{"j", ",", 
      RowBox[{"Length", "[", 
-      RowBox[{"NullSpace", "[", "pinrigmat", "]"}], "]"}]}], "}"}]}], 
-  "]"}]}], "Input"]
+      RowBox[{"NullSpace", "[", "pinrigmat", "]"}], "]"}]}], "}"}]}], "]"}]}],
+  "Input"]
 }, Closed]],
 
 Cell[CellGroupData[{
@@ -8466,7 +8464,9 @@ behavior of ",
 
 Cell[CellGroupData[{
 
-Cell["Net dipole", "Subsubsection"],
+Cell["\<\
+Net dipole (needs to be fixed still!)\
+\>", "Subsubsection"],
 
 Cell["\<\
 In order to ensure that the quantities further below make sense, we must \
@@ -8503,8 +8503,18 @@ Cell[TextData[{
 }], "Text"],
 
 Cell["\<\
-[KL14] claim that this net dipole will always be an integer combination of \
-unit cell basis vectors for an isostatic system with uniform coordination.  \
+WARNING: THE CURRENT IMPLEMENTATION DOES NOT COMPUTE THIS PROPERLY - THE \
+GAUGE CHOICE MADE IN RIGIDITYMATRIX IS NOT CONSISTENT WITH THE CHOICE MADE \
+HERE!\
+\>", "Text",
+ FontWeight->"Bold"],
+
+Cell["\<\
+[KL14] claim that this net dipole will always be an integer linear \
+combination of unit cell basis vectors for an isostatic system with uniform \
+coordination.  Kane has informed me that this may in fact only be a \
+half-integer linear combination of unit cell basis vectors (private \
+communication).\
 \>", "Text"],
 
 Cell[TextData[{
@@ -8825,7 +8835,7 @@ vol. 372 no. 2008 20120030. http://arxiv.org/abs/1102.2744\
 },
 EvaluationCompletionAction->{},
 WindowSize->{867, 826},
-WindowMargins->{{Automatic, 53}, {Automatic, 0}},
+WindowMargins->{{356, Automatic}, {Automatic, 0}},
 PrivateNotebookOptions->{"FileOutlineCache"->False},
 TrackCellChangeTimes->False,
 Background->RGBColor[0.965927, 0.985016, 0.999908],

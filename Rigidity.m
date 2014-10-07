@@ -27,11 +27,20 @@ Doublemat[tab_]:=Module[{L=Length[tab],j},Flatten[Table[{2tab[[j]]-1,2tab[[j]]},
 
 (* Compute intersection "times" between two lines moving at unit speed, presented as point, angle *)
 computeintersection[p1_,th1_,p3_,th3_]:=
-Module[{u1,u2,p2=p1+{Cos[th1],Sin[th1]},p4=p3+{Cos[th3],Sin[th3]},pos},
+Module[{u1,u2,p2=p1+{Cos[th1],Sin[th1]},p4=p3+{Cos[th3],Sin[th3]}},
 u1=((p4[[1]]-p3[[1]])(p1[[2]]-p3[[2]])-(p4[[2]]-p3[[2]])(p1[[1]]-p3[[1]]))/((p4[[2]]-p3[[2]])(p2[[1]]-p1[[1]])-(p4[[1]]-p3[[1]])(p2[[2]]-p1[[2]]));
 u2=((p2[[1]]-p1[[1]])(p1[[2]]-p3[[2]])-(p2[[2]]-p1[[2]])(p1[[1]]-p3[[1]]))/((p4[[2]]-p3[[2]])(p2[[1]]-p1[[1]])-(p4[[1]]-p3[[1]])(p2[[2]]-p1[[2]]));
 (*pos=p1+u1{Cos[th1],Sin[th1]};*)
 {u1,u2(*,pos*)}
+];
+
+(* Compute intersection point between two lines moving at unit speed, presented as point, angle *)
+computeintersectionpos[p1_,th1_,p3_,th3_]:=
+Module[{u1,u2,p2=p1+{Cos[th1],Sin[th1]},p4=p3+{Cos[th3],Sin[th3]},pos},
+u1=((p4[[1]]-p3[[1]])(p1[[2]]-p3[[2]])-(p4[[2]]-p3[[2]])(p1[[1]]-p3[[1]]))/((p4[[2]]-p3[[2]])(p2[[1]]-p1[[1]])-(p4[[1]]-p3[[1]])(p2[[2]]-p1[[2]]));
+u2=((p2[[1]]-p1[[1]])(p1[[2]]-p3[[2]])-(p2[[2]]-p1[[2]])(p1[[1]]-p3[[1]]))/((p4[[2]]-p3[[2]])(p2[[1]]-p1[[1]])-(p4[[1]]-p3[[1]])(p2[[2]]-p1[[2]]));
+pos=p1+u1{Cos[th1],Sin[th1]};
+pos
 ];
 
 
