@@ -6165,9 +6165,10 @@ Cell[TextData[{
   FontFamily->"Courier",
   FontWeight->"Bold"],
  " can also compute the \[OpenCurlyDoubleQuote]fixed-lattice\
-\[CloseCurlyDoubleQuote] type [MT12] of rigidity matrix.  It contains (dim of \
-space)(dim of lattice) extra columns parametrizing the linearized change of \
-shape of the unit cell:"
+\[CloseCurlyDoubleQuote] type [MT12] of rigidity matrix.  This is also \
+essentially the \[OpenCurlyDoubleQuote]augmented\[CloseCurlyDoubleQuote] \
+rigidity matrix of [HF06].  It contains (dim of space)(dim of lattice) extra \
+columns parametrizing the linearized change of shape of the unit cell:"
 }], "Text"],
 
 Cell[BoxData[
@@ -8806,6 +8807,13 @@ in ",
 }], "Text"],
 
 Cell["\<\
+[HF06] R.G. Hutchinson and N.A. Fleck, \[OpenCurlyDoubleQuote]The Structural \
+performance of the periodic truss,\[CloseCurlyDoubleQuote] \
+10.1016/j.jmps.2005.10.008 Journal of the Mechanics and Physics of Solids 54, \
+756-782 (2006).\
+\>", "Text"],
+
+Cell["\<\
 [KL14] C.L. Kane and T.C. Lubensky, \[OpenCurlyDoubleQuote]Topological \
 Boundary Modes in Isostatic Lattices,\[CloseCurlyDoubleQuote] \
 10.1038/nphys2835 Nature Physics 10, 39 (2014). http://arxiv.org/abs/1308.0554\
@@ -8835,7 +8843,7 @@ vol. 372 no. 2008 20120030. http://arxiv.org/abs/1102.2744\
 },
 EvaluationCompletionAction->{},
 WindowSize->{867, 826},
-WindowMargins->{{356, Automatic}, {Automatic, 0}},
+WindowMargins->{{351, Automatic}, {Automatic, 0}},
 PrivateNotebookOptions->{"FileOutlineCache"->False},
 TrackCellChangeTimes->False,
 Background->RGBColor[0.965927, 0.985016, 0.999908],

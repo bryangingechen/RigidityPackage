@@ -186,7 +186,10 @@ NIntegrate[Im[D[Log[zz],t]],{t,0,2\[Pi]}]
 
 (* "dynamical matrix" shorthand function *)
 DynMat[rig_,kmat_:{}]:=Module[{},If[kmat=={},ConjugateTranspose[rig].rig,
-ConjugateTranspose[rig].kmat.rig]]
+ConjugateTranspose[rig].kmat.rig]];
+
+(* "hamiltonian matrix" shorthand function *)
+HMat[rig_]:=ArrayFlatten[{{0,ConjugateTranspose[rig]},{rig,0}}];
 
 
 (* ::Section:: *)
