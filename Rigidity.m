@@ -153,6 +153,8 @@ Norm[ebond]^2
 {j,numbonds}]];
 
 
+(* don't trust this right now in full generality - gauge choices made in rigidity matrix functions may be inconsistent with it *)
+
 NetDipole[posns_,basis_,edgedat_]:=Module[{vertcont,edgecont,dim=Length[posns[[1]]],qdim=Length[basis],
 nsp=NullSpace[basis],edatExtend,j},
 vertcont=dim(Sum[posns[[j]],{j,Length[posns]}]);
@@ -172,8 +174,9 @@ w1=NIntegrate[Im[D[Log[zz],t]],{t,0,2\[Pi]}];
 ];
 
 
-KLPolarization[latticep_,basis_,latticeEdat_,cyclesorigin_:{-1,-1}]:=
+KLPolarization[latticep_,basis_,latticeEdat_,cyclesorigin_:{}]:=
 Module[{powmat,w,zz,k,qdim=Length[basis],z,cycle,t},
+If[cyclesorigin=={},cyclesorigin=Table[-1,{qdim}]];
 powmat=RigidityMatrix[Table[z[j],{j,qdim}],latticep,basis,latticeEdat];
 w=Table[
 cycle=Table[z[k]->If[k!=j,cyclesorigin[[k]],Exp[I t]],{k,qdim}];

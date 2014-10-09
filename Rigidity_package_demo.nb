@@ -5314,7 +5314,8 @@ Cell[TextData[{
  " computes this matrix, as a sparse matrix in ",
  StyleBox["Mathematica",
   FontSlant->"Italic"],
- ".  For 2D non-periodic frameworks it should be called as below."
+ ".  For 2D non-periodic frameworks it should be called as below.  (The empty \
+lists are used only for periodic frameworks, as explained later)."
 }], "Text"],
 
 Cell[BoxData[
@@ -5406,6 +5407,17 @@ Cell[BoxData[
        RowBox[{"tetrahedronpos", ",", 
         RowBox[{"{", "}"}], ",", "tetrahedronedgedat"}], "]"}]}], "]"}]}], 
    "]"}]}]], "Input"],
+
+Cell[TextData[{
+ StyleBox["HMat",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " is a function which computes the class BDI Hamiltonian matrix derived by \
+Kane and Lubensky [KL14] - it just takes the rigidity matrix as input:"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{"HMat", "[", "tetrahedronR", "]"}]], "Input"],
 
 Cell[TextData[{
  "The modes (and more generally, any infinitesimal displacements) can be \
@@ -6005,6 +6017,21 @@ Cell[TextData[{
 for zx, zy.  This can often improve the numerical accuracy when plotting or \
 computing eigenvalues and determinants of the rigidity matrix or dynamical \
 matrix."
+}], "Text"],
+
+Cell[TextData[{
+ StyleBox["Warning: ",
+  FontWeight->"Bold"],
+ "the gauge chosen for Bloch waves assigns a factor of ",
+ Cell[BoxData[
+  FormBox[
+   SuperscriptBox["e", 
+    RowBox[{"i", " ", "k"}]], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ " whenever a bond crosses a unit cell.  This does not agree with the choice \
+made in [KL14]... (yet).  As such, one must take care with the interpretation \
+of winding numbers and how it changes as the way the unit cell is chosen \
+changes.  "
 }], "Text"],
 
 Cell["\<\
@@ -6984,6 +7011,38 @@ Cell[BoxData[{
       RowBox[{"ColorData", "[", "1", "]"}], "/@", 
       RowBox[{"Range", "[", 
        RowBox[{"1", ",", "8"}], "]"}]}]}]}]}], "]"}]}], "Input"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ev1", "=", 
+   RowBox[{
+    RowBox[{"Eigenvectors", "[", 
+     RowBox[{"tetrahelixdyn", "/.", 
+      RowBox[{"{", 
+       RowBox[{"k", "\[Rule]", ".1"}], "}"}]}], "]"}], "[", 
+    RowBox[{"[", "2", "]"}], "]"}]}], ";", 
+  RowBox[{"ev2", "=", 
+   RowBox[{
+    RowBox[{"Eigenvectors", "[", 
+     RowBox[{"tetrahelixdyn", "/.", 
+      RowBox[{"{", 
+       RowBox[{"k", "\[Rule]", ".1"}], "}"}]}], "]"}], "[", 
+    RowBox[{"[", "3", "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Show", "[", 
+  RowBox[{
+   RowBox[{"DrawTPeriodic3DFrameworkMode", "[", 
+    RowBox[{
+    "tetrahelixpos", ",", "tetrahelixtransf", ",", "tetrahelixedgedat", ",", 
+     "ev1", ",", 
+     RowBox[{"{", "15", "}"}], ",", 
+     RowBox[{"{", "}"}], ",", 
+     RowBox[{"{", "}"}], ",", 
+     RowBox[{"{", "Green", "}"}]}], "]"}], ",", 
+   RowBox[{"DrawTPeriodic3DFrameworkMode", "[", 
+    RowBox[{
+    "tetrahelixpos", ",", "tetrahelixtransf", ",", "tetrahelixedgedat", ",", 
+     "ev2", ",", 
+     RowBox[{"{", "15", "}"}]}], "]"}]}], "]"}]}], "Input"],
 
 Cell[TextData[{
  StyleBox["RigidityMatrixT",
@@ -8046,8 +8105,8 @@ Cell[BoxData[{
    RowBox[{"{", 
     RowBox[{"j", ",", 
      RowBox[{"Length", "[", 
-      RowBox[{"NullSpace", "[", "pinrigmat", "]"}], "]"}]}], "}"}]}], "]"}]}],
-  "Input"]
+      RowBox[{"NullSpace", "[", "pinrigmat", "]"}], "]"}]}], "}"}]}], 
+  "]"}]}], "Input"]
 }, Closed]],
 
 Cell[CellGroupData[{
