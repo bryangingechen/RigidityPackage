@@ -6638,7 +6638,7 @@ Cell[BoxData[
            RowBox[{"Sin", "[", "r1", "]"}]}]}]], "]"}], ",", 
        RowBox[{"{", 
         RowBox[{"ax", ",", "ay"}], "}"}]}], "]"}]}], ";"}], 
-   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
    RowBox[{
     RowBox[{"stretchtransf", "=", 
      RowBox[{"{", 
@@ -6668,7 +6668,7 @@ Cell[BoxData[
           "}"}], ",", 
          RowBox[{"{", 
           RowBox[{"0", ",", "1"}], "}"}]}], "}"}], "]"}], "}"}]}], ";"}], 
-   "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
    RowBox[{
     RowBox[{"cylindertransf", "=", 
      RowBox[{"{", "\[IndentingNewLine]", 
@@ -8297,7 +8297,7 @@ Cell[TextData[{
   FontWeight->"Bold",
   FontSlant->"Italic"],
  " is a stress that induces zero net force on each of the vertices.  It is a \
-vector lying in the kernel of the rigidity matrix."
+vector lying in the kernel of the transpose of the rigidity matrix."
 }], "Text"],
 
 Cell[BoxData[
