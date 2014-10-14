@@ -6026,8 +6026,7 @@ Cell[TextData[{
  Cell[BoxData[
   FormBox[
    SuperscriptBox["e", 
-    RowBox[{"i", " ", "k"}]], TraditionalForm]],
-  FormatType->"TraditionalForm"],
+    RowBox[{"i", " ", "k"}]], TraditionalForm]]],
  " whenever a bond crosses a unit cell.  This does not agree with the choice \
 made in [KL14]... (yet).  As such, one must take care with the interpretation \
 of winding numbers and how it changes as the way the unit cell is chosen \
@@ -7011,6 +7010,13 @@ Cell[BoxData[{
       RowBox[{"ColorData", "[", "1", "]"}], "/@", 
       RowBox[{"Range", "[", 
        RowBox[{"1", ",", "8"}], "]"}]}]}]}]}], "]"}]}], "Input"],
+
+Cell["\<\
+We can plot the eigenvectors near k=0 to see what the bands correspond to.  \
+Note that the upper band (magenta band above, ev1 and green below) is \
+approximately a vertical translation and the lower band (gold band above, ev2 \
+and red below) is approximately a rotation.\
+\>", "Text"],
 
 Cell[BoxData[{
  RowBox[{
@@ -8524,9 +8530,7 @@ behavior of ",
 
 Cell[CellGroupData[{
 
-Cell["\<\
-Net dipole (needs to be fixed still!)\
-\>", "Subsubsection"],
+Cell["Net dipole (needs to be fixed still!)", "Subsubsection"],
 
 Cell["\<\
 In order to ensure that the quantities further below make sense, we must \
@@ -8902,7 +8906,7 @@ vol. 372 no. 2008 20120030. http://arxiv.org/abs/1102.2744\
 },
 EvaluationCompletionAction->{},
 WindowSize->{867, 826},
-WindowMargins->{{351, Automatic}, {Automatic, 0}},
+WindowMargins->{{100, Automatic}, {Automatic, 0}},
 PrivateNotebookOptions->{"FileOutlineCache"->False},
 TrackCellChangeTimes->False,
 Background->RGBColor[0.965927, 0.985016, 0.999908],
