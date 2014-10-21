@@ -174,9 +174,10 @@ w1=NIntegrate[Im[D[Log[zz],t]],{t,0,2\[Pi]}];
 ];
 
 
-KLPolarization[latticep_,basis_,latticeEdat_,cyclesorigin_:{}]:=
-Module[{powmat,w,zz,k,qdim=Length[basis],z,cycle,t},
-If[cyclesorigin=={},cyclesorigin=Table[-1,{qdim}]];
+KLPolarization[latticep_,basis_,latticeEdat_,cyclesorigin0_:{}]:=
+Module[{powmat,w,zz,k,qdim=Length[basis],z,cycle,t,cyclesorigin},
+(* need both cyclesorigin0 and cyclesorigin because Mathematica's optional arguments are no longer variables *)
+If[Length[cyclesorigin0]!=qdim, cyclesorigin = Table[-1,{qdim}],cyclesorigin=cyclesorigin0];
 powmat=RigidityMatrix[Table[z[j],{j,qdim}],latticep,basis,latticeEdat];
 w=Table[
 cycle=Table[z[k]->If[k!=j,cyclesorigin[[k]],Exp[I t]],{k,qdim}];
