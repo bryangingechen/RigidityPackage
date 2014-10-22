@@ -800,12 +800,13 @@ Sow[{{i,j},Table[m[k],{k,qdim}],1}]],
 
 (* make a list of vertex positions in any dimension *)
 CoveringFrameworkVerts[unitcell_,latt_,cover_,r_:0]:=
-Module[{i,qdim=Length[latt],dim=Length[unitcell[[1]]],tabspec,m},
+Module[{i,j,qdim=Length[latt],dim=Length[unitcell[[1]]],tabspec,m},
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,qdim}];
 Flatten[
 Table[
 Table[
-Sum[latt[[i]]*m[i],{i,qdim}]+If[r>0, RandomReal[{-r,r},dim],Table[0,{dim}]]+unitcell[[i]],
+Sum[latt[[j]]*m[j],{j,qdim}]+If[r>0, RandomReal[{-r,r},dim],Table[0,{dim}]]
++unitcell[[i]],
 {i,Length[unitcell]}],
 ##]&@@tabspec,(* specification of table, dim copies of loops from 0 to cover-1 *)
 qdim]
