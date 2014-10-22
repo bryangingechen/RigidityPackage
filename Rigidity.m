@@ -835,19 +835,19 @@ tmat=Dot@@Table[MatrixPower[transf[[i]],cover[i]],{i,qdim}]
 
 (* this function was broken!!! *)
 CoveringFrameworkEdges[edgedat_,cover_,periodic_:False]:=
-Module[{i,j,dim=Length[cover],ind1,ind2,p1,p2,a,m,numbonds=0,
+Module[{i,j,dim=Length[cover],ind1,ind2,p1,p2,edatExtend,m,numbonds=0,
 bondlist=Table[Null,{Length[edgedat](Times@@cover)}],lenedge=Length[edgedat],
 unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec},
 tabspec=Join[Table[{m[j],cover[[j]]},{j,dim}],{{i,lenedge}}];
 Do[(* loop over edges in edgedat, (i.e. copy an edge i into all cells m,n) *)
 {p1,p2}=edgedat[[i,1]];
 (*a=edgedat[[i,2]];*)
-a=Join[edgedat[[i,2,1;;Min[Length[edgedat[[i,2]]],dim]]],Table[0,{dim-Length[edgedat[[i,2]]]}]];
+edatExtend=Join[edgedat[[i,2,1;;Min[Length[edgedat[[i,2]]],dim]]],Table[0,{dim-Length[edgedat[[i,2]]]}]];
 ind1=getatomindex2[Table[m[j],{j,dim}],p1,cover,unitcellsize];
-ind2=getatomindex2[Table[Mod[m[j]+a[[j]],cover[[j]],1],{j,dim}],p2,cover,unitcellsize];
+ind2=getatomindex2[Table[Mod[m[j]+edatExtend[[j]],cover[[j]],1],{j,dim}],p2,cover,unitcellsize];
 cellchange=Table[
 (* ceiling -1 because we need right endpoint *)
-Ceiling[(m[j]+a[[j]])/cover[[j]]-1],{j,dim}];
+Ceiling[(m[j]+edatExtend[[j]])/cover[[j]]-1],{j,dim}];
 If[periodic||(cellchange==Table[0,{dim}]),
 numbonds++;
 bondlist[[numbonds]]={{ind1,ind2},cellchange,1}
