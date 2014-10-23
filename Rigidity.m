@@ -829,7 +829,7 @@ qdim]
 CoveringTransformations[transf_,cover_]:=
 Module[{i,qdim=Length[transf],tmat},
 (* assuming that all matrices in transf commute... *)
-tmat=Dot@@Table[MatrixPower[transf[[i]],cover[[i]]],{i,qdim}]
+tmat=Table[MatrixPower[transf[[i]],cover[[i]]],{i,qdim}]
 ];
 
 
