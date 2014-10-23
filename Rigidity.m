@@ -44,6 +44,40 @@ pos
 ];
 
 
+(* Smith Normal Form code from Daniel Lichtblau
+http://mathematica.stackexchange.com/a/40930
+ *)
+diagonalQ[mat_?MatrixQ]:=With[{posns=Flatten[Map[Position[#,_?(#!=0&)]&,mat]]},
+Length[Union[posns]]==Length[posns]]
+
+diagonalize[mat_?MatrixQ]:=Module[{hnf=mat,umat=IdentityMatrix[Length[mat]],
+vmat=IdentityMatrix[Length[mat[[1]]]],tmpu,tmpv},
+While[Not[diagonalQ[hnf]],{tmpu,hnf}=HermiteDecomposition[hnf];
+umat=tmpu.umat;
+{tmpv,hnf}=HermiteDecomposition[Transpose[hnf]];
+vmat=vmat.Transpose[tmpv];
+hnf=Transpose[hnf];];
+{umat,hnf,vmat}]
+
+divides[a_,b_]:=GCD[a,b]===a
+
+smithNormalForm[mat_?MatrixQ]:=Module[{uu,dd,vv,diags,gcd,col=0,dim,tmpu,tmpv},
+{uu,dd,vv}=diagonalize[mat];
+diags=Select[Flatten[dd],#!=0&];
+dim=Length[diags];
+While[col+1<dim,col++;
+If[divides[diags[[col]],GCD[Apply[Sequence,Drop[diags,col]]]],Continue[]];
+vv=Transpose[vv];
+Do[dd[[j,col]]=diags[[j]];
+vv[[col]]+=vv[[j]],{j,col+1,dim}];
+vv=Transpose[vv];
+{tmpu,dd,tmpv}=diagonalize[dd];
+uu=tmpu.uu;
+vv=vv.tmpv;
+diags=Select[Flatten[dd],#!=0&];];
+{uu,dd,vv}]
+
+
 (* ::Section:: *)
 (*Rigidity Matrix Functions*)
 
