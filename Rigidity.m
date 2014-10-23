@@ -829,7 +829,7 @@ qdim]
 CoveringTransformations[transf_,cover_]:=
 Module[{i,qdim=Length[transf],tmat},
 (* assuming that all matrices in transf commute... *)
-tmat=Dot@@Table[MatrixPower[transf[[i]],cover[i]],{i,qdim}]
+tmat=Dot@@Table[MatrixPower[transf[[i]],cover[[i]]],{i,qdim}]
 ];
 
 
@@ -840,19 +840,90 @@ bondlist=Table[Null,{Length[edgedat](Times@@cover)}],lenedge=Length[edgedat],
 unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec},
 tabspec=Join[Table[{m[j],cover[[j]]},{j,dim}],{{i,lenedge}}];
 Do[(* loop over edges in edgedat, (i.e. copy an edge i into all cells m,n) *)
-{p1,p2}=edgedat[[i,1]];
-(*a=edgedat[[i,2]];*)
 edatExtend=Join[edgedat[[i,2,1;;Min[Length[edgedat[[i,2]]],dim]]],Table[0,{dim-Length[edgedat[[i,2]]]}]];
-ind1=getatomindex2[Table[m[j],{j,dim}],p1,cover,unitcellsize];
-ind2=getatomindex2[Table[Mod[m[j]+edatExtend[[j]],cover[[j]],1],{j,dim}],p2,cover,unitcellsize];
 cellchange=Table[
 (* ceiling -1 because we need right endpoint *)
 Ceiling[(m[j]+edatExtend[[j]])/cover[[j]]-1],{j,dim}];
 If[periodic||(cellchange==Table[0,{dim}]),
+(* only add the bond if the periodic flag is set or it does not wrap*)
+{p1,p2}=edgedat[[i,1]];
+ind1=getatomindex2[Table[m[j],{j,dim}],p1,cover,unitcellsize];
+ind2=getatomindex2[Table[Mod[m[j]+edatExtend[[j]],cover[[j]],1],{j,dim}],p2,cover,unitcellsize];
 numbonds++;
 bondlist[[numbonds]]={{ind1,ind2},cellchange,1}
 ];
 ,##]&@@tabspec;
+bondlist[[1;;numbonds]]
+];
+
+
+(* make a list of vertex positions in any dimension *)
+(* with an arbitrary new basis *)
+Clear[BCoveringFrameworkVerts]
+BCoveringFrameworkVerts[unitcell_,latt_,basis_,r_:0]:=
+Module[{i,qdim=Length[latt],dim=Length[unitcell[[1]]],tabspec,m,
+tA,tU,tD,tV,tDvec,pts,p,y},
+tA=Transpose[basis];
+(* tA has the basis as _columns_ *)
+{tU,tD,tV}=smithNormalForm[tA];
+tDvec=Table[tD[[j,j]],{j,qdim}];
+tabspec=Table[{m[i],0,tDvec[[i]]-1},{i,qdim}];
+(* pts is a list of points in the new unit cell *)
+pts=Flatten[Table[
+y=Table[m[i],{i,qdim}];
+p=LinearSolve[tU.tA,y];
+p=tA.Mod[p,1];
+(* p is the list of integer points in the fundamental domain defined by "basis" *)
+Table[
+Sum[latt[[i]]*p[[i]],{i,qdim}]+If[r>0, RandomReal[{-r,r},dim],Table[0,{dim}]]
++unitcell[[i]],
+{i,Length[unitcell]}]
+,##]&@@tabspec,qdim]
+];
+
+
+(* connect up the points created by BCoveringFrameworkVerts *)
+BCoveringFrameworkEdges[edgedat_,basis_,periodic_:False]:=
+Module[{i,j,dim=Length[basis],ind1,ind2,p1,p2,edatExtend,m,numbonds=0,
+bondlist=Table[Null,{Length[edgedat](Abs[Det[basis]])}],lenedge=Length[edgedat],
+unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec,
+tA,tU,tD,tV,tDvec,pts,p,y,pp,ptemp,ptemp2},
+tA=Transpose[basis];
+(* tA has the basis as _columns_ *)
+{tU,tD,tV}=smithNormalForm[tA];
+tDvec=Table[tD[[j,j]],{j,dim}];
+tabspec=Table[{m[j],0,tDvec[[j]]-1},{j,dim}];
+
+pts=Flatten[Table[y=Table[m[i],{i,dim}];
+p=LinearSolve[tU.tA,y];
+tA.Mod[p,1],##]&@@tabspec,dim-1];
+
+Do[(* loop over edges in edgedat, (i.e. copy an edge i into all cells m,n) *)
+{p1,p2}=edgedat[[i,1]];
+edatExtend=Join[edgedat[[i,2,1;;Min[Length[edgedat[[i,2]]],dim]]],Table[0,{dim-Length[edgedat[[i,2]]]}]];
+
+(* unit cell of p1 (index is k) *)
+p=pts[[k]];
+(* unit cell of p2 *)
+pp=p+edatExtend;
+ind1=unitcellsize(k-1)+p1;
+
+(* need to convert pp into an index and a cellchange (relative to new basis) *)
+(* first put in basis*) 
+ptemp=LinearSolve[tA,pp];
+
+(* to get index take mod, convert back, and then use Position *)
+ptemp2=tA.Mod[ptemp,1];
+ind2=unitcellsize(Position[pts,ptemp2][[1,1]]-1)+p2;
+
+(* to get cellchange, measure the integer parts ? use floor now *)
+cellchange=Floor[ptemp];
+
+If[periodic||(cellchange==Table[0,{dim}]),
+numbonds++;
+bondlist[[numbonds]]={{ind1,ind2},cellchange,1}
+];
+,{k,Length[pts]},{i,lenedge}];
 bondlist[[1;;numbonds]]
 ];
 
