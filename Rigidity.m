@@ -859,7 +859,6 @@ bondlist[[1;;numbonds]]
 
 (* make a list of vertex positions in any dimension *)
 (* with an arbitrary new basis *)
-Clear[BCoveringFrameworkVerts]
 BCoveringFrameworkVerts[unitcell_,latt_,basis_,r_:0]:=
 Module[{i,qdim=Length[latt],dim=Length[unitcell[[1]]],tabspec,m,
 tA,tU,tD,tV,tDvec,pts,p,y},

@@ -6485,11 +6485,11 @@ Cell[BoxData[{
      RowBox[{"{", 
       RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", 
      RowBox[{"{", 
-      RowBox[{"1", ",", "0", ",", "0"}], "}"}], ",", 
+      RowBox[{".5", ",", "0", ",", "0"}], "}"}], ",", 
      RowBox[{"{", 
-      RowBox[{"0", ",", "1", ",", "0"}], "}"}], ",", 
+      RowBox[{"0", ",", ".5", ",", "0"}], "}"}], ",", 
      RowBox[{"{", 
-      RowBox[{"1", ",", "1", ",", "0"}], "}"}]}], "}"}]}], ";"}]}], "Input"],
+      RowBox[{".5", ",", ".5", ",", "0"}], "}"}]}], "}"}]}], ";"}]}], "Input"],
 
 Cell["\<\
 In generalized periodic frameworks, a set of symmetry transformations plays \
@@ -6681,7 +6681,7 @@ Cell[BoxData[
             RowBox[{"Transpose", "[", 
              RowBox[{"{", 
               RowBox[{"{", 
-               RowBox[{"2", ",", "0", ",", "0"}], "}"}], "}"}], "]"}]}], 
+               RowBox[{"1", ",", "0", ",", "0"}], "}"}], "}"}], "]"}]}], 
            "}"}], ",", 
           RowBox[{"{", 
            RowBox[{"0", ",", "1"}], "}"}]}], "}"}], "]"}], ",", 
@@ -7505,12 +7505,14 @@ Cell[BoxData[{
   ";"}]}], "Input"],
 
 Cell[TextData[{
- "The above code creates 3 copies in the x-direction and 2 copies in the \
-y-direction.  (Of course, this also could have been done directly within ",
+ "The above code creates data for a cover with 3 copies in the x-direction \
+and 2 copies in the y-direction.  (To just create the picture, we could also \
+use ",
  StyleBox["DrawPeriodic2DFramework",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " by specifying the number of copies there):"
+ " -- the use of the above functions is useful e.g. for creating data for \
+simulations):"
 }], "Text"],
 
 Cell[BoxData[
@@ -7530,19 +7532,17 @@ Cell[TextData[{
 argument is omitted):"
 }], "Text"],
 
-Cell[BoxData[
+Cell[BoxData[{
  RowBox[{
   RowBox[{"squarecovernonperiodicedgedat", "=", 
    RowBox[{"CoveringFrameworkEdges", "[", 
     RowBox[{"squareedgedat", ",", 
      RowBox[{"{", 
       RowBox[{"3", ",", "2"}], "}"}], ",", "False"}], "]"}]}], 
-  ";"}]], "Input"],
-
-Cell[BoxData[
+  ";"}], "\[IndentingNewLine]", 
  RowBox[{"Draw2DFramework", "[", 
   RowBox[{"squarecover", ",", "squarecovernonperiodicedgedat"}], 
-  "]"}]], "Input"],
+  "]"}]}], "Input"],
 
 Cell[TextData[{
  StyleBox["CoveringFrameworkVerts",
@@ -7553,18 +7553,17 @@ where r is the fourth argument (optional, if omitted, assumed zero), and dim \
 is the dimensionality of the position vectors."
 }], "Text"],
 
-Cell[BoxData[
+Cell[BoxData[{
  RowBox[{
   RowBox[{"squarecoverrandom", "=", 
    RowBox[{"CoveringFrameworkVerts", "[", 
     RowBox[{"squarepos2", ",", "squarebasis", ",", 
      RowBox[{"{", 
-      RowBox[{"3", ",", "2"}], "}"}], ",", ".4"}], "]"}]}], ";"}]], "Input"],
-
-Cell[BoxData[
+      RowBox[{"3", ",", "2"}], "}"}], ",", ".4"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
  RowBox[{"Draw2DFramework", "[", 
   RowBox[{"squarecoverrandom", ",", "squarecovernonperiodicedgedat"}], 
-  "]"}]], "Input"],
+  "]"}]}], "Input"],
 
 Cell[TextData[{
  "For generalized periodic lattices, the function ",
@@ -7576,18 +7575,20 @@ transformations.  (No random perturbation functionality is currently present \
 in this function)."
 }], "Text"],
 
-Cell[BoxData[
+Cell[BoxData[{
  RowBox[{
-  RowBox[{"squarecoverrandom", "=", 
-   RowBox[{"CoveringFrameworkVerts", "[", 
-    RowBox[{"squarepos2", ",", "squarebasis", ",", 
+  RowBox[{"cylindercover", "=", 
+   RowBox[{"CoveringTFrameworkVerts", "[", 
+    RowBox[{"cylinderpos", ",", "cylindertransf", ",", 
      RowBox[{"{", 
-      RowBox[{"3", ",", "2"}], "}"}], ",", ".4"}], "]"}]}], ";"}]], "Input"],
-
-Cell[BoxData[
- RowBox[{"Draw2DFramework", "[", 
-  RowBox[{"squarecoverrandom", ",", "squarecovernonperiodicedgedat"}], 
-  "]"}]], "Input"],
+      RowBox[{"3", ",", "2"}], "}"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"cylindercoveredgedat", "=", 
+   RowBox[{"CoveringFrameworkEdges", "[", 
+    RowBox[{"cylinderedgedat", ",", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", "2"}], "}"}], ",", "True"}], "]"}]}], 
+  ";"}]}], "Input"],
 
 Cell[TextData[{
  "And the function ",
@@ -7597,18 +7598,132 @@ Cell[TextData[{
  " creates the new set of transformations that correspond to that covering."
 }], "Text"],
 
-Cell[BoxData[
+Cell[BoxData[{
  RowBox[{
-  RowBox[{"squarecoverrandom", "=", 
-   RowBox[{"CoveringFrameworkVerts", "[", 
-    RowBox[{"squarepos2", ",", "squarebasis", ",", 
+  RowBox[{"cylindercovertransf", "=", 
+   RowBox[{"CoveringTransformations", "[", 
+    RowBox[{"cylindertransf", ",", 
      RowBox[{"{", 
-      RowBox[{"3", ",", "2"}], "}"}], ",", ".4"}], "]"}]}], ";"}]], "Input"],
+      RowBox[{"3", ",", "2"}], "}"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"DrawTPeriodic3DFramework", "[", 
+  RowBox[{
+  "cylindercover", ",", "cylindercovertransf", ",", "cylindercoveredgedat"}], 
+  "]"}]}], "Input"],
 
-Cell[BoxData[
- RowBox[{"Draw2DFramework", "[", 
-  RowBox[{"squarecoverrandom", ",", "squarecovernonperiodicedgedat"}], 
-  "]"}]], "Input"]
+Cell[TextData[{
+ "Sometimes it is useful to create a covering by picking a new set of basis \
+vectors in a more general way.  In particular, suppose we would like to \
+create a lattice where the new basis vectors are integer linear combinations \
+of the previous ones.  The functions ",
+ StyleBox["BCoveringFrameworkVerts",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " and ",
+ StyleBox["BCoveringFrameworkEdges",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " can do this."
+}], "Text"],
+
+Cell["\<\
+Begin with a one-atom unit cell square lattice:\
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"smallsquarepos", "=", 
+   RowBox[{"{", 
+    RowBox[{"{", 
+     RowBox[{"0", ",", "0"}], "}"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"smallsquareedgedat", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "1"}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"smallsquarebasis", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "1"}], "}"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"DrawPeriodic2DFramework", "[", 
+  RowBox[{
+  "smallsquarepos", ",", "smallsquarebasis", ",", "smallsquareedgedat", ",", 
+   RowBox[{"{", 
+    RowBox[{"5", ",", "5"}], "}"}]}], "]"}]}], "Input"],
+
+Cell["\<\
+Now define a list containing integer vectors that will lead to the new basis \
+vectors (\[OpenCurlyDoubleQuote]rotated 45 degrees\[CloseCurlyDoubleQuote] \
+from the original one):\
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"smallsquarenewbasisint", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", 
+       RowBox[{"-", "1"}]}], "}"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"smallsquarenewbasis", "=", 
+   RowBox[{"(*", " ", 
+    RowBox[{"note", ",", " ", 
+     RowBox[{
+     "dot", " ", "from", " ", "the", " ", "left", " ", "since", " ", "the", 
+      " ", "basis", " ", "vectors", " ", "are", " ", "rows"}]}], " ", "*)"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"smallsquarenewbasisint", ".", "smallsquarebasis"}]}], 
+  ";"}]}], "Input"],
+
+Cell[TextData[{
+ "We compute the new unit cell positions and edge data with ",
+ StyleBox["BCoveringFrameworkVerts",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " (applying some randomness with the last [optional] argument) and ",
+ StyleBox["BCoveringFrameworkEdges",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ":"
+}], "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"smallsquarecover", "=", 
+   RowBox[{"BCoveringFrameworkVerts", "[", 
+    RowBox[{
+    "smallsquarepos", ",", "smallsquarebasis", ",", "smallsquarenewbasisint", 
+     ",", "0.3"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"smallsquarecoveredgedat", "=", 
+   RowBox[{"BCoveringFrameworkEdges", "[", 
+    RowBox[{
+    "smallsquareedgedat", ",", "smallsquarenewbasisint", ",", "True"}], 
+    "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"DrawPeriodic2DFramework", "[", 
+  RowBox[{
+  "smallsquarecover", ",", "smallsquarenewbasis", ",", 
+   "smallsquarecoveredgedat", ",", 
+   RowBox[{"{", 
+    RowBox[{"5", ",", "5"}], "}"}]}], "]"}]}], "Input"]
 }, Closed]],
 
 Cell[CellGroupData[{
@@ -8906,7 +9021,7 @@ vol. 372 no. 2008 20120030. http://arxiv.org/abs/1102.2744\
 },
 EvaluationCompletionAction->{},
 WindowSize->{867, 826},
-WindowMargins->{{100, Automatic}, {Automatic, 0}},
+WindowMargins->{{Automatic, 257}, {Automatic, 0}},
 PrivateNotebookOptions->{"FileOutlineCache"->False},
 TrackCellChangeTimes->False,
 Background->RGBColor[0.965927, 0.985016, 0.999908],
