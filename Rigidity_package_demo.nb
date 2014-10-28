@@ -7625,9 +7625,7 @@ of the previous ones.  The functions ",
  " can do this."
 }], "Text"],
 
-Cell["\<\
-Begin with a one-atom unit cell square lattice:\
-\>", "Text"],
+Cell["Begin with a one-atom unit cell square lattice:", "Text"],
 
 Cell[BoxData[{
  RowBox[{

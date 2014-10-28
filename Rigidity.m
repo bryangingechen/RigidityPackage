@@ -415,19 +415,19 @@ time=computeintersection[{m,0},\[Pi]/2+slopesx[[m+1]],{0,n},slopesy[[n+1]]];
 
 (* kagome in the form of a rhombus *)
 KagLatticeRho[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *)Module[{m,n,i},
-Flatten[Table[Table[
+Flatten[Table[
 {(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}
 +If[r>0,RandomReal[{-r,r},2],{0,0}]
 +1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]}
-,{i,3}],{m,1,xx},{n,0,yy-1}],2]];
+,{m,1,xx},{n,0,yy-1},{i,3}],2]];
 
 (* kagome in the form of a rectangle *)
 KagLatticeRec[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Module[{i,m,n},
-Flatten[Table[Table[
+Flatten[Table[
 {m+1/2 Mod[n,2],Sqrt[3]/2 n}+{-1/4,-Sqrt[3]/12}
 +If[r>0,RandomReal[{-r,r},2],{0,0}]
 +1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]}
-,{i,3}],{m,1,xx},{n,0,yy-1}],2]];
+,{m,1,xx},{n,0,yy-1},{i,3}],2]];
 
 (* triangular lattice in the form of rhombus *)
 TriLatticeRho[xx_,yy_,r_:0]:=(* yy better be even? *) Module[{m,n},
@@ -445,12 +445,12 @@ Flatten[Table[
 
 (* honeycomb in the form of a rectangle *)
 HoneycombLattice[xx_,yy_,r_:0]:=(* yy better be even? *) Module[{temp,x,m,n,i},
-temp=Flatten[Table[Table[
+temp=Flatten[Table[
 If[((Mod[m+1/2 n,xx]==0)&&(i==1))||((Mod[m+1/2 n,xx]==xx-1/2)&&(i==2)),
 {},
 {Mod[m+1/2 n,xx],Sqrt[3]/2 n}
 +If[r>0,RandomReal[{-r,r},2],{0,0}]+(-1)^i /(2Sqrt[3]){Sqrt[3]/2,1/2}]
-,{i,2}],{m,1,xx},{n,0,yy-1}],2];
+,{m,1,xx},{n,0,yy-1},{i,2}],2];
 Replace[temp,x_List:>DeleteCases[x,{}],{0,Infinity}]
 ];
 
