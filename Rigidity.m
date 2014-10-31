@@ -116,8 +116,40 @@ Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]](ebond[[bcompon
 ,{numbonds,dim numpart+If[fixedperiodic,qdim*dim,0]}]
 ];
 
+CompatibilityMatrix[z_,posns_,basis_,edgedat_,fixedperiodic_:False]:=Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],bcomponent,bvec,
+numpart=Length[posns],part1,part2,ebond,lattchange,zm,edatExtend,k,j},
+SparseArray[Flatten[Table[part1=edgedat[[j,1,1]];
+part2=edgedat[[j,1,2]];
+edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
+lattchange=If[qdim>0,edatExtend.basis,0];
+zm=Product[z[[k]]^edatExtend[[k]],{k,qdim}];
+ebond=-posns[[part1]]+(posns[[part2]]+lattchange); (* sign convention from malestein theran *)
+(* unit vectors *)
+ebond=ebond/Norm[ebond];
+If[part1!=part2,(Join[
+Table[{j,dim (part1-1)+k}->-ebond[[k]],{k,dim}],
+Table[{j,dim (part2-1)+k}->ebond[[k]] zm,{k,dim}],
+If[fixedperiodic,Flatten[
+Table[{j,dim numpart+(bvec-1) qdim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
+,{bvec,qdim},{bcomponent,dim}]]
+,{}]
+]),
+(* part1\[Equal]part2*)
+Join[Table[{j,dim (part1-1)+k}->-ebond[[k]](1-zm),{k,dim}],
+If[fixedperiodic,Flatten[
+Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]](ebond[[bcomponent]])
+,{bvec,dim},{bcomponent,dim}]]
+,{}]]
+],
+{j,numbonds}]]
+,{numbonds,dim numpart+If[fixedperiodic,qdim*dim,0]}]
+];
+
 NRigidityMatrix[z_?(VectorQ[#,NumericQ]&),posns_,basis_,edgedat_,fixedperiodic_:False]:=
 RigidityMatrix[z,posns,basis,edgedat,fixedperiodic];
+
+NCompatibilityMatrix[z_?(VectorQ[#,NumericQ]&),posns_,basis_,edgedat_,fixedperiodic_:False]:=
+CompatibilityMatrix[z,posns,basis,edgedat,fixedperiodic];
 
 
 (* Generalized periodic Rigidity matrix*)
@@ -345,11 +377,16 @@ HarmonicExtension[Lap_,bvtr_,u_]:=Module[{j,l=Dimensions[Lap][[1]]/2,inter,dinte
 inter=Complement[Table[j,{j,l}],bvtr];
 dinter=Doublemat[inter];
 cinter=Doublemat[bvtr];
-matB=Lap[[dinter,cinter]];
+(* somehow slower if u is sparse????*)
+(*matB=If[toggle\[Equal]1,SparseArray[Lap[[dinter,cinter]].u],Lap[[dinter,cinter]].u];*)
+matB=Lap[[dinter,cinter]].u;
+(* dissatisfying that taking determinant here is the only way to see whether we have rigidity inside*)
 matC=Lap[[dinter,dinter]];
-If[Det[matC]==0,
+If[Chop[Det[matC]]==0,
 Print["Rank deficient; system is floppy"];,
-fI=-Inverse[matC].matB.u; (* Schur complement *)
+(*fI=-Inverse[matC].matB.u;*)
+(*fI=If[toggle\[Equal]1,-LinearSolve[matC,matB,Method\[Rule]"Krylov"],-LinearSolve[matC,matB]];*)
+fI=-LinearSolve[matC,matB];
 ans=Table[0,{2l}];
 Do[ans[[dinter[[j]]]]=fI[[j]];,{j,Length[fI]}];
 Do[ans[[cinter[[j]]]]=u[[j]];,{j,Length[u]}];
@@ -365,7 +402,9 @@ matA=Lap[[cinter,cinter]];
 matB=Lap[[cinter,dinter]];
 matC=Lap[[dinter,cinter]];
 matD=Lap[[dinter,dinter]];
-matA-matB.Inverse[matD].matC (* Schur complement *)
+(* Schur complement *)
+(*matA-matB.Inverse[matD].matC *)
+matA=matB.LinearSolve[matD,matC]
 ];
 
 
