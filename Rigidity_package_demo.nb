@@ -7791,8 +7791,8 @@ to."
 }], "Text"],
 
 Cell["\<\
-In the following example I begin with a periodic kagome lattice of 15 by 2 \
-unit cells.\
+In the following example I begin with a periodic perturbed kagome lattice of \
+15 by 2 unit cells.\
 \>", "Text"],
 
 Cell[BoxData[{

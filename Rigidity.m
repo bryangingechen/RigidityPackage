@@ -116,7 +116,8 @@ Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]](ebond[[bcompon
 ,{numbonds,dim numpart+If[fixedperiodic,qdim*dim,0]}]
 ];
 
-CompatibilityMatrix[z_,posns_,basis_,edgedat_,fixedperiodic_:False]:=Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],bcomponent,bvec,
+CompatibilityMatrix[z_,posns_,basis_,edgedat_,fixedperiodic_:False]:=
+Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],bcomponent,bvec,
 numpart=Length[posns],part1,part2,ebond,lattchange,zm,edatExtend,k,j},
 SparseArray[Flatten[Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
@@ -1062,6 +1063,14 @@ Join[col,Table[Line[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{i,Length[p]}]]
 }]];
 
 
+Draw2DFrameworkModeArr[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{i,j,e=Length[E]},
+Graphics[{
+Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
+Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
+Join[col,Table[Arrow[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{i,Length[p]}]]
+}]];
+
+
 Draw2DFrameworkModeAmp[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{i,j,e=Length[E]},
 Graphics[{
 Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
@@ -1179,6 +1188,28 @@ Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{i,Length[
 ]];
 
 
+DrawPeriodic2DFrameworkModeArr[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[1,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics[
+Table[
+unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
+realnv=Re[nv Product[qvec[[i]]^m[i],{i,dim}]]; 
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+Join[col,Table[Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{i,Length[p]}]]
+}
+,##]&@@tabspec
+]];
+
+
 DrawTPeriodic2DFrameworkMode[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
 Module[{i,j,e=Length[E],nv,qvec,dim=Length[transformations],
 tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
@@ -1203,6 +1234,35 @@ pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
 pv[[1;;2]]]}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
 Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{i,Length[p]}]]
+}
+,##]&@@tabspec
+]];
+
+
+DrawTPeriodic2DFrameworkModeArr[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{i,j,e=Length[E],nv,qvec,dim=Length[transformations],
+tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[1,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics[
+Table[
+tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
+(* shifted unit cell positions *)
+unitcell=Dot[tmat,Join[#,{1}]][[1;;2]]&/@p;
+realnv=Re[tmat[[;;2,;;2]].nv Product[qvec[[i]]^m[i],{i,dim}]]; 
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
+(* apply appropriate transformation again to get line to second particle *)
+tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
+pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
+pv[[1;;2]]]}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+Join[col,Table[Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
@@ -1281,6 +1341,14 @@ Graphics3D[{
 Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
 Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
 Join[col,Table[Line[{p[[i]],p[[i]]+nv[[3i-2;;3i]]}],{i,Length[p]}]]
+}]];
+
+
+Draw3DFrameworkModeArr[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{i,j,e=Length[E]},
+Graphics3D[{
+Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
+Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
+Join[col,Table[Arrow[{p[[i]],p[[i]]+nv[[3i-2;;3i]]}],{i,Length[p]}]]
 }]];
 
 
@@ -1400,6 +1468,28 @@ Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{i,Length[
 ]];
 
 
+DrawPeriodic3DFrameworkModeArr[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[1,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics3D[
+Table[
+unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
+realnv=Re[nv Product[qvec[[i]]^m[i],{i,dim}]];
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+Join[col,Table[Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{i,Length[p]}]]
+}
+,##]&@@tabspec
+]];
+
+
 DrawTPeriodic3DFrameworkMode[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
 Module[{i,j,e=Length[E],nv,qvec,dim=Length[transformations],
 tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
@@ -1424,6 +1514,35 @@ pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
 pv[[1;;3]]]}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
 Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{i,Length[p]}]]
+}
+,##]&@@tabspec
+]];
+
+
+DrawTPeriodic3DFrameworkModeArr[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{i,j,e=Length[E],nv,qvec,dim=Length[transformations],
+tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[1,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics3D[
+Table[
+tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
+(* shifted unit cell positions *)
+unitcell=Dot[tmat,Join[#,{1}]][[1;;3]]&/@p;
+realnv=Re[tmat[[;;3,;;3]].nv Product[qvec[[i]]^m[i],{i,dim}]];
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
+(* apply appropriate transformation again to get line to second particle *)
+tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
+pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
+pv[[1;;3]]]}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+Join[col,Table[Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
