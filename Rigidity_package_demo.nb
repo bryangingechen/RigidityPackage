@@ -6236,9 +6236,10 @@ Cell[TextData[{
  StyleBox["Draw2DUnitCellShapeChange",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " which draws the original lattice vectors in dashed light gray and the \
-lattice vectors with the relevant mode components added to it in darker \
-gray:"
+ " which draws the original lattice vectors in dashed light gray (if the \
+third parameter is set to \[OpenCurlyDoubleQuote]True\[CloseCurlyDoubleQuote] \
+(default)) and the lattice vectors with the relevant mode components added to \
+it in darker gray:"
 }], "Text"],
 
 Cell[BoxData[
@@ -6250,7 +6251,26 @@ Cell[BoxData[
     "]"}], ",", 
    RowBox[{"Draw2DUnitCellShapeChange", "[", 
     RowBox[{"squarebasis", ",", "nvec", ",", "True"}], "]"}]}], 
-  "]"}]], "Input"]
+  "]"}]], "Input"],
+
+Cell[TextData[{
+ "Another style is drawn by the function ",
+ StyleBox["Draw2DUnitCellShapeChangeArr",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " which draws the original lattice vectors in dashed light gray and the \
+relevant mode components as arrows showing the change in darker gray:"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{"Show", "[", 
+  RowBox[{
+   RowBox[{"DrawPeriodic2DFrameworkMode", "[", 
+    RowBox[{
+    "squarepos2", ",", "squarebasis", ",", "squareedgedat", ",", "nvec"}], 
+    "]"}], ",", 
+   RowBox[{"Draw2DUnitCellShapeChangeArr", "[", 
+    RowBox[{"squarebasis", ",", "nvec"}], "]"}]}], "]"}]], "Input"]
 }, Closed]],
 
 Cell[CellGroupData[{

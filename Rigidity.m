@@ -1625,6 +1625,12 @@ Arrow[{{0,0},basis[[2]]}]},{}],GrayLevel[0.3],Dashing[{}],
 Arrow[{{0,0},basis[[1]]+nv[[-4;;-3]]}],Arrow[{{0,0},basis[[2]]+nv[[-2;;-1]]}]}
 ]
 
+Draw2DUnitCellShapeChangeArr[basis_,nv_]:=Graphics[
+{{Gray,Dashed,Arrow[{{0,0},basis[[1]]}],
+Arrow[{{0,0},basis[[2]]}]},GrayLevel[0.3],Dashing[{}],
+Arrow[{basis[[1]],basis[[1]]+nv[[-4;;-3]]}],Arrow[{basis[[2]],basis[[2]]+nv[[-2;;-1]]}]}
+]
+
 
 (* ::Section:: *)
 (*End*)
