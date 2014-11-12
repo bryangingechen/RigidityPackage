@@ -344,7 +344,7 @@ diff=posns[[j]]-origin;
 getnontriv2D[pos_,basis_,edgedat_]:=Module[{pmtestk,testrotk,transx,transy,numatoms=Length[pos]},
 pmtestk=Normal[RigidityMatrix[{1,1},pos,basis,edgedat,True]];
 transx=Flatten[Join[Table[{1,0},{numatoms}],Table[0,{4}]]];
-transy=Flatten[Join[Table[{0,1},{numatoms}],Table[0,{4}]]];;
+transy=Flatten[Join[Table[{0,1},{numatoms}],Table[0,{4}]]];
 testrotk=infinitesimal2drotationmode[pos,basis];
 NullSpace[Join[pmtestk,{transx,transy,testrotk}]][[1]]];
 
@@ -1617,6 +1617,13 @@ path[[j]]},{j,Length[path]}];
 func=Interpolation[interpdat,#,InterpolationOrder->1]&;
 Plot[
 f=func[t];poly/.Table[z[[j]]->Exp[I f[[j]]],{j,Length[z]}],{t,0,prev},opts]];
+
+
+Draw2DUnitCellShapeChange[basis_,nv_,showorig_:True]:=Graphics[
+{If[showorig,{Gray,Dashed,Arrow[{{0,0},basis[[1]]}],
+Arrow[{{0,0},basis[[2]]}]},{}],GrayLevel[0.3],Dashing[{}],
+Arrow[{{0,0},basis[[1]]+nv[[-4;;-3]]}],Arrow[{{0,0},basis[[2]]+nv[[-2;;-1]]}]}
+]
 
 
 (* ::Section:: *)

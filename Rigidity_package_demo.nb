@@ -5023,10 +5023,7 @@ Cell[TextData[{
       LineBox[{{15., 4.}, {14., 3.}}]}, 
      {RGBColor[0.5, 0, 0.5], AbsoluteThickness[0.05199021373065811], 
       LineBox[{{12., 6.}, {11., 5.}}]}}},
-   ImageSize->{Automatic, 274.659975}]],
-  CellChangeTimes->{{3.560759043568902*^9, 3.5607590534985123`*^9}, 
-    3.5607591258090277`*^9, 3.560759292880434*^9, {3.5607593700659523`*^9, 
-    3.560759379282174*^9}, {3.5607594316824636`*^9, 3.560759467976565*^9}}]
+   ImageSize->{Automatic, 274.659975}]]]
 }], "Title"],
 
 Cell[CellGroupData[{
@@ -6204,7 +6201,56 @@ Cell[BoxData[
    "chainedgedat", ",", "True"}], "]"}]], "Input"],
 
 Cell[BoxData[
- RowBox[{"Normal", "[", "%", "]"}]], "Input"]
+ RowBox[{"Normal", "[", "%", "]"}]], "Input"],
+
+Cell[TextData[{
+ "This matrix is used to compute the \[OpenCurlyDoubleQuote]nontrivial\
+\[CloseCurlyDoubleQuote] unit-cell shape-changing mode (called the Guest mode \
+by Mike Thorpe after Simon Guest, see [KTFG09]).  There is currently a \
+function ",
+ StyleBox["getnontriv2D",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " to compute this mode for a 2D periodic lattice:"
+}], "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"squarepos2", "=", 
+   RowBox[{"squarepos", "+", 
+    RowBox[{"RandomReal", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", ".5"}], ",", ".5"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"4", ",", "2"}], "}"}]}], "]"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"nvec", "=", 
+  RowBox[{"getnontriv2D", "[", 
+   RowBox[{"squarepos2", ",", "squarebasis", ",", "squareedgedat"}], 
+   "]"}]}]}], "Input"],
+
+Cell[TextData[{
+ "This mode can be crudely visualized with the function ",
+ StyleBox["Draw2DUnitCellShapeChange",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " which draws the original lattice vectors in dashed light gray and the \
+lattice vectors with the relevant mode components added to it in darker \
+gray:"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{"Show", "[", 
+  RowBox[{
+   RowBox[{"DrawPeriodic2DFrameworkMode", "[", 
+    RowBox[{
+    "squarepos2", ",", "squarebasis", ",", "squareedgedat", ",", "nvec"}], 
+    "]"}], ",", 
+   RowBox[{"Draw2DUnitCellShapeChange", "[", 
+    RowBox[{"squarebasis", ",", "nvec", ",", "True"}], "]"}]}], 
+  "]"}]], "Input"]
 }, Closed]],
 
 Cell[CellGroupData[{
@@ -9004,6 +9050,13 @@ http://arxiv.org/abs/1110.3890\
 \>", "Text"],
 
 Cell["\<\
+[KTFG09] V. Kapko, M.M.J. Treacy, M.F. Thorpe, and S.D. Guest, \
+\[OpenCurlyDoubleQuote]On the collapse of locally isostatic networks,\
+\[CloseCurlyDoubleQuote] 10.1098/rspa.2009.0307 Proc. R. Soc. A 465, \
+3517-3530 (2009). \
+\>", "Text"],
+
+Cell["\<\
 [MT12] J. Malestein and L. Theran, \"Generic combinatorial rigidity of \
 periodic frameworks,\" 10.1016/j.aim.2012.10.007 Adv. in Math. Volume 233, \
 Issue 1, 30 January 2013, Pages 291\[Dash]331.  http://arxiv.org/abs/1008.1837\
@@ -9019,7 +9072,7 @@ vol. 372 no. 2008 20120030. http://arxiv.org/abs/1102.2744\
 },
 EvaluationCompletionAction->{},
 WindowSize->{867, 826},
-WindowMargins->{{Automatic, 257}, {Automatic, 0}},
+WindowMargins->{{Automatic, 16}, {Automatic, 0}},
 PrivateNotebookOptions->{"FileOutlineCache"->False},
 TrackCellChangeTimes->False,
 Background->RGBColor[0.965927, 0.985016, 0.999908],
