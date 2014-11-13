@@ -5409,8 +5409,9 @@ Cell[TextData[{
  StyleBox["HMat",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " is a function which computes the class BDI Hamiltonian matrix derived by \
-Kane and Lubensky [KL14] - it just takes the rigidity matrix as input:"
+ " is a function which computes the class BDI quantum Hamiltonian matrix \
+derived by Kane and Lubensky [KL14] - it just takes the rigidity matrix as \
+input:"
 }], "Text"],
 
 Cell[BoxData[
@@ -5444,6 +5445,33 @@ Cell[BoxData[
    RowBox[{"{", 
     RowBox[{"Red", ",", 
      RowBox[{"Thickness", "\[Rule]", ".02"}]}], "}"}]}], "]"}]], "Input"],
+
+Cell[TextData[{
+ "There are also variants ",
+ StyleBox["Draw2DFrameworkModeArr",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " and ",
+ StyleBox["Draw3DFrameworkModeArr",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ", which shows the mode with arrows instead of lines:"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{"Draw3DFrameworkModeArr", "[", 
+  RowBox[{"tetrahedronpos", ",", "tetrahedronedgedat", ",", 
+   RowBox[{".5", 
+    RowBox[{"tetrahedronModes", "[", 
+     RowBox[{"[", "1", "]"}], "]"}]}], ",", 
+   RowBox[{"{", 
+    RowBox[{"Blue", ",", 
+     RowBox[{"PointSize", "\[Rule]", ".06"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"Thickness", "\[Rule]", ".02"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"Red", ",", 
+     RowBox[{"Thickness", "\[Rule]", ".01"}]}], "}"}]}], "]"}]], "Input"],
 
 Cell[TextData[{
  "Or alternatively with ",
@@ -5935,6 +5963,10 @@ e.g. ",
   FontFamily->"Courier",
   FontWeight->"Bold"],
  ", ",
+ StyleBox["DrawPeriodic3DFrameworkModeArr",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ", ",
  StyleBox["DrawPeriodic3DFrameworkModeAmp",
   FontFamily->"Courier",
   FontWeight->"Bold"],
@@ -5952,6 +5984,10 @@ graphics options."
 Cell[TextData[{
  "Note that ",
  StyleBox["DrawPeriodic2DFrameworkMode",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ",  ",
+ StyleBox["DrawPeriodic2DFrameworkModeArr",
   FontFamily->"Courier",
   FontWeight->"Bold"],
  ", ",
@@ -6157,8 +6193,9 @@ Cell[TextData[{
  StyleBox["DrawPeriodic2DFrameworkMode",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- ". Note that the depicted eigenvector is complex at a value of k=2\[Pi]/7; \
-this data is thus input as a pair {eigenvector, list of z-values}:"
+ ". Note that the depicted eigenvector is at a value of k=2\[Pi]/7 and thus \
+has complex-valued components; the k-vector data should be included in the \
+mode input slot as part of a pair {mode vector, list of z-values}:"
 }], "Text"],
 
 Cell[BoxData[{
@@ -6954,6 +6991,10 @@ functions, e.g. ",
   FontFamily->"Courier",
   FontWeight->"Bold"],
  ", ",
+ StyleBox["DrawTPeriodic3DFrameworkModeArr",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ", ",
  StyleBox["DrawTPeriodic3DFrameworkModeAmp",
   FontFamily->"Courier",
   FontWeight->"Bold"],
@@ -6961,7 +7002,7 @@ functions, e.g. ",
  StyleBox["DrawTPeriodic3DFrameworkStress",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " (as well as the 2D variants).  "
+ " (as well as the 2D variants)."
 }], "Text"]
 }, Closed]],
 
@@ -8290,8 +8331,8 @@ Cell[BoxData[{
    RowBox[{"{", 
     RowBox[{"j", ",", 
      RowBox[{"Length", "[", 
-      RowBox[{"NullSpace", "[", "pinrigmat", "]"}], "]"}]}], "}"}]}], 
-  "]"}]}], "Input"]
+      RowBox[{"NullSpace", "[", "pinrigmat", "]"}], "]"}]}], "}"}]}], "]"}]}],
+  "Input"]
 }, Closed]],
 
 Cell[CellGroupData[{
