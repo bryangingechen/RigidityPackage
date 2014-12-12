@@ -8331,8 +8331,8 @@ Cell[BoxData[{
    RowBox[{"{", 
     RowBox[{"j", ",", 
      RowBox[{"Length", "[", 
-      RowBox[{"NullSpace", "[", "pinrigmat", "]"}], "]"}]}], "}"}]}], "]"}]}],
-  "Input"]
+      RowBox[{"NullSpace", "[", "pinrigmat", "]"}], "]"}]}], "}"}]}], 
+  "]"}]}], "Input"]
 }, Closed]],
 
 Cell[CellGroupData[{
@@ -8412,7 +8412,9 @@ lifted in turn."
 
 Cell[CellGroupData[{
 
-Cell["Linear response and stresses", "Subsection"],
+Cell["\<\
+Linear response, linear elasticity and stresses\
+\>", "Subsection"],
 
 Cell[CellGroupData[{
 
@@ -8435,6 +8437,525 @@ Cell[TextData[{
  " described in the previous section will be useful for setting up the \
 desired displacement."
 }], "Text"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Linear elasticity", "Subsubsection"],
+
+Cell[TextData[{
+ "The function ",
+ StyleBox["ElasticTensor",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " computes the elastic tensor of a spring network, following [LKMSS15].  \
+First, some notation / conventions."
+}], "Text"],
+
+Cell[TextData[{
+ "Let the macroscopic strain tensor be ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["\[Epsilon]", "ij"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ ", expressed in Voigt notation, that is, as a d(d+1)/2 dimensional vector.  \
+The ordering of the indices  {i,j} in dimension d that we use is given by the \
+function ",
+ StyleBox["symmetricindexlist[]",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ":"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"dimension", " ", "2"}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"symmetricindexlist", "[", "2", "]"}], "\[IndentingNewLine]", 
+   RowBox[{"(*", " ", 
+    RowBox[{"dimension", " ", "3"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"symmetricindexlist", "[", "3", "]"}]}]}]], "Input"],
+
+Cell[TextData[{
+ "The elastic energy density associated with this is ",
+ Cell[BoxData[
+  FormBox[
+   RowBox[{
+    SubscriptBox["f", "el"], "=", 
+    RowBox[{
+     FractionBox["1", "2"], 
+     SubscriptBox["K", "ijkl"], 
+     SubscriptBox["\[Epsilon]", "ij"], 
+     SubscriptBox["\[Epsilon]", "kl"]}]}], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ ".  "
+}], "Text"],
+
+Cell[TextData[{
+ "The elastic constant tensor ",
+ Cell[BoxData[
+  FormBox[
+   SubscriptBox["K", "ijkl"], TraditionalForm]],
+  FormatType->"TraditionalForm"],
+ " in Voigt notation is a d(d+1)/2 by d(d+1)/2 square matrix, and the \
+coefficients correspond to quadratic coefficients of strains as follows:"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "ordering", " ", "of", " ", "indices", " ", "in", " ", "elastic", " ", 
+    "tensor", " ", "in", " ", "2", "D"}], " ", "*)"}], "\[IndentingNewLine]", 
+  
+  RowBox[{
+   RowBox[{"fourthrankindices", "[", "2", "]"}], "//", 
+   "MatrixForm"}]}]], "Input",
+ CellChangeTimes->{{3.624008578048253*^9, 3.6240085993092747`*^9}, {
+  3.624020064929654*^9, 3.624020066365143*^9}}],
+
+Cell[TextData[{
+ "Below we give a few examples using ",
+ StyleBox["ElasticTensor",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ".  The order of parameters is \[OpenCurlyDoubleQuote]positions of particles \
+in unit cell\[CloseCurlyDoubleQuote], \[OpenCurlyDoubleQuote]basis vectors \
+for unit cell\[CloseCurlyDoubleQuote], \[OpenCurlyDoubleQuote]edge data\
+\[CloseCurlyDoubleQuote], \[OpenCurlyDoubleQuote]list of spring constants\
+\[CloseCurlyDoubleQuote] (if omitted, assumed to be 1):"
+}], "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"square", " ", "lattice", " ", "test"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"ElasticTensor", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "0"}], "}"}], "}"}], ",", 
+    RowBox[{"IdentityMatrix", "[", "2", "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"1", ",", "1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"1", ",", "1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "1"}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+   "]"}]}]], "Input",
+ CellChangeTimes->{{3.6239937583053093`*^9, 3.62399376435872*^9}, {
+  3.624003197190583*^9, 3.624003203911944*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"square", " ", "lattice", " ", "with", " ", "NNN", " ", "test"}], 
+   " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"ElasticTensor", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "0"}], "}"}], "}"}], ",", 
+    RowBox[{"IdentityMatrix", "[", "2", "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"1", ",", "1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"1", ",", "1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"1", ",", "1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"1", ",", "1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", 
+          RowBox[{"-", "1"}]}], "}"}], ",", "1"}], "}"}]}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"k", ",", "k", ",", "k1", ",", "k1"}], "}"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.6239937583053093`*^9, 3.62399376435872*^9}, {
+  3.624003197190583*^9, 3.624003203911944*^9}, {3.624007230164887*^9, 
+  3.6240072698280687`*^9}, {3.624008340651676*^9, 3.624008341657263*^9}, {
+  3.6240193010890207`*^9, 3.62401931146844*^9}, {3.627335486306364*^9, 
+  3.627335488424776*^9}, {3.627337901119481*^9, 3.6273379045194483`*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"zigzagpos", "=", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"1", "/", "10"}], ",", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"11", "/", "10"}], ",", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"1", ",", "1"}], "}"}]}], "}"}], "/", "2"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"squarebasis", "=", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"2", ",", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", "2"}], "}"}]}], "}"}], "/", "2"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"squareedgedat", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "4"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"3", ",", "4"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"3", ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"4", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"4", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"DrawPeriodic2DFramework", "[", 
+   RowBox[{"zigzagpos", ",", "squarebasis", ",", "squareedgedat", ",", 
+    RowBox[{"{", 
+     RowBox[{"5", ",", "5"}], "}"}]}], "]"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Simplify", "[", 
+  RowBox[{"ElasticTensor", "[", 
+   RowBox[{"zigzagpos", ",", "squarebasis", ",", "squareedgedat"}], "]"}], 
+  "]"}]}], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"triangular", " ", "lattice", " ", "test"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"ElasticTensor", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "0"}], "}"}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"1", ",", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"1", "/", "2"}], ",", 
+        RowBox[{
+         RowBox[{"Sqrt", "[", "3", "]"}], "/", "2"}]}], "}"}]}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"1", ",", "1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"1", ",", "1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"1", ",", "1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", 
+          RowBox[{"-", "1"}]}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+   "]"}]}]], "Input",
+ CellChangeTimes->{{3.623970276753355*^9, 3.6239703158443193`*^9}, {
+  3.6239936709473953`*^9, 3.623993721592031*^9}, {3.6239964267758007`*^9, 
+  3.623996441152997*^9}, {3.624003207686376*^9, 3.624003211291597*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"kagpos", "=", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        FractionBox["1", "2"], ",", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        FractionBox["3", "4"], ",", 
+        RowBox[{"-", 
+         FractionBox[
+          SqrtBox["3"], "4"]}]}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"kagpos", "=", 
+     RowBox[{"KagLatticeRho", "[", 
+      RowBox[{"1", ",", "1", ",", "0"}], "]"}]}], ";"}], "*)"}], " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "uncomment", " ", "if", " ", "RigidityPackage", " ", "is", " ", "loaded"}],
+    " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kaglatticeE", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "1"}], ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "1"}], ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", 
+         RowBox[{"-", "1"}]}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kaglatticeNNN", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "1"}], ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "1"}], ",", "0"}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kaglatticeNNN2", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", 
+         RowBox[{"-", "1"}]}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "1"}], ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", 
+         RowBox[{"-", "1"}]}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"kaglatt", "=", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"1", ",", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"1", "/", "2"}], ",", 
+        RowBox[{
+         SqrtBox["3"], "/", "2"}]}], "}"}]}], "}"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"DrawPeriodic2DFramework", "[", 
+   RowBox[{"kagpos", ",", "kaglatt", ",", 
+    RowBox[{"Join", "[", 
+     RowBox[{"kaglatticeE", ",", "kaglatticeNNN", ",", "kaglatticeNNN2"}], 
+     "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"5", ",", "5"}], "}"}]}], "]"}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{"kagome", " ", "lattice", " ", "test"}], " ", 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"etkag", "=", 
+   RowBox[{"ElasticTensor", "[", 
+    RowBox[{"kagpos", ",", "kaglatt", ",", "kaglatticeE"}], "]"}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]"}], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"elastic", " ", "energy"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"Total", "[", 
+   RowBox[{
+    RowBox[{"etkag", "*", 
+     RowBox[{"fourthrankindices", "[", "2", "]"}]}], ",", "2"}], 
+   "]"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "kagome", " ", "lattice", " ", "with", " ", "NNN", " ", "bonds", " ", 
+    "test"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "cannot", " ", "do", " ", "it", " ", "with", " ", "symbolic", " ", 
+    "spring", " ", 
+    RowBox[{"constants", " ", "--"}], " ", "too", " ", "slow"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{"equal", " ", "spring", " ", "constants", " ", "first"}], " ", 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"ElasticTensor", "[", 
+   RowBox[{
+    RowBox[{"N", "[", 
+     RowBox[{"kagpos", ",", "30"}], "]"}], ",", 
+    RowBox[{"N", "[", 
+     RowBox[{"kaglatt", ",", "30"}], "]"}], ",", 
+    RowBox[{"Join", "[", 
+     RowBox[{"kaglatticeE", ",", "kaglatticeNNN", ",", "kaglatticeNNN2"}], 
+     "]"}], ",", "\[IndentingNewLine]", 
+    RowBox[{"Join", "[", 
+     RowBox[{
+      RowBox[{"Table", "[", 
+       RowBox[{"1", ",", 
+        RowBox[{"{", "6", "}"}]}], "]"}], ",", 
+      RowBox[{"Table", "[", 
+       RowBox[{"1", ",", 
+        RowBox[{"{", "6", "}"}]}], "]"}]}], "]"}]}], "]"}]}]], "Input"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"unequal", " ", "spring", " ", "constants"}], "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"ElasticTensor", "[", 
+   RowBox[{
+    RowBox[{"N", "[", 
+     RowBox[{"kagpos", ",", "20"}], "]"}], ",", 
+    RowBox[{"N", "[", 
+     RowBox[{"kaglatt", ",", "20"}], "]"}], ",", 
+    RowBox[{"Join", "[", 
+     RowBox[{"kaglatticeE", ",", "kaglatticeNNN", ",", "kaglatticeNNN2"}], 
+     "]"}], ",", "\[IndentingNewLine]", 
+    RowBox[{"Join", "[", 
+     RowBox[{
+      RowBox[{"Table", "[", 
+       RowBox[{"1", ",", 
+        RowBox[{"{", "6", "}"}]}], "]"}], ",", 
+      RowBox[{"Table", "[", 
+       RowBox[{".2", ",", 
+        RowBox[{"{", "6", "}"}]}], "]"}]}], "]"}]}], "]"}]}]], "Input"]
 }, Closed]],
 
 Cell[CellGroupData[{
@@ -9118,6 +9639,12 @@ Cell["\<\
 \>", "Text"],
 
 Cell["\<\
+[LKMSS15] T.C. Lubensky, C.L. Kane, X. Mao, A. Souslov, and K. Sun, \
+\[OpenCurlyDoubleQuote]Phonons and elasticity in critically coordinated \
+lattices,\[CloseCurlyDoubleQuote] manuscript.\
+\>", "Text"],
+
+Cell["\<\
 [MT12] J. Malestein and L. Theran, \"Generic combinatorial rigidity of \
 periodic frameworks,\" 10.1016/j.aim.2012.10.007 Adv. in Math. Volume 233, \
 Issue 1, 30 January 2013, Pages 291\[Dash]331.  http://arxiv.org/abs/1008.1837\
@@ -9133,7 +9660,7 @@ vol. 372 no. 2008 20120030. http://arxiv.org/abs/1102.2744\
 },
 EvaluationCompletionAction->{},
 WindowSize->{867, 826},
-WindowMargins->{{Automatic, 16}, {Automatic, 0}},
+WindowMargins->{{Automatic, 272}, {Automatic, 0}},
 PrivateNotebookOptions->{"FileOutlineCache"->False},
 TrackCellChangeTimes->False,
 Background->RGBColor[0.965927, 0.985016, 0.999908],
