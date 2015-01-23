@@ -1370,7 +1370,7 @@ Table[
 tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
 (* shifted unit cell positions *)
 unitcell=Dot[tmat,Join[#,{1}]][[1;;2]]&/@p;
-realnv=Re[tmat[[;;2,;;2]].nv Product[qvec[[i]]^m[i],{i,dim}]]; 
+realnv=Re[Flatten[Table[tmat[[;;2,;;2]].nv[[2i-1;;2i]],{i,Length[p]}]] Product[qvec[[i]]^m[i],{i,dim}]]; 
 {Join[linestyle,Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
@@ -1399,7 +1399,7 @@ Table[
 tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
 (* shifted unit cell positions *)
 unitcell=Dot[tmat,Join[#,{1}]][[1;;2]]&/@p;
-realnv=Re[tmat[[;;2,;;2]].nv Product[qvec[[i]]^m[i],{i,dim}]]; 
+realnv=Re[Flatten[Table[tmat[[;;2,;;2]].nv[[2i-1;;2i]],{i,Length[p]}]] Product[qvec[[i]]^m[i],{i,dim}]]; 
 {Join[linestyle,Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
@@ -1672,7 +1672,7 @@ Table[
 tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
 (* shifted unit cell positions *)
 unitcell=Dot[tmat,Join[#,{1}]][[1;;3]]&/@p;
-realnv=Re[tmat[[;;3,;;3]].nv Product[qvec[[i]]^m[i],{i,dim}]];
+realnv=Re[Flatten[Table[tmat[[;;3,;;3]].nv[[3i-2;;3i]],{i,Length[p]}]] Product[qvec[[i]]^m[i],{i,dim}]];
 {Join[linestyle,Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
@@ -1701,7 +1701,7 @@ Table[
 tmat=Dot@@Table[MatrixPower[transformations[[i]],m[i]],{i,dim}]; (* maybe could memoize *)
 (* shifted unit cell positions *)
 unitcell=Dot[tmat,Join[#,{1}]][[1;;3]]&/@p;
-realnv=Re[tmat[[;;3,;;3]].nv Product[qvec[[i]]^m[i],{i,dim}]];
+realnv=Re[Flatten[Table[tmat[[;;3,;;3]].nv[[3i-2;;3i]],{i,Length[p]}]] Product[qvec[[i]]^m[i],{i,dim}]];
 {Join[linestyle,Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
