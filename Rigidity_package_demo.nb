@@ -6224,7 +6224,7 @@ Cell[TextData[{
  StyleBox["RigidityMatrix",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " can also compute the \[OpenCurlyDoubleQuote]fixed-lattice\
+ " can also compute the non-\[OpenCurlyDoubleQuote]fixed-lattice\
 \[CloseCurlyDoubleQuote] type [MT12] of rigidity matrix.  This is also \
 essentially the \[OpenCurlyDoubleQuote]augmented\[CloseCurlyDoubleQuote] \
 rigidity matrix of [HF06].  It contains (dim of space)(dim of lattice) extra \
@@ -7849,10 +7849,20 @@ Cell[TextData[{
  StyleBox["SliceOffVerts[pos,edgedat,poscond,indexcond]",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " is a function written to do this.  \[OpenCurlyDoubleQuote]poscond\
-\[CloseCurlyDoubleQuote] and \[OpenCurlyDoubleQuote]indexcond\
-\[CloseCurlyDoubleQuote] are Boolean functions that one inputs so that they \
-evaluate to True when vertices and edges are to be removed.  "
+ " is a function written to do this.  \[OpenCurlyDoubleQuote]",
+ StyleBox["poscond",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ "\[CloseCurlyDoubleQuote] and \[OpenCurlyDoubleQuote]",
+ StyleBox["indexcond",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ "\[CloseCurlyDoubleQuote] are Boolean functions that one inputs so that they \
+evaluate to ",
+ StyleBox["True",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " when vertices and edges are to be removed.  "
 }], "Text"],
 
 Cell[TextData[{
@@ -7886,10 +7896,17 @@ instance, ",
 }], "Text"],
 
 Cell[TextData[{
- "The output of is two lists, a new \"edge data\" list of the remaining edges \
-(with all remaining vertices reindexed!) and a \[OpenCurlyDoubleQuote]keepers\
-\[CloseCurlyDoubleQuote] list of the indices of the vertices that are kept.  \
-Thus, ",
+ "The output of ",
+ StyleBox["SliceOffVerts",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " is two lists, a new \"edge data\" list of the remaining edges (with all \
+remaining vertices reindexed!) and a \[OpenCurlyDoubleQuote]",
+ StyleBox["keepers",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ "\[CloseCurlyDoubleQuote] list of the indices of the vertices that are kept. \
+ Thus, ",
  StyleBox["pos[[keepers]]",
   FontFamily->"Courier",
   FontWeight->"Bold"],
@@ -8040,6 +8057,240 @@ Cell[BoxData[{
   ";"}], "\[IndentingNewLine]", 
  RowBox[{"Length", "[", 
   RowBox[{"NullSpace", "[", "ksliceR", "]"}], "]"}]}], "Input"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Gluing frameworks", "Subsubsection"],
+
+Cell["\<\
+Also useful is putting together a framework from two (or more) different \
+ones.  The functionality included currently is a bit limited, but hopefully \
+still useful.\
+\>", "Text"],
+
+Cell[TextData[{
+ StyleBox["CoveringFrameworkVertsCondition[unitcell1,unitcell2,basis,cover,m,\
+condition,r]",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " is a function written to output the vertex positions of a periodic system \
+with \[OpenCurlyDoubleQuote]",
+ StyleBox["cover",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ "\[CloseCurlyDoubleQuote] unit cells in each direction with lattice vectors \
+given by \[OpenCurlyDoubleQuote]",
+ StyleBox["basis",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ "\[CloseCurlyDoubleQuote].  Each of the unit cells will be given by vertex \
+positions specified by either ",
+ StyleBox["unitcell1",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " or ",
+ StyleBox["unitcell2",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ ".  \[OpenCurlyDoubleQuote]",
+ StyleBox["condition",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ "\[CloseCurlyDoubleQuote] is a Boolean expression that one inputs so that it \
+evaluates to ",
+ StyleBox["True",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " when ",
+ StyleBox["unitcell1",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " is to be used and ",
+ StyleBox["False",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " when ",
+ StyleBox["unitcell2",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " is to be used.  "
+}], "Text"],
+
+Cell[TextData[{
+ "The parameter ",
+ StyleBox["r",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " (optional) can be used to specify random perturbations to the vertex \
+positions."
+}], "Text"],
+
+Cell["\<\
+In the following example I create a domain wall in a system of 16 by 2 unit \
+cells between two periodic perturbed kagome lattices.\
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"kagpos1", "=", 
+   RowBox[{
+    RowBox[{"KagLatticeRho", "[", 
+     RowBox[{"1", ",", "1", ",", ".3"}], "]"}], "+", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"0", ",", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", ".35"}], ",", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", "0"}], "}"}]}], "}"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kagpos2", "=", 
+   RowBox[{
+    RowBox[{"KagLatticeRho", "[", 
+     RowBox[{"1", ",", "1", ",", ".3"}], "]"}], "+", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"0", ",", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{".35", ",", "0"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"0", ",", "0"}], "}"}]}], "}"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kaglatticeE", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "1"}], ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "1"}], ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"1", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", 
+         RowBox[{"-", "1"}]}], "}"}], ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"2", ",", "3"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kaglatt", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"1", "/", "2"}], ",", 
+       RowBox[{
+        SqrtBox["3."], "/", "2"}]}], "}"}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kcopies", "=", 
+   RowBox[{"{", 
+    RowBox[{"16", ",", "2"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kwallcover", "=", 
+   RowBox[{"CoveringFrameworkVertsCondition", "[", 
+    RowBox[{
+    "kagpos1", ",", "kagpos2", ",", "kaglatt", ",", "kcopies", ",", "m", ",", 
+     
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"m", "[", "1", "]"}], ">", "7"}], ")"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kwallcoverE", "=", 
+   RowBox[{"CoveringFrameworkEdges", "[", 
+    RowBox[{"kaglatticeE", ",", "kcopies", ",", "True"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"wallpic", "=", 
+  RowBox[{"DrawPeriodic2DFramework", "[", 
+   RowBox[{"kwallcover", ",", 
+    RowBox[{"kaglatt", "*", "kcopies"}], ",", "kwallcoverE"}], 
+   "]"}]}]}], "Input"],
+
+Cell["\<\
+Observe that this system has localized zero modes / self-stresses at the two \
+walls (left and right):\
+\>", "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"kwallR", "=", 
+   RowBox[{"RigidityMatrix", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", "1"}], "}"}], ",", "kwallcover", ",", 
+     RowBox[{"kaglatt", "*", "kcopies"}], ",", "kwallcoverE"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"wallfloppy", "=", 
+   RowBox[{"Eigensystem", "[", 
+    RowBox[{
+     RowBox[{"DynMat", "[", "kwallR", "]"}], ",", 
+     RowBox[{"-", "5"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"wallfloppy", "[", 
+  RowBox[{"[", "1", "]"}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"wallstress", "=", 
+   RowBox[{"Eigensystem", "[", 
+    RowBox[{
+     RowBox[{"DynMat", "[", 
+      RowBox[{"Transpose", "[", "kwallR", "]"}], "]"}], ",", 
+     RowBox[{"-", "5"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"wallstress", "[", 
+  RowBox[{"[", "1", "]"}], "]"}]}], "Input"],
+
+Cell[BoxData[{
+ RowBox[{"DrawPeriodic2DFrameworkMode", "[", 
+  RowBox[{"kwallcover", ",", 
+   RowBox[{"kaglatt", "*", "kcopies"}], ",", "kwallcoverE", ",", 
+   RowBox[{"5", 
+    RowBox[{"wallfloppy", "[", 
+     RowBox[{"[", 
+      RowBox[{"2", ",", "3"}], "]"}], "]"}]}]}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"Show", "[", 
+  RowBox[{"wallpic", ",", 
+   RowBox[{"DrawPeriodic2DFrameworkStress", "[", 
+    RowBox[{"kwallcover", ",", 
+     RowBox[{"kaglatt", "*", "kcopies"}], ",", "kwallcoverE", ",", 
+     RowBox[{"wallstress", "[", 
+      RowBox[{"[", 
+       RowBox[{"2", ",", "3"}], "]"}], "]"}], ",", 
+     RowBox[{"{", "}"}], ",", "5"}], "]"}]}], "]"}]}], "Input"]
 }, Closed]]
 }, Closed]]
 }, Closed]],
@@ -8412,9 +8663,7 @@ lifted in turn."
 
 Cell[CellGroupData[{
 
-Cell["\<\
-Linear response, linear elasticity and stresses\
-\>", "Subsection"],
+Cell["Linear response, linear elasticity and stresses", "Subsection"],
 
 Cell[CellGroupData[{
 
@@ -8456,8 +8705,7 @@ Cell[TextData[{
  "Let the macroscopic strain tensor be ",
  Cell[BoxData[
   FormBox[
-   SubscriptBox["\[Epsilon]", "ij"], TraditionalForm]],
-  FormatType->"TraditionalForm"],
+   SubscriptBox["\[Epsilon]", "ij"], TraditionalForm]]],
  ", expressed in Voigt notation, that is, as a d(d+1)/2 dimensional vector.  \
 The ordering of the indices  {i,j} in dimension d that we use is given by the \
 function ",
@@ -8487,8 +8735,7 @@ Cell[TextData[{
      FractionBox["1", "2"], 
      SubscriptBox["K", "ijkl"], 
      SubscriptBox["\[Epsilon]", "ij"], 
-     SubscriptBox["\[Epsilon]", "kl"]}]}], TraditionalForm]],
-  FormatType->"TraditionalForm"],
+     SubscriptBox["\[Epsilon]", "kl"]}]}], TraditionalForm]]],
  ".  "
 }], "Text"],
 
@@ -8496,8 +8743,7 @@ Cell[TextData[{
  "The elastic constant tensor ",
  Cell[BoxData[
   FormBox[
-   SubscriptBox["K", "ijkl"], TraditionalForm]],
-  FormatType->"TraditionalForm"],
+   SubscriptBox["K", "ijkl"], TraditionalForm]]],
  " in Voigt notation is a d(d+1)/2 by d(d+1)/2 square matrix, and the \
 coefficients correspond to quadratic coefficients of strains as follows:"
 }], "Text"],
@@ -9660,7 +9906,7 @@ vol. 372 no. 2008 20120030. http://arxiv.org/abs/1102.2744\
 },
 EvaluationCompletionAction->{},
 WindowSize->{867, 826},
-WindowMargins->{{Automatic, 272}, {Automatic, 0}},
+WindowMargins->{{Automatic, 117}, {Automatic, 0}},
 PrivateNotebookOptions->{"FileOutlineCache"->False},
 TrackCellChangeTimes->False,
 Background->RGBColor[0.965927, 0.985016, 0.999908],

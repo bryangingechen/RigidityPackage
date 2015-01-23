@@ -83,7 +83,7 @@ diags=Select[Flatten[dd],#!=0&];];
 
 
 (* Fixed lattice matrix code *)
-(* if fixedperiodic is false how do we deal with z's?? *)
+(* if fixedperiodic is true how do we deal with z's?? *)
 (* convention for "lattice" columns agrees with papers *)
 
 RigidityMatrix[z_,posns_,basis_,edgedat_,fixedperiodic_:False]:=
@@ -276,8 +276,11 @@ fourthrankindices[dim_]:=Module[{sil=symmetricindexlist[dim]},Table[
 Subscript[\[Epsilon], sil[[is]]] Subscript[\[Epsilon], sil[[js]]]
 ,{is,dim (dim+1)/2},{js,dim (dim+1)/2}]]
 
+
 (* let k0 be a list of spring constants, possibly including 0's *)
-ElasticTensor[pos_,basis_,edat0_,k0_:{}]:=Module[{k,qdim=Length[basis],dim=Length[pos[[1]]],E=Length[edat0],numparts=Length[pos],C,U,\[CapitalSigma],Vs,is,js,presym,Eafflist,Eafflist2,
+ElasticTensor[pos_,basis_,edat0_,k0_:{}]:=Module[{k,qdim=Length[basis],
+dim=Length[pos[[1]]],E=Length[edat0],numparts=Length[pos],C,U,\[CapitalSigma],Vs,is,js,
+presym,Eafflist,Eafflist2,
 symmetricindex,i,j,pair1,pair2,kk,matA,matB,matC,matD,proj,
 part1,part2,edatExtend,lattchange,ebond,ebondlist,eps=10^-14,numss,nonzeros,edat},
 
@@ -453,6 +456,23 @@ transx=Flatten[Join[Table[{1,0},{numatoms}],Table[0,{4}]]];
 transy=Flatten[Join[Table[{0,1},{numatoms}],Table[0,{4}]]];
 testrotk=infinitesimal2drotationmode[pos,basis];
 NullSpace[Join[pmtestk,{transx,transy,testrotk}]][[1]]];
+
+getnontriv2Dflat[flatvec_?(VectorQ[#,NumericQ]&),edgedat_]:=Module[{pmtestk,testrotk,transx,transy,
+numatoms,pos,basis,nsp,nspp,bigrig,bigrig2,j},
+numatoms=(Length[flatvec]-4)/2;
+pos=Partition[flatvec[[1;;2numatoms]],2];
+basis={flatvec[[-4;;-3]],flatvec[[-2;;-1]]};
+pmtestk=Normal[RigidityMatrix[{1,1},pos,basis,edgedat,True]];
+transx=Flatten[Join[Table[{1,0},{numatoms}],Table[0,{4}]]];
+transy=Flatten[Join[Table[{0,1},{numatoms}],Table[0,{4}]]];
+testrotk=infinitesimal2drotationmode[pos,basis];
+bigrig=Join[pmtestk,{transx,transy,testrotk}];
+bigrig2=bigrig[[1;;-2,1;;2numatoms]];
+nspp=NullSpace[bigrig2];
+If[Length[nspp]>0,bigrig=Join[bigrig,nspp=Table[Join[nspp[[j]],{0,0,0,0}],{j,Length[nspp]}]]];
+nsp=NullSpace[bigrig];
+Join[nspp,nsp]
+];
 
 
 (* need this to be cromulent with CoveringFrameworkVerts and CoveringFrameworkEdges *)
@@ -929,12 +949,15 @@ Table[{getatomindex[m,yy,ind,xx,yy,4],getatomindex[m,yy,indout,xx,yy,4]},{m,xx}]
 (* create lists suitable for input into the last two slots of HarmonicExtension; 
 the first being the indices of the "boundary" vertices 
 and the second being the actual applied forces / displacements there  *)
-shearbvsq[lx_,ly_,u_:{1,0}]:=Module[{j},{(* site indices *) Join[Table[ly(j-1)+1,{j,lx}],Table[ly*j,{j,lx}]], 
-(* applied displacement components; 0 on bottom, u on top *) Join[Table[0,{2lx}],Flatten[Table[u,{lx}]]]}];
+shearbvsq[lx_,ly_,u_:{1,0}]:=Module[{j},{(* site indices *)
+Join[Table[ly(j-1)+1,{j,lx}],Table[ly*j,{j,lx}]], 
+(* applied displacement components; 0 on bottom, u on top *) 
+Join[Table[0,{2lx}],Flatten[Table[u,{lx}]]]}];
 
 
 BoundaryVerts[edgedat_,cover_,cellspec_]:=
-Module[{i,j,k,qdim=Length[cover],tabspec,m,list,unitcellsize=Max[edgedat[[All,1]]](*,parts*)},
+Module[{i,j,k,qdim=Length[cover],tabspec,m,list,unitcellsize=Max[edgedat[[All,1]]]
+(*,parts*)},
 (*parts=Table[0,{2qdim}];*)
 list=Table[
 {tabspec=Table[If[i!=k,{m[i],cover[[i]]},
@@ -988,6 +1011,22 @@ Table[
 Sum[latt[[j]]*m[j],{j,qdim}]+If[r>0, RandomReal[{-r,r},dim],Table[0,{dim}]]
 +unitcell[[i]],
 {i,Length[unitcell]}],
+##]&@@tabspec,(* specification of table, dim copies of loops from 0 to cover-1 *)
+qdim]
+];
+
+
+(* make a list of vertex positions in any dimension from two unit cell types *)
+CoveringFrameworkVertsCondition[unitcell1_,unitcell2_,latt_,cover_,m_,condition_,r_:0]:=
+Module[{qdim=Length[latt],dim=Length[unitcell1[[1]]],tabspec},
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,qdim}];
+Flatten[
+Table[
+Table[
+Sum[latt[[i]]*m[i],{i,qdim}]+If[r>0, RandomReal[{-r,r},dim],Table[0,{dim}]]
+(* If condition is true, unitcell1, if condition is false, unitcell2 *)
++If[condition,unitcell1[[i]],unitcell2[[i]]],
+{i,Length[unitcell1]}],
 ##]&@@tabspec,(* specification of table, dim copies of loops from 0 to cover-1 *)
 qdim]
 ];
@@ -1154,11 +1193,12 @@ Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]]
 }]];
 
 
-Draw2DFrameworkStress[p_,E_,stress_,mthick_:.01,colors_:{Purple,Orange}]:=
+Draw2DFrameworkStress[p_,E_,stress_,mthick_:.01,colors_:{Purple,Orange},cutoff_:10^-5]:=
 Module[{j,e=Length[E],nstr=mthick stress/Max[Abs[stress]]},
 Graphics[{
-Table[{If[nstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[nstr[[j]]]],
-Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}]},{j,e}]}]];
+Table[If[Abs[nstr[[j]]]>cutoff,{If[nstr[[j]]>0,colors[[1]],colors[[2]]],
+AbsoluteThickness[Abs[nstr[[j]]]],Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}]},{}],
+{j,e}]}]];
 
 
 Draw2DFrameworkMode[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{i,j,e=Length[E]},
@@ -1169,11 +1209,11 @@ Join[col,Table[Line[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{i,Length[p]}]]
 }]];
 
 
-Draw2DFrameworkModeArr[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{i,j,e=Length[E]},
+Draw2DFrameworkModeArr[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=Module[{i,j,e=Length[E]},
 Graphics[{
 Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
 Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
-Join[col,Table[Arrow[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[nv[[2i-1;;2i]]]>cutoff,Arrow[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{}],{i,Length[p]}]]
 }]];
 
 
@@ -1222,12 +1262,12 @@ Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]]}
 ]];
 
 
-(* allow complex stresses(?), if so need qvec *)
+(* allow complex stresses(?), if so need qvec (a vector of z's) *)
 DrawPeriodic2DFrameworkStress[p_,basis_,E_,stressinput_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=
 Module[{i,j,e=Length[E],stress,qvec,nstr,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend,realnstr},
 (* dumb trick for backwards compatibility *)
 If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),qvec=stressinput[[2]];stress=stressinput[[1]];,
-qvec=Table[0,{dim}];stress=stressinput;
+qvec=Table[1,{dim}];stress=stressinput;
 ];
 nstr=mthick stress/Max[Abs[stress]];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1249,7 +1289,7 @@ Module[{i,j,e=Length[E],stress,qvec,nstr,dim=Length[transformations],
 tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnstr},
 (* dumb trick for backwards compatibility *)
 If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),qvec=stressinput[[2]];stress=stressinput[[1]];,
-qvec=Table[0,{dim}];stress=stressinput;
+qvec=Table[1,{dim}];stress=stressinput;
 ];
 nstr=mthick stress/Max[Abs[stress]];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1591,6 +1631,28 @@ edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2
 Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
 Join[col,Table[Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{i,Length[p]}]]
+}
+,##]&@@tabspec
+]];
+
+
+DrawPeriodic3DFrameworkModeArrTube[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+(* dumb trick for backwards compatibility *)
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+qvec=Table[1,{dim}];nv=nvinput;
+];
+cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+Graphics3D[
+Table[
+unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
+realnv=Re[nv Product[qvec[[i]]^m[i],{i,dim}]];
+{Join[linestyle,Table[
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
+Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
+Join[col,Table[Arrow[Tube[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}]],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
