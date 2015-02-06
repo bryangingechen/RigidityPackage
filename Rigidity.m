@@ -1201,27 +1201,33 @@ AbsoluteThickness[Abs[nstr[[j]]]],Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}]},{}],
 {j,e}]}]];
 
 
-Draw2DFrameworkMode[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{i,j,e=Length[E]},
+Draw2DFrameworkMode[p_,E_,nv_,pointstyle_:{},linestyle_:{},
+col_:{Red},cutoff_:10^-5]:=Module[{i,j,e=Length[E]},
 Graphics[{
 Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
 Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
-Join[col,Table[Line[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[nv[[2i-1;;2i]]]>cutoff,
+Line[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{}],{i,Length[p]}]]
 }]];
 
 
-Draw2DFrameworkModeArr[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=Module[{i,j,e=Length[E]},
+Draw2DFrameworkModeArr[p_,E_,nv_,pointstyle_:{},linestyle_:{},
+col_:{Red},cutoff_:10^-5]:=Module[{i,j,e=Length[E]},
 Graphics[{
 Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
 Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
-Join[col,Table[If[Norm[nv[[2i-1;;2i]]]>cutoff,Arrow[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{}],{i,Length[p]}]]
+Join[col,Table[If[Norm[nv[[2i-1;;2i]]]>cutoff,
+Arrow[{p[[i]],p[[i]]+nv[[2i-1;;2i]]}],{}],{i,Length[p]}]]
 }]];
 
 
-Draw2DFrameworkModeAmp[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{i,j,e=Length[E]},
+Draw2DFrameworkModeAmp[p_,E_,nv_,pointstyle_:{},linestyle_:{},
+col_:{Red},cutoff_:10^-5]:=Module[{i,j,e=Length[E]},
 Graphics[{
 Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
 Join[pointstyle,Table[{Point[p[[i]]]},{i,Length[p]}]],
-Join[col,Table[{PointSize->Norm[nv[[2i-1;;2i]]],Point[{p[[i]]}]},{i,Length[p]}]]
+Join[col,Table[If[Norm[nv[[2i-1;;2i]]]>cutoff,
+{PointSize->Norm[nv[[2i-1;;2i]]],Point[{p[[i]]}]},{}],{i,Length[p]}]]
 }]];
 
 
@@ -1240,8 +1246,10 @@ Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]]}
 ]];
 
 
-DrawTPeriodic2DFramework[p_,transformations_,E_,copies_:{},pointstyle_:{},linestyle_:{}]:=
-Module[{i,j,e=Length[E],dim=Length[transformations],tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2},
+DrawTPeriodic2DFramework[p_,transformations_,E_,copies_:{},pointstyle_:{},
+linestyle_:{}]:=
+Module[{i,j,e=Length[E],dim=Length[transformations],tabspec,m,cover,
+edatExtend,tmat,unitcell,pv,tmatp2},
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
 tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
 Graphics[
@@ -1263,10 +1271,13 @@ Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]]}
 
 
 (* allow complex stresses(?), if so need qvec (a vector of z's) *)
-DrawPeriodic2DFrameworkStress[p_,basis_,E_,stressinput_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=
-Module[{i,j,e=Length[E],stress,qvec,nstr,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend,realnstr},
+DrawPeriodic2DFrameworkStress[p_,basis_,E_,stressinput_,copies_:{},mthick_:.01,
+colors_:{Purple,Orange},cutoff_:10^-5]:=
+Module[{i,j,e=Length[E],stress,qvec,nstr,dim=Length[basis],tabspec,m,cover,
+unitcell,edatExtend,realnstr},
 (* dumb trick for backwards compatibility *)
-If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),qvec=stressinput[[2]];stress=stressinput[[1]];,
+If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),
+qvec=stressinput[[2]];stress=stressinput[[1]];,
 qvec=Table[1,{dim}];stress=stressinput;
 ];
 nstr=mthick stress/Max[Abs[stress]];
@@ -1277,18 +1288,23 @@ Table[
 unitcell=Plus[#,Sum[m[i]*basis[[i]],{i,dim}]]&/@p;
 realnstr=Re[nstr Product[qvec[[i]]^m[i],{i,dim}]];
 Table[
-edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
-{If[realnstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[realnstr[[j]]]],
-Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}]},{j,e}]
+edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],
+Table[0,{dim-Length[E[[j,2]]]}]];
+{If[realnstr[[j]]>0,colors[[1]],colors[[2]]],
+AbsoluteThickness[Abs[realnstr[[j]]]],
+If[Abs[realnstr[[j]]]>cutoff,Line[{unitcell[[E[[j,1,1]]]],
+unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{}]},{j,e}]
 ,##]&@@tabspec
 ]];
 
 
-DrawTPeriodic2DFrameworkStress[p_,transformations_,E_,stressinput_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=
+DrawTPeriodic2DFrameworkStress[p_,transformations_,E_,stressinput_,
+copies_:{},mthick_:.01,colors_:{Purple,Orange},cutoff_:10^-5]:=
 Module[{i,j,e=Length[E],stress,qvec,nstr,dim=Length[transformations],
 tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnstr},
 (* dumb trick for backwards compatibility *)
-If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),qvec=stressinput[[2]];stress=stressinput[[1]];,
+If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),
+qvec=stressinput[[2]];stress=stressinput[[1]];,
 qvec=Table[1,{dim}];stress=stressinput;
 ];
 nstr=mthick stress/Max[Abs[stress]];
@@ -1303,19 +1319,23 @@ realnstr=Re[nstr Product[qvec[[i]]^m[i],{i,dim}]];
 Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 {If[realnstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[realnstr[[j]]]],
+If[Abs[realnstr[[j]]]>cutoff,
 Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
 (* apply appropriate transformation again to get line to second particle *)
 tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
 pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
-pv[[1;;2]]]}]},{j,e}]
+pv[[1;;2]]]}],{}]},{j,e}]
 ,##]&@@tabspec
 ]];
 
 
-DrawPeriodic2DFrameworkMode[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
-Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+DrawPeriodic2DFrameworkMode[p_,basis_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
+Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],
+tabspec,m,cover,unitcell,edatExtend},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1328,16 +1348,20 @@ realnv=Re[nv Product[qvec[[i]]^m[i],{i,dim}]];
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[2i-1;;2i]]]>cutoff,
+Line[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
 
 
-DrawPeriodic2DFrameworkModeArr[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
-Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+DrawPeriodic2DFrameworkModeArr[p_,basis_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
+Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,
+m,cover,unitcell,edatExtend},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1350,17 +1374,20 @@ realnv=Re[nv Product[qvec[[i]]^m[i],{i,dim}]];
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[2i-1;;2i]]]>cutoff,
+Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
 
 
-DrawTPeriodic2DFrameworkMode[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+DrawTPeriodic2DFrameworkMode[p_,transformations_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
 Module[{i,j,e=Length[E],nv,qvec,dim=Length[transformations],
 tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1379,17 +1406,20 @@ tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (*
 pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
 pv[[1;;2]]]}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[2i-1;;2i]]]>cutoff,
+Line[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
 
 
-DrawTPeriodic2DFrameworkModeArr[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+DrawTPeriodic2DFrameworkModeArr[p_,transformations_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
 Module[{i,j,e=Length[E],nv,qvec,dim=Length[transformations],
 tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1408,16 +1438,20 @@ tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (*
 pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
 pv[[1;;2]]]}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[2i-1;;2i]]]>cutoff,
+Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[2i-1;;2i]]}],{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
 
 
-DrawPeriodic2DFrameworkModeAmp[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
-Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+DrawPeriodic2DFrameworkModeAmp[p_,basis_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
+Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,
+m,cover,unitcell,edatExtend},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1430,17 +1464,20 @@ realnv=Re[nv Product[qvec[[i]]^m[i],{i,dim}]];
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[{PointSize->Norm[realnv[[2i-1;;2i]]],Point[{unitcell[[i]]}]},{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[2i-1;;2i]]]>cutoff,
+{PointSize->Norm[realnv[[2i-1;;2i]]],Point[{unitcell[[i]]}]},{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
 
 
-DrawTPeriodic2DFrameworkModeAmp[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+DrawTPeriodic2DFrameworkModeAmp[p_,transformations_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
 Module[{i,j,e=Length[E],nv,qvec,dim=Length[transformations],
 tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==2Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1459,7 +1496,8 @@ tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (*
 pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
 pv[[1;;2]]]}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[{PointSize->Norm[realnv[[2i-1;;2i]]],Point[{unitcell[[i]]}]},{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[2i-1;;2i]]]>cutoff,
+{PointSize->Norm[realnv[[2i-1;;2i]]],Point[{unitcell[[i]]}]},{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
@@ -1472,37 +1510,41 @@ Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]]
 }]];
 
 
-Draw3DFrameworkStress[p_,E_,stress_,mthick_:.01,colors_:{Purple,Orange}]:=
+Draw3DFrameworkStress[p_,E_,stress_,mthick_:.01,colors_:{Purple,Orange},cutoff_:10^-5]:=
 Module[{j,e=Length[E],nstr=mthick stress/Max[Abs[stress]]},
 Graphics3D[{
 Table[{
 If[nstr[[j]]>0,colors[[1]],colors[[2]]],
 AbsoluteThickness[Abs[nstr[[j]]]],
-Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}]},{j,e}]
+If[Abs[nstr[[j]]]>cutoff,Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{}]},{j,e}]
 }]];
 
 
-Draw3DFrameworkMode[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{i,j,e=Length[E]},
+Draw3DFrameworkMode[p_,E_,nv_,pointstyle_:{},linestyle_:{},
+col_:{Red},cutoff_:10^-5]:=Module[{i,j,e=Length[E]},
 Graphics3D[{
 Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
 Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
-Join[col,Table[Line[{p[[i]],p[[i]]+nv[[3i-2;;3i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[nv[[3i-2;;3i]]]>cutoff,Line[{p[[i]],p[[i]]+nv[[3i-2;;3i]]}],{}],{i,Length[p]}]]
 }]];
 
 
-Draw3DFrameworkModeArr[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{i,j,e=Length[E]},
+Draw3DFrameworkModeArr[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red},
+cutoff_:10^-5]:=Module[{i,j,e=Length[E]},
 Graphics3D[{
 Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
 Join[pointstyle,Table[Point[p[[i]]],{i,Length[p]}]],
-Join[col,Table[Arrow[{p[[i]],p[[i]]+nv[[3i-2;;3i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[nv[[3i-2;;3i]]]>cutoff,Arrow[{p[[i]],p[[i]]+nv[[3i-2;;3i]]}],{}],{i,Length[p]}]]
 }]];
 
 
-Draw3DFrameworkModeAmp[p_,E_,nv_,pointstyle_:{},linestyle_:{},col_:{Red}]:=Module[{i,j,e=Length[E]},
+Draw3DFrameworkModeAmp[p_,E_,nv_,pointstyle_:{},linestyle_:{},
+col_:{Red},cutoff_:10^-5]:=Module[{i,j,e=Length[E]},
 Graphics3D[{
 Join[linestyle,Table[Line[{p[[E[[j,1,1]]]],p[[E[[j,1,2]]]]}],{j,e}]],
 Join[pointstyle,Table[{Point[p[[i]]]},{i,Length[p]}]],
-Join[col,Table[{PointSize->Norm[nv[[3i-2;;3i]]],Point[{p[[i]]}]},{i,Length[p]}]]
+Join[col,Table[If[Norm[nv[[3i-2;;3i]]]>cutoff,
+{PointSize->Norm[nv[[3i-2;;3i]]],Point[{p[[i]]}]},{}],{i,Length[p]}]]
 }]];
 
 
@@ -1543,10 +1585,13 @@ Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]]}
 
 
 (* allow complex stresses(?), if so need qvec *)
-DrawPeriodic3DFrameworkStress[p_,basis_,E_,stressinput_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=
-Module[{i,j,e=Length[E],stress,qvec,nstr,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend,realnstr},
+DrawPeriodic3DFrameworkStress[p_,basis_,E_,stressinput_,copies_:{},
+mthick_:.01,colors_:{Purple,Orange},cutoff_:10^-5]:=
+Module[{i,j,e=Length[E],stress,qvec,nstr,dim=Length[basis],tabspec,
+m,cover,unitcell,edatExtend,realnstr},
 (* dumb trick for backwards compatibility *)
-If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),qvec=stressinput[[2]];stress=stressinput[[1]];,
+If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),
+qvec=stressinput[[2]];stress=stressinput[[1]];,
 qvec=Table[1,{dim}];stress=stressinput;
 ];
 nstr=mthick stress/Max[Abs[stress]];
@@ -1559,16 +1604,20 @@ realnstr=Re[nstr Product[qvec[[i]]^m[i],{i,dim}]];
 Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 {If[realnstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[realnstr[[j]]]],
-Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}]},{j,e}]
+If[Abs[realnstr[[j]]]>cutoff,
+Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{}]},
+{j,e}]
 ,##]&@@tabspec
 ]];
 
 
-DrawTPeriodic3DFrameworkStress[p_,transformations_,E_,stressinput_,copies_:{},mthick_:.01,colors_:{Purple,Orange}]:=
+DrawTPeriodic3DFrameworkStress[p_,transformations_,E_,stressinput_,copies_:{},
+mthick_:.01,colors_:{Purple,Orange},cutoff_:10^-5]:=
 Module[{i,j,e=Length[E],stress,qvec,nstr,dim=Length[transformations],
 tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnstr},
 (* dumb trick for backwards compatibility *)
-If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),qvec=stressinput[[2]];stress=stressinput[[1]];,
+If[(Length[stressinput]==2)&&(Length[stressinput[[1]]]==Length[E]),
+qvec=stressinput[[2]];stress=stressinput[[1]];,
 qvec=Table[1,{dim}];stress=stressinput;
 ];
 nstr=mthick stress/Max[Abs[stress]];
@@ -1583,19 +1632,23 @@ realnstr=Re[nstr Product[qvec[[i]]^m[i],{i,dim}]];
 Table[
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 {If[realnstr[[j]]>0,colors[[1]],colors[[2]]],AbsoluteThickness[Abs[realnstr[[j]]]],
+If[Abs[realnstr[[j]]]>cutoff,
 Line[{unitcell[[E[[j,1,1]]]],If[edatExtend==Table[0,{dim}],unitcell[[E[[j,1,2]]]],
 (* apply appropriate transformation again to get line to second particle *)
 tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (* maybe could memoize *)
 pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
-pv[[1;;3]]]}]},{j,e}]
+pv[[1;;3]]]}],{}]},{j,e}]
 ,##]&@@tabspec
 ]];
 
 
-DrawPeriodic3DFrameworkMode[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
-Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+DrawPeriodic3DFrameworkMode[p_,basis_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
+Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,
+m,cover,unitcell,edatExtend},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1608,16 +1661,20 @@ realnv=Re[nv Product[qvec[[i]]^m[i],{i,dim}]];
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[3i-2;;3i]]]>cutoff,
+Line[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
 
 
-DrawPeriodic3DFrameworkModeArr[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
-Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+DrawPeriodic3DFrameworkModeArr[p_,basis_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
+Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,
+m,cover,unitcell,edatExtend},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1630,16 +1687,20 @@ realnv=Re[nv Product[qvec[[i]]^m[i],{i,dim}]];
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[3i-2;;3i]]]>cutoff,
+Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
 
 
-DrawPeriodic3DFrameworkModeArrTube[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
-Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+DrawPeriodic3DFrameworkModeArrTube[p_,basis_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
+Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,
+m,cover,unitcell,edatExtend},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1652,17 +1713,20 @@ realnv=Re[nv Product[qvec[[i]]^m[i],{i,dim}]];
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[Arrow[Tube[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}]],{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[3i-2;;3i]]]>cutoff,
+Arrow[Tube[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}]],{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
 
 
-DrawTPeriodic3DFrameworkMode[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+DrawTPeriodic3DFrameworkMode[p_,transformations_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
 Module[{i,j,e=Length[E],nv,qvec,dim=Length[transformations],
 tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1681,17 +1745,20 @@ tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (*
 pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
 pv[[1;;3]]]}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[Line[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[3i-2;;3i]]]>cutoff,
+Line[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
 
 
-DrawTPeriodic3DFrameworkModeArr[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
+DrawTPeriodic3DFrameworkModeArr[p_,transformations_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
 Module[{i,j,e=Length[E],nv,qvec,dim=Length[transformations],
 tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1710,16 +1777,20 @@ tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (*
 pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
 pv[[1;;3]]]}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[3i-2;;3i]]]>cutoff,
+Arrow[{unitcell[[i]],unitcell[[i]]+realnv[[3i-2;;3i]]}],{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
 
 
-DrawPeriodic3DFrameworkModeAmp[p_,basis_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
-Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,m,cover,unitcell,edatExtend},
+DrawPeriodic3DFrameworkModeAmp[p_,basis_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
+Module[{i,j,e=Length[E],nv,qvec,realnv,dim=Length[basis],tabspec,
+m,cover,unitcell,edatExtend},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1732,17 +1803,20 @@ realnv=Re[nv Product[qvec[[i]]^m[i],{i,dim}]];
 edatExtend=Join[E[[j,2,1;;Min[Length[E[[j,2]]],dim]]],Table[0,{dim-Length[E[[j,2]]]}]];
 Line[{unitcell[[E[[j,1,1]]]],unitcell[[E[[j,1,2]]]]+edatExtend.basis}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[{PointSize->Norm[realnv[[3i-2;;3i]]],Point[{unitcell[[i]]}]},{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[3i-2;;3i]]]>cutoff,
+{PointSize->Norm[realnv[[3i-2;;3i]]],Point[{unitcell[[i]]}]},{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
 
 
-DrawTPeriodic3DFrameworkModeAmp[p_,transformations_,E_,nvinput_,copies_:{},pointstyle_:{},linestyle_:{},col_:{Red}]:=
-Module[{i,j,e=Length[E],nv,qvec,dim=Length[transformations],
-tabspec,m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
+DrawTPeriodic3DFrameworkModeAmp[p_,transformations_,E_,nvinput_,copies_:{},
+pointstyle_:{},linestyle_:{},col_:{Red},cutoff_:10^-5]:=
+Module[{i,j,e=Length[E],nv,qvec,dim=Length[transformations],tabspec,
+m,cover,edatExtend,tmat,unitcell,pv,tmatp2,realnv},
 (* dumb trick for backwards compatibility *)
-If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),qvec=nvinput[[2]];nv=nvinput[[1]];,
+If[(Length[nvinput]==2)&&(Length[nvinput[[1]]]==3Length[p]),
+qvec=nvinput[[2]];nv=nvinput[[1]];,
 qvec=Table[1,{dim}];nv=nvinput;
 ];
 cover=If[Length[copies]!=dim,Table[1,{dim}],copies];
@@ -1761,7 +1835,8 @@ tmatp2=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,dim}]; (*
 pv=tmatp2.Join[unitcell[[E[[j,1,2]]]],{1}];
 pv[[1;;3]]]}],{j,e}]],
 Join[pointstyle,Table[{Point[unitcell[[i]]]},{i,Length[p]}]],
-Join[col,Table[{PointSize->Norm[realnv[[3i-2;;3i]]],Point[{unitcell[[i]]}]},{i,Length[p]}]]
+Join[col,Table[If[Norm[realnv[[3i-2;;3i]]]>cutoff,
+{PointSize->Norm[realnv[[3i-2;;3i]]],Point[{unitcell[[i]]}]},{}],{i,Length[p]}]]
 }
 ,##]&@@tabspec
 ]];
