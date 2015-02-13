@@ -439,8 +439,8 @@ infinitesimal2drotationmode[pos_,basis_:{},cent_:{0,0}]:=Module[{j,numparts=Leng
 posrot=Table[{(pos[[j,2]]-cent[[2]]),-(pos[[j,1]]-cent[[1]])},{j,numparts}];
 basisrot=Table[{basis[[j,2]],-basis[[j,1]]},{j,Length[basis]}];
 Join[Flatten[posrot],If[Length[basis]>0,
-Join[basisrot[[1]],
-basisrot[[2]]]
+Flatten[Table[basisrot[[i]],
+{i,Length[basis]}]]
 ,{}
 ]]
 ];
@@ -451,9 +451,9 @@ diff=posns[[j]]-origin;
 {-diff[[2]],diff[[1]]},{j,Length[posns]}]]];
 
 getnontriv2D[pos_,basis_,edgedat_]:=Module[{pmtestk,testrotk,transx,transy,numatoms=Length[pos]},
-pmtestk=Normal[RigidityMatrix[{1,1},pos,basis,edgedat,True]];
-transx=Flatten[Join[Table[{1,0},{numatoms}],Table[0,{4}]]];
-transy=Flatten[Join[Table[{0,1},{numatoms}],Table[0,{4}]]];
+pmtestk=Normal[RigidityMatrix[Table[1,{Length[basis]}],pos,basis,edgedat,True]];
+transx=Flatten[Join[Table[{1,0},{numatoms}],Table[0,{2Length[basis]}]]];
+transy=Flatten[Join[Table[{0,1},{numatoms}],Table[0,{2Length[basis]}]]];
 testrotk=infinitesimal2drotationmode[pos,basis];
 NullSpace[Join[pmtestk,{transx,transy,testrotk}]][[1]]];
 
