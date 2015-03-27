@@ -457,6 +457,20 @@ transy=Flatten[Join[Table[{0,1},{numatoms}],Table[0,{2Length[basis]}]]];
 testrotk=infinitesimal2drotationmode[pos,basis];
 NullSpace[Join[pmtestk,{transx,transy,testrotk}]][[1]]];
 
+getnontriv2Dall[pos_,basis_,edgedat_]:=Module[{pmtestk,testrotk,transx,transy,numatoms=Length[pos]},
+pmtestk=Normal[RigidityMatrix[Table[1,{Length[basis]}],pos,basis,edgedat,True]];
+transx=Flatten[Join[Table[{1,0},{numatoms}],Table[0,{2Length[basis]}]]];
+transy=Flatten[Join[Table[{0,1},{numatoms}],Table[0,{2Length[basis]}]]];
+testrotk=infinitesimal2drotationmode[pos,basis];
+NullSpace[Join[pmtestk,{transx,transy,testrotk}]]];
+
+getnontriv2Dmat[pos_,basis_,edgedat_]:=Module[{pmtestk,testrotk,transx,transy,numatoms=Length[pos]},
+pmtestk=Normal[RigidityMatrix[Table[1,{Length[basis]}],pos,basis,edgedat,True]];
+transx=Flatten[Join[Table[{1,0},{numatoms}],Table[0,{2Length[basis]}]]];
+transy=Flatten[Join[Table[{0,1},{numatoms}],Table[0,{2Length[basis]}]]];
+testrotk=infinitesimal2drotationmode[pos,basis];
+Join[pmtestk,{transx,transy,testrotk}]];
+
 getnontriv2Dflat[flatvec_?(VectorQ[#,NumericQ]&),edgedat_]:=Module[{pmtestk,testrotk,transx,transy,
 numatoms,pos,basis,nsp,nspp,bigrig,bigrig2,j},
 numatoms=(Length[flatvec]-4)/2;
@@ -1847,6 +1861,14 @@ reciprocbasis[qx_,qy_,basis_]:={qx,qy}.Inverse[basis];
 BandPlot[{zx_,zy_},poly_,basis_:{{1,0},{0,1}},xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},opts_:{MaxRecursion->Automatic}]:=
 Module[{qx,qy,b,rec},
 ContourPlot[(* this seems to work, but I should rederive it to make sure... *)
+(* checked with Jayson, we had to reverse qx, qy because vectors get relabeled after 90 degree rotation *)
+(* also a flip of sign of qy so that when basis = {{1,0},{0,1}} want to get just qx, qy again *)
+Evaluate[rec=reciprocbasis[-qy,qx,LeviCivitaTensor[2].basis];(poly/.{zx->Exp[I rec[[1]]],zy->Exp[I rec[[2]]]})],
+{qx,xwind[[1]],xwind[[2]]},{qy,ywind[[1]],ywind[[2]]},opts]];
+
+BandPlot3D[{zx_,zy_},poly_,basis_:{{1,0},{0,1}},xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},opts_:{MaxRecursion->Automatic}]:=
+Module[{qx,qy,b,rec},
+Plot3D[(* this seems to work, but I should rederive it to make sure... *)
 (* checked with Jayson, we had to reverse qx, qy because vectors get relabeled after 90 degree rotation *)
 (* also a flip of sign of qy so that when basis = {{1,0},{0,1}} want to get just qx, qy again *)
 Evaluate[rec=reciprocbasis[-qy,qx,LeviCivitaTensor[2].basis];(poly/.{zx->Exp[I rec[[1]]],zy->Exp[I rec[[2]]]})],
