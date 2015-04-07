@@ -92,7 +92,8 @@ numpart=Length[posns],part1,part2,ebond,kb,lattchange,zm,edatExtend,k,j},
 SparseArray[Flatten[Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
 kb=1;(*edgedat[[j,3]];*)
-edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
+edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],
+Table[0,{qdim-Length[edgedat[[j,2]]]}]];
 lattchange=If[qdim>0,edatExtend.basis,0];
 zm=Product[z[[k]]^edatExtend[[k]],{k,qdim}];
 ebond=-posns[[part1]]+(posns[[part2]]+lattchange); (* sign convention from malestein theran *)
@@ -101,7 +102,7 @@ If[part1!=part2,(Join[
 Table[{j,dim (part1-1)+k}->-ebond[[k]],{k,dim}],
 Table[{j,dim (part2-1)+k}->ebond[[k]] zm,{k,dim}],
 If[fixedperiodic,Flatten[
-Table[{j,dim numpart+(bvec-1) qdim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
+Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
 ,{bvec,qdim},{bcomponent,dim}]]
 ,{}]
 ]),
@@ -121,7 +122,8 @@ Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],bcomponen
 numpart=Length[posns],part1,part2,ebond,lattchange,zm,edatExtend,k,j},
 SparseArray[Flatten[Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
-edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
+edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],
+Table[0,{qdim-Length[edgedat[[j,2]]]}]];
 lattchange=If[qdim>0,edatExtend.basis,0];
 zm=Product[z[[k]]^edatExtend[[k]],{k,qdim}];
 ebond=-posns[[part1]]+(posns[[part2]]+lattchange); (* sign convention from malestein theran *)
@@ -131,7 +133,7 @@ If[part1!=part2,(Join[
 Table[{j,dim (part1-1)+k}->-ebond[[k]],{k,dim}],
 Table[{j,dim (part2-1)+k}->ebond[[k]] zm,{k,dim}],
 If[fixedperiodic,Flatten[
-Table[{j,dim numpart+(bvec-1) qdim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
+Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
 ,{bvec,qdim},{bcomponent,dim}]]
 ,{}]
 ]),
@@ -158,11 +160,13 @@ CompatibilityMatrix[z,posns,basis,edgedat,fixedperiodic];
 
 RigidityMatrixT[z_,posns_,transformations_,edgedat_(*,fixedperiodic_:False*)]:=
 Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],bcomponent,bvec,
-numpart=Length[posns],part1,part2,ebond,kb,lattchange,zm,edatExtend,tmat,pv,fixedperiodic=False,k,j,i,ebondrot},
+numpart=Length[posns],part1,part2,ebond,kb,lattchange,zm,edatExtend,tmat,pv,
+fixedperiodic=False,k,j,i,ebondrot},
 SparseArray[Flatten[Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
 kb=1;(*edgedat[[j,3]];*)
-edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
+edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],
+Table[0,{qdim-Length[edgedat[[j,2]]]}]];
 zm=Product[z[[k]]^edatExtend[[k]],{k,qdim}];
 (* assuming that all matrices in transf commute... *)
 tmat=Dot@@Table[MatrixPower[transformations[[i]],edatExtend[[i]]],{i,qdim}]; (* maybe could memoize *)
@@ -174,7 +178,7 @@ If[part1!=part2,(Join[
 Table[{j,dim (part1-1)+k}->-ebond[[k]],{k,dim}],
 Table[{j,dim (part2-1)+k}->zm ebondrot[[k]],{k,dim}],
 If[fixedperiodic,Flatten[
-Table[{j,dim numpart+(bvec-1) qdim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
+Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
 ,{bvec,qdim},{bcomponent,dim}]]
 ,{}]
 ]),
@@ -198,7 +202,8 @@ numbonds=Length[edgedat],edatExtend,j},
 Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
 kb=edgedat[[j,3]];
-edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],Table[0,{qdim-Length[edgedat[[j,2]]]}]];
+edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],
+Table[0,{qdim-Length[edgedat[[j,2]]]}]];
 lattchange=If[qdim>0,edatExtend.basis,0];
 ebond=-posns[[part1]]+(posns[[part2]]+lattchange); (* sign convention from malestein theran *)
 Norm[ebond]^2
@@ -490,16 +495,21 @@ Join[nspp,nsp]
 
 
 (* need this to be cromulent with CoveringFrameworkVerts and CoveringFrameworkEdges *)
-CoveringMotion[mode_,cover_,periodic_:False]:=Module[{i,j,dim=Length[cover],numparts,tabspec,m,ind},
-(* dim*number of particles + dim^2 = length of mode vector*)
-If[Mod[Length[mode],dim]!=0,Print["bad mode length"];Abort[]];
-numparts=(Length[mode]-dim^2)/dim; (* y then x *)
-tabspec=Table[{m[i],0,cover[[i]]-1},{i,dim}];
+CoveringMotion[mode_,cover_,dim0_:0,periodic_:False]:=Module[{i,j,dim,qdim=Length[cover],
+numparts,tabspec,m,ind},
+dim=If[dim0!=0,dim0,Length[cover]];
+(* dim*number of particles + dim qdim = length of mode vector*)
+If[Mod[(Length[mode]-dim qdim),dim]!=0,Print["bad mode length"];Abort[]];
+numparts=(Length[mode]-dim qdim)/dim; (* y then x *)
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,qdim}];
 Join[Flatten[
 Table[
 Table[
+(* affine contribution from last components of mode *)
+(* infinitesimal change of jth basis vector *)
 Sum[ind=dim numparts+dim (j-1);
-mode[[ind+1;;ind+dim]]*m[j],{j,dim}]
+mode[[ind+1;;ind+dim]]*m[j],{j,qdim}]
+(* internal components of mode *)
 +mode[[dim (i-1)+1;;dim (i-1)+dim]],
 {i,numparts}],
 ##]&@@tabspec (* specification of table, dim copies of loops from 0 to cover-1 *)
@@ -507,7 +517,7 @@ mode[[ind+1;;ind+dim]]*m[j],{j,dim}]
 If[periodic,
 Flatten[Table[
 ind=dim numparts+dim(j-1);
-cover[[j]]mode[[ind+1;;ind+dim]],{j,dim}]],{}]
+cover[[j]]mode[[ind+1;;ind+dim]],{j,qdim}]],{}]
 ]
 ];
 
