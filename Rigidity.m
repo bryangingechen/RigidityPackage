@@ -330,14 +330,14 @@ k=If[Length[k0]\[Equal]0,IdentityMatrix[numss],
 The Schur complement for a matrix in block form {{A,B},{C,D}} is 
 A - B D^{-1} C .
 *)
-Never mind, I'll use another way
+(*Never mind, I'll use another way*)
  *)
 (*kk=U.k0.Transpose[U];
 (*Print[kk];*)
 matA=kk[[E-numss+1;;E,E-numss+1;;E]];
 If[E\[Equal]numss,matA,
-matB=kk[[E-numss+1,;;E-numss]];
-matC=kk[[;;E-numss,E-numss+1]];
+matB=kk[[E-numss+1;;E,;;E-numss]];
+matC=kk[[;;E-numss,E-numss+1;;E]];
 matD=kk[[;;E-numss,;;E-numss]];
 matA-matB.LinearSolve[matD,matC]]
 ];
@@ -345,9 +345,12 @@ matA-matB.LinearSolve[matD,matC]]
 (*Print[k];*)
 *)
 (* get basis for space of ss *)
-U=NullSpace[Transpose[C]];
-(* now we project k^-1 onto ss space *)
+U=NullSpace[Transpose[C]];(*Print[Length[U]];*)
+(* now we project k^-1 onto ss space, creates a LinearSolveFunction which can act on a vector *)
+(* hopefully a better way of computing MatrixInverse[U.MatrixInverse[k].Transpose[U]]*)
 k=LinearSolve[U.LinearSolve[k,Transpose[U]]];
+
+(*Print[k[IdentityMatrix[Length[U]]]];*)
 
 (* a list of pairs of indices *)
 symmetricindex=Flatten[Table[
@@ -365,13 +368,111 @@ ebond[[pair1[[1]]]]ebond[[pair1[[2]]]]/Norm[ebond]
 proj=U;
 Eafflist2=Table[proj.Eafflist[[is]],{is,dim (dim+1)/2}];
  (*Eafflist2=Transpose[proj.Transpose[Eafflist]];*)
-(* store components of the elastic tensor *)
+(* store components of the elastic tensor in an upper triangular matrix *)
 presym=Table[
 If[is<=js,
 Eafflist2[[is]].k[Eafflist2[[js]]]
 ,0]
 ,{is,dim (dim+1)/2},{js,dim (dim+1)/2}];
-(* reorganize into a symmetric matrix; probably inefficient here *)
+(* reorganize upper triangular matrix into a symmetric matrix; probably inefficient here *)
+Table[presym[[Min[is,js],Max[is,js]]]
+,{is,dim (dim+1)/2},{js,dim (dim+1)/2}]
+]
+
+
+(* let k0 be a list of spring constants, possibly including 0's *)
+ElasticTensor2[pos_,basis_,edat0_,k0_:{}]:=Module[{k,qdim=Length[basis],
+dim=Length[pos[[1]]],E=Length[edat0],numparts=Length[pos],C,U,\[CapitalSigma],Vs,is,js,
+presym,Eafflist,Eafflist2,
+symmetricindex,i,j,pair1,pair2,kk,matA,matB,matC,matD,proj,
+part1,part2,edatExtend,lattchange,ebond,ebondlist,eps=10^-14,numss,nonzeros,edat},
+
+k=If[Length[k0]!=E||Depth[k0]!=2,Print["Assuming all spring constants are 1"];
+edat=edat0;IdentityMatrix[E],
+(* remove edges with sufficiently small spring constant *)
+nonzeros=Position[k0,(x_/;(x>eps)||(Not[NumericQ[x]]))][[2;;-2]];
+edat=edat0[[Flatten[nonzeros]]];
+E=Length[nonzeros];
+DiagonalMatrix[Extract[k0,nonzeros]]
+];
+
+ebondlist=Table[Null,{E}];
+(* compute compatibility matrix at q=0 and save the vector of extensions "ebondlist" *)
+C=SparseArray[Flatten[Table[
+part1=edat[[j,1,1]];
+part2=edat[[j,1,2]];
+edatExtend=Join[edat[[j,2,1;;Min[Length[edat[[j,2]]],qdim]]],
+Table[0,{qdim-Length[edat[[j,2]]]}]];
+lattchange=If[qdim>0,edatExtend.basis,0];
+ebond=-pos[[part1]]+(pos[[part2]]+lattchange); (* sign convention from malestein theran *)
+(* unit vectors *)
+ebondlist[[j]]=ebond;
+ebond=ebond/Norm[ebond];
+If[part1!=part2,
+Join[
+Table[{j,dim (part1-1)+k}->-ebond[[k]],{k,dim}],Table[{j,dim (part2-1)+k}->ebond[[k]] ,{k,dim}]
+],
+(* part1\[Equal]part2*)
+Table[{j,dim (part1-1)+k}->0,{k,dim}]
+],
+{j,E}]]
+,{E,dim numparts}];
+(* previous try using Schur complement by hand *)
+
+(* compute SVD of compatibility matrix *)
+{U,\[CapitalSigma],Vs}=SingularValueDecomposition[C];
+(* get number of self-stresses at q = 0*)
+numss=Length[Select[Diagonal[Normal[\[CapitalSigma]]],Abs[N[#]]<eps&]]+E-dim numparts;
+k=If[Length[k0]==0,IdentityMatrix[numss],
+(* Schur complement of k0, after rotating into stress eigenvector basis with Vs and Transpose[Vs].
+The Schur complement for a matrix in block form {{A,B},{C,D}} is 
+A - B D^{-1} C .
+*)
+(* Never mind, I'll use another way
+ *)
+kk=Transpose[U].k.U;
+(*Print[kk];*)
+matA=kk[[E-numss+1;;E,E-numss+1;;E]];
+If[E==numss,matA,
+matB=kk[[E-numss+1;;E,;;E-numss]];
+matC=kk[[;;E-numss,E-numss+1;;E]];
+matD=kk[[;;E-numss,;;E-numss]];
+matA-matB.LinearSolve[matD,matC]]
+];
+(* don't we need to rotate back? *)
+(* something above was wrong. k could end up with negative eigenvalues?? *)
+(* I believe this is fixed now.  Unclear which is more efficient *)
+(*Print[k];*)
+
+(* get basis for space of ss *)
+(*U=NullSpace[Transpose[C]];
+(* now we project k^-1 onto ss space, creates a LinearSolveFunction which can act on a vector *)
+(* hopefully a better way of computing MatrixInverse[U.MatrixInverse[k].Transpose[U]]*)
+k=LinearSolve[U.LinearSolve[k,Transpose[U]]];*)
+
+(* a list of pairs of indices *)
+symmetricindex=Flatten[Table[
+Table[{j,j+(i-1)},{j,dim-i+1}]
+,{i,dim}],1];
+(* compute coefficients of Subscript[\[Epsilon], ij] in the components of Subscript[E, aff] (indexed by j) *)
+(* separate into different lists, indexed by "is" *)
+Eafflist=Table[
+pair1=symmetricindex[[is]];
+ebond=ebondlist[[j]];
+ebond[[pair1[[1]]]]ebond[[pair1[[2]]]]/Norm[ebond]
+,{is,dim (dim+1)/2},{j,E}];
+(* projection onto self-stress space *)
+proj=ArrayFlatten[{Join[Table[0,{E-numss}],{IdentityMatrix[numss]}]}].Transpose[U];
+(*proj=U;*)
+Eafflist2=Table[proj.Eafflist[[is]],{is,dim (dim+1)/2}];
+ (*Eafflist2=Transpose[proj.Transpose[Eafflist]];*)
+(* store components of the elastic tensor in an upper triangular matrix *)
+presym=Table[
+If[is<=js,
+Eafflist2[[is]].k.Eafflist2[[js]]
+,0]
+,{is,dim (dim+1)/2},{js,dim (dim+1)/2}];
+(* reorganize upper triangular matrix into a symmetric matrix; probably inefficient here *)
 Table[presym[[Min[is,js],Max[is,js]]]
 ,{is,dim (dim+1)/2},{js,dim (dim+1)/2}]
 ]
