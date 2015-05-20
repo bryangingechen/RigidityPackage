@@ -1194,7 +1194,7 @@ If[periodic||(cellchange==Table[0,{dim}]),
 ind1=getatomindex2[Table[m[j],{j,dim}],p1,cover,unitcellsize];
 ind2=getatomindex2[Table[Mod[m[j]+edatExtend[[j]],cover[[j]],1],{j,dim}],p2,cover,unitcellsize];
 numbonds++;
-bondlist[[numbonds]]={{ind1,ind2},cellchange,1}
+bondlist[[numbonds]]={{ind1,ind2},cellchange,edgedat[[i,3]]}
 ];
 ,##]&@@tabspec;
 bondlist[[1;;numbonds]]
@@ -1264,7 +1264,7 @@ cellchange=Floor[ptemp];
 
 If[periodic||(cellchange==Table[0,{dim}]),
 numbonds++;
-bondlist[[numbonds]]={{ind1,ind2},cellchange,1}
+bondlist[[numbonds]]={{ind1,ind2},cellchange,edgedat[[i,3]]}
 ];
 ,{k,Length[pts]},{i,lenedge}];
 bondlist[[1;;numbonds]]
