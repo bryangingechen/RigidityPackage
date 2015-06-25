@@ -319,31 +319,7 @@ Table[{j,dim (part1-1)+k}->0,{k,dim}]
 ],
 {j,E}]]
 ,{E,dim numparts}];
-(* (* previous try using Schur complement by hand *)
 
-(* compute SVD of compatibility matrix *)
-{U,\[CapitalSigma],Vs}=SingularValueDecomposition[C];
-(* get number of self-stresses at q = 0*)
-numss=Length[Select[Diagonal[Normal[\[CapitalSigma]]],Abs[N[#]]<eps&]]+E-dim numparts;
-k=If[Length[k0]\[Equal]0,IdentityMatrix[numss],
-(* Schur complement of k0, after rotating into stress eigenvector basis with Vs and Transpose[Vs].
-The Schur complement for a matrix in block form {{A,B},{C,D}} is 
-A - B D^{-1} C .
-*)
-(*Never mind, I'll use another way*)
- *)
-(*kk=U.k0.Transpose[U];
-(*Print[kk];*)
-matA=kk[[E-numss+1;;E,E-numss+1;;E]];
-If[E\[Equal]numss,matA,
-matB=kk[[E-numss+1;;E,;;E-numss]];
-matC=kk[[;;E-numss,E-numss+1;;E]];
-matD=kk[[;;E-numss,;;E-numss]];
-matA-matB.LinearSolve[matD,matC]]
-];
-(* something above was wrong. k could end up with negative eigenvalues?? *)
-(*Print[k];*)
-*)
 (* get basis for space of ss *)
 U=NullSpace[Transpose[C]];(*Print[Length[U]];*)
 (* now we project k^-1 onto ss space, creates a LinearSolveFunction which can act on a vector *)
@@ -428,8 +404,6 @@ k=If[Length[k0]==0,IdentityMatrix[numss],
 The Schur complement for a matrix in block form {{A,B},{C,D}} is 
 A - B D^{-1} C .
 *)
-(* Never mind, I'll use another way
- *)
 kk=Transpose[U].k.U;
 (*Print[kk];*)
 matA=kk[[E-numss+1;;E,E-numss+1;;E]];
@@ -443,12 +417,6 @@ matA-matB.LinearSolve[matD,matC]]
 (* something above was wrong. k could end up with negative eigenvalues?? *)
 (* I believe this is fixed now.  Unclear which is more efficient *)
 (*Print[k];*)
-
-(* get basis for space of ss *)
-(*U=NullSpace[Transpose[C]];
-(* now we project k^-1 onto ss space, creates a LinearSolveFunction which can act on a vector *)
-(* hopefully a better way of computing MatrixInverse[U.MatrixInverse[k].Transpose[U]]*)
-k=LinearSolve[U.LinearSolve[k,Transpose[U]]];*)
 
 (* a list of pairs of indices *)
 symmetricindex=Flatten[Table[
@@ -621,6 +589,20 @@ ind=dim numparts+dim(j-1);
 cover[[j]]mode[[ind+1;;ind+dim]],{j,qdim}]],{}]
 ]
 ];
+
+
+SubtractTranslations[mode_,dim_,periodicdim_:0]:=Module[{modeinternal,modeguest,avgtranslation,numparts},
+If[periodicdim>0,
+modeinternal=mode[[;;-periodicdim dim-1]];
+modeguest=mode[[-periodicdim dim;;]];
+,
+modeinternal=mode;
+modeguest={};
+];
+numparts=(Length[modeinternal]/dim);
+avgtranslation=Total[Partition[modeinternal,dim]]/numparts;
+Join[modeinternal-Flatten[Table[avgtranslation,{numparts}]],modeguest]
+]
 
 
 (* this should yield the elastic displacements in a spring network *)
