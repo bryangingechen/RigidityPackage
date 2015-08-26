@@ -1949,22 +1949,15 @@ Join[col,Table[If[Norm[realnv[[3i-2;;3i]]]>cutoff,
 ]];
 
 
-reciprocbasis[qx_,qy_,basis_]:={qx,qy}.Inverse[basis];
-
 BandPlot[{zx_,zy_},poly_,basis_:{{1,0},{0,1}},xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},opts_:{MaxRecursion->Automatic}]:=
 Module[{qx,qy,b,rec},
-ContourPlot[(* this seems to work, but I should rederive it to make sure... *)
-(* checked with Jayson, we had to reverse qx, qy because vectors get relabeled after 90 degree rotation *)
-(* also a flip of sign of qy so that when basis = {{1,0},{0,1}} want to get just qx, qy again *)
-Evaluate[rec=reciprocbasis[-qy,qx,LeviCivitaTensor[2].basis];(poly/.{zx->Exp[I rec[[1]]],zy->Exp[I rec[[2]]]})],
+ContourPlot[
+Evaluate[rec={qx,qy}.Transpose[basis];(poly/.{zx->Exp[I rec[[1]]],zy->Exp[I rec[[2]]]})],
 {qx,xwind[[1]],xwind[[2]]},{qy,ywind[[1]],ywind[[2]]},opts]];
 
 BandPlot3D[{zx_,zy_},poly_,basis_:{{1,0},{0,1}},xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},opts_:{MaxRecursion->Automatic}]:=
 Module[{qx,qy,b,rec},
-Plot3D[(* this seems to work, but I should rederive it to make sure... *)
-(* checked with Jayson, we had to reverse qx, qy because vectors get relabeled after 90 degree rotation *)
-(* also a flip of sign of qy so that when basis = {{1,0},{0,1}} want to get just qx, qy again *)
-Evaluate[rec=reciprocbasis[-qy,qx,LeviCivitaTensor[2].basis];(poly/.{zx->Exp[I rec[[1]]],zy->Exp[I rec[[2]]]})],
+Plot3D[Evaluate[rec={qx,qy}.Transpose[basis];(poly/.{zx->Exp[I rec[[1]]],zy->Exp[I rec[[2]]]})],
 {qx,xwind[[1]],xwind[[2]]},{qy,ywind[[1]],ywind[[2]]},opts]];
 
 (* function that plots function(s) of q along a piecewise linear path in q-space *)
