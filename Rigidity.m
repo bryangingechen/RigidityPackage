@@ -289,7 +289,8 @@ presym,Eafflist,Eafflist2,
 symmetricindex,i,j,pair1,pair2,kk,matA,matB,matC,matD,proj,
 part1,part2,edatExtend,lattchange,ebond,ebondlist,eps=10^-14,numss,nonzeros,edat},
 
-k=If[Length[k0]!=E||Depth[k0]!=2,Print["Assuming all spring constants are 1"];
+(* kk is a matrix! *)
+kk=If[Length[k0]!=E||Depth[k0]!=2,Print["Assuming all spring constants are 1"];
 edat=edat0;IdentityMatrix[E],
 (* remove edges with sufficiently small spring constant *)
 nonzeros=Position[k0,(x_/;(x>eps)||(Not[NumericQ[x]]))][[2;;-2]];
@@ -324,9 +325,9 @@ Table[{j,dim (part1-1)+k}->0,{k,dim}]
 U=NullSpace[Transpose[C]];(*Print[Length[U]];*)
 (* now we project k^-1 onto ss space, creates a LinearSolveFunction which can act on a vector *)
 (* hopefully a better way of computing MatrixInverse[U.MatrixInverse[k].Transpose[U]]*)
-k=LinearSolve[U.LinearSolve[k,Transpose[U]]];
+kk=LinearSolve[U.LinearSolve[kk,Transpose[U]]];
 
-(*Print[k[IdentityMatrix[Length[U]]]];*)
+(*Print[kk[IdentityMatrix[Length[U]]]];*)
 
 (* a list of pairs of indices *)
 symmetricindex=Flatten[Table[
@@ -347,7 +348,7 @@ Eafflist2=Table[proj.Eafflist[[is]],{is,dim (dim+1)/2}];
 (* store components of the elastic tensor in an upper triangular matrix *)
 presym=Table[
 If[is<=js,
-Eafflist2[[is]].k[Eafflist2[[js]]]
+Eafflist2[[is]].kk[Eafflist2[[js]]]
 ,0]
 ,{is,dim (dim+1)/2},{js,dim (dim+1)/2}];
 (* reorganize upper triangular matrix into a symmetric matrix; probably inefficient here *)
@@ -356,6 +357,8 @@ Table[presym[[Min[is,js],Max[is,js]]]
 ]
 
 
+(* currently broken for undercoordinated / unstable systems *)
+
 (* let k0 be a list of spring constants, possibly including 0's *)
 ElasticTensor2[pos_,basis_,edat0_,k0_:{}]:=Module[{k,qdim=Length[basis],
 dim=Length[pos[[1]]],E=Length[edat0],numparts=Length[pos],C,U,\[CapitalSigma],Vs,is,js,
@@ -363,7 +366,8 @@ presym,Eafflist,Eafflist2,
 symmetricindex,i,j,pair1,pair2,kk,matA,matB,matC,matD,proj,
 part1,part2,edatExtend,lattchange,ebond,ebondlist,eps=10^-14,numss,nonzeros,edat},
 
-k=If[Length[k0]!=E||Depth[k0]!=2,Print["Assuming all spring constants are 1"];
+(* kk is a matrix! *)
+kk=If[Length[k0]!=E||Depth[k0]!=2,Print["Assuming all spring constants are 1"];
 edat=edat0;IdentityMatrix[E],
 (* remove edges with sufficiently small spring constant *)
 nonzeros=Position[k0,(x_/;(x>eps)||(Not[NumericQ[x]]))][[2;;-2]];
@@ -398,14 +402,18 @@ Table[{j,dim (part1-1)+k}->0,{k,dim}]
 (* compute SVD of compatibility matrix *)
 {U,\[CapitalSigma],Vs}=SingularValueDecomposition[C];
 (* get number of self-stresses at q = 0*)
+(* numss can end up negative, which is bad *)
 numss=Length[Select[Diagonal[Normal[\[CapitalSigma]]],Abs[N[#]]<eps&]]+E-dim numparts;
-k=If[Length[k0]==0,IdentityMatrix[numss],
+kk=If[Length[k0]==0,IdentityMatrix[numss],
 (* Schur complement of k0, after rotating into stress eigenvector basis with Vs and Transpose[Vs].
 The Schur complement for a matrix in block form {{A,B},{C,D}} is 
 A - B D^{-1} C .
 *)
-kk=Transpose[U].k.U;
-(*Print[kk];*)
+kk=Transpose[U].kk.U;
+(*Print[kk];
+Print[\[CapitalSigma]];
+Print[E];
+Print[numss];*)
 matA=kk[[E-numss+1;;E,E-numss+1;;E]];
 If[E==numss,matA,
 matB=kk[[E-numss+1;;E,;;E-numss]];
@@ -414,9 +422,9 @@ matD=kk[[;;E-numss,;;E-numss]];
 matA-matB.LinearSolve[matD,matC]]
 ];
 (* don't we need to rotate back? *)
-(* something above was wrong. k could end up with negative eigenvalues?? *)
+(* something above was wrong. kk could end up with negative eigenvalues?? *)
 (* I believe this is fixed now.  Unclear which is more efficient *)
-(*Print[k];*)
+(*Print[kk];*)
 
 (* a list of pairs of indices *)
 symmetricindex=Flatten[Table[
@@ -437,7 +445,7 @@ Eafflist2=Table[proj.Eafflist[[is]],{is,dim (dim+1)/2}];
 (* store components of the elastic tensor in an upper triangular matrix *)
 presym=Table[
 If[is<=js,
-Eafflist2[[is]].k.Eafflist2[[js]]
+Eafflist2[[is]].kk.Eafflist2[[js]]
 ,0]
 ,{is,dim (dim+1)/2},{js,dim (dim+1)/2}];
 (* reorganize upper triangular matrix into a symmetric matrix; probably inefficient here *)
