@@ -646,7 +646,7 @@ matC=Lap[[dinter,cinter]];
 matD=Lap[[dinter,dinter]];
 (* Schur complement *)
 (*matA-matB.Inverse[matD].matC *)
-matA=matB.LinearSolve[matD,matC]
+matA-matB.LinearSolve[matD,matC]
 ];
 
 
@@ -693,6 +693,8 @@ Flatten[Table[
 time=computeintersection[{m,0},\[Pi]/2+slopesx[[m+1]],{0,n},slopesy[[n+1]]];
 {0,n}+time [[2]]{Cos[slopesy[[n+1]]],Sin[slopesy[[n+1]]]}
 ,{m,0,xx-1},{n,0,yy-1}],1]];
+
+(* Twist angle convention for kagome lattices has the opposite sign from that of K Sun et al PNAS 2012 *)
 
 (* kagome in the form of a rhombus *)
 KagLatticeRho[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *)Module[{m,n,i},
