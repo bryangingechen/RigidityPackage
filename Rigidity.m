@@ -25,6 +25,8 @@ increment*(cellcoords[[-i]]-1)
 
 Doublemat[tab_]:=Module[{L=Length[tab],j},Flatten[Table[{2tab[[j]]-1,2tab[[j]]},{j,L}]]];
 
+PosVecIndices[tab_,d_]:=Module[{L=Length[tab],j,k},Flatten[Table[Table[d tab[[j]]-d+k,{k,d}],{j,L}]]];
+
 (* Compute intersection "times" between two lines moving at unit speed, presented as point, angle *)
 computeintersection[p1_,th1_,p3_,th3_]:=
 Module[{u1,u2,p2=p1+{Cos[th1],Sin[th1]},p4=p3+{Cos[th3],Sin[th3]}},
@@ -598,6 +600,26 @@ cover[[j]]mode[[ind+1;;ind+dim]],{j,qdim}]],{}]
 ]
 ];
 
+(* need this to be cromulent with CoveringFrameworkVerts and CoveringFrameworkEdges *)
+CoveringMotionz[z_,mode_,cover_,dim0_:0]:=Module[{i,j,dim,qdim=Length[cover],
+numparts,tabspec,m,ind,mult},
+dim=If[dim0!=0,dim0,qdim];
+(* dim*number of particles = length of mode vector*)
+If[Mod[(Length[mode]),dim]!=0,Print["bad mode length"];Abort[]];
+numparts=(Length[mode])/dim; (* y then x *)
+tabspec=Table[{m[i],0,cover[[i]]-1},{i,qdim}];
+Flatten[
+Table[
+Table[
+(* contribution from z; take real part by default *)
+mult=Re[Product[z[[j]]^m[j],{j,qdim}]];
+(* internal components of mode *)
+mult mode[[dim (i-1)+1;;dim (i-1)+dim]],
+{i,numparts}],
+##]&@@tabspec (* specification of table, dim copies of loops from 0 to cover-1 *)
+]
+];
+
 
 SubtractTranslations[mode_,dim_,periodicdim_:0]:=Module[{modeinternal,modeguest,avgtranslation,numparts},
 If[periodicdim>0,
@@ -614,11 +636,15 @@ Join[modeinternal-Flatten[Table[avgtranslation,{numparts}]],modeguest]
 
 
 (* this should yield the elastic displacements in a spring network *)
-HarmonicExtension[Lap_,bvtr_,u_]:=Module[{j,l=Dimensions[Lap][[1]]/2,inter,dinter,cinter,matB,matC,fI,ans},
+(* Lap is the dynamical matrix *)
+(* bvtr is a list of indices of particles whose displacements will be specified by u *)
+(* u is the list of applied displacements *)
+HarmonicExtension[Lap_,bvtr_,u_,dim_:2]:=Module[{j,l=Dimensions[Lap][[2]]/dim,
+inter,dinter,cinter,matB,matC,fI,ans},
 (* need to be careful with "Complement" because does not preserve ordering *)
 inter=Complement[Table[j,{j,l}],bvtr];
-dinter=Doublemat[inter];
-cinter=Doublemat[bvtr];
+dinter=PosVecIndices[inter,dim];
+cinter=PosVecIndices[bvtr,dim];
 (* somehow slower if u is sparse????*)
 (*matB=If[toggle\[Equal]1,SparseArray[Lap[[dinter,cinter]].u],Lap[[dinter,cinter]].u];*)
 matB=Lap[[dinter,cinter]].u;
@@ -629,17 +655,17 @@ Print["Rank deficient; system is floppy"];,
 (*fI=-Inverse[matC].matB.u;*)
 (*fI=If[toggle\[Equal]1,-LinearSolve[matC,matB,Method\[Rule]"Krylov"],-LinearSolve[matC,matB]];*)
 fI=-LinearSolve[matC,matB];
-ans=Table[0,{2l}];
+ans=Table[0,{dim l}];
 Do[ans[[dinter[[j]]]]=fI[[j]];,{j,Length[fI]}];
 Do[ans[[cinter[[j]]]]=u[[j]];,{j,Length[u]}];
 ans]
 ];
 
 (* Dirichlet to Neumann operator *)
-DtN[Lap_,bvtr_]:=Module[{j,l=Dimensions[Lap][[1]]/2,inter,dinter,cinter,matA,matB,matC,matD},
+DtN[Lap_,bvtr_,dim_:2]:=Module[{j,l=Dimensions[Lap][[1]]/dim,inter,dinter,cinter,matA,matB,matC,matD},
 inter=Complement[Table[j,{j,l}],bvtr];
-dinter=Doublemat[inter];
-cinter=Doublemat[bvtr];
+dinter=PosVecIndices[inter,dim];
+cinter=PosVecIndices[bvtr,dim];
 matA=Lap[[cinter,cinter]];
 matB=Lap[[cinter,dinter]];
 matC=Lap[[dinter,cinter]];
@@ -1071,6 +1097,12 @@ Join[Table[ly(j-1)+1,{j,lx}],Table[ly*j,{j,lx}]],
 (* applied displacement components; 0 on bottom, u on top *) 
 Join[Table[0,{2lx}],Flatten[Table[u,{lx}]]]}];
 
+(* create lists suitable for input into the last two slots of HarmonicExtension; the first being the indices of the "boundary" vertices (for kagome chosen to be top and bottom row of triangles) and the second being the actual applied forces / displacements there  *)
+shearbvkag[lx_,ly_,u_:{1,0}]:={(* site indices *) Join[Flatten[
+Table[3ly(j-1)+i,{j,lx},{i,3}]],Flatten[Table[3ly j-3+i,{j,lx},{i,3}]]], 
+(* applied displacement components; 0 on bottom, u on top *) 
+Join[Table[0,{6lx}],Flatten[Table[u,{3lx}]]]}
+
 
 BoundaryVerts[edgedat_,cover_,cellspec_]:=
 Module[{i,j,k,qdim=Length[cover],tabspec,m,list,unitcellsize=Max[edgedat[[All,1]]]
@@ -1170,23 +1202,28 @@ tmat=Table[MatrixPower[transf[[i]],cover[[i]]],{i,qdim}]
 
 
 (* this function was broken!!! *)
-CoveringFrameworkEdges[edgedat_,cover_,periodic_:False]:=
+CoveringFrameworkEdges[edgedat_,cover_,periodic0_:False]:=
 Module[{i,j,dim=Length[cover],ind1,ind2,p1,p2,edatExtend,m,numbonds=0,
 bondlist=Table[Null,{Length[edgedat](Times@@cover)}],lenedge=Length[edgedat],
-unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec},
+unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec,periodic,pdirs,cellchangenew},
+periodic=If[BooleanQ[periodic0],Table[periodic0,{dim}],periodic0];
 tabspec=Join[Table[{m[j],cover[[j]]},{j,dim}],{{i,lenedge}}];
 Do[(* loop over edges in edgedat, (i.e. copy an edge i into all cells m,n) *)
 edatExtend=Join[edgedat[[i,2,1;;Min[Length[edgedat[[i,2]]],dim]]],Table[0,{dim-Length[edgedat[[i,2]]]}]];
 cellchange=Table[
 (* ceiling -1 because we need right endpoint *)
 Ceiling[(m[j]+edatExtend[[j]])/cover[[j]]-1],{j,dim}];
-If[periodic||(cellchange==Table[0,{dim}]),
+pdirs=Flatten[SparseArray[cellchange]["NonzeroPositions"]];
+If[(And@@periodic[[pdirs]])||(cellchange==Table[0,{dim}]),
 (* only add the bond if the periodic flag is set or it does not wrap*)
 {p1,p2}=edgedat[[i,1]];
 ind1=getatomindex2[Table[m[j],{j,dim}],p1,cover,unitcellsize];
 ind2=getatomindex2[Table[Mod[m[j]+edatExtend[[j]],cover[[j]],1],{j,dim}],p2,cover,unitcellsize];
+(* new cell change preserves ordering from original one but omits any directions 
+that were specified False in periodic *)
+cellchangenew=Flatten[Table[If[periodic[[j]],cellchange[[j]],{}],{j,dim}]];
 numbonds++;
-bondlist[[numbonds]]={{ind1,ind2},cellchange,edgedat[[i,3]]}
+bondlist[[numbonds]]={{ind1,ind2},cellchangenew,edgedat[[i,3]]}
 ];
 ,##]&@@tabspec;
 bondlist[[1;;numbonds]]
@@ -1218,11 +1255,12 @@ Sum[latt[[i]]*p[[i]],{i,qdim}]+If[r>0, RandomReal[{-r,r},dim],Table[0,{dim}]]
 
 
 (* connect up the points created by BCoveringFrameworkVerts *)
-BCoveringFrameworkEdges[edgedat_,basis_,periodic_:False]:=
+BCoveringFrameworkEdges[edgedat_,basis_,periodic0_:False]:=
 Module[{i,j,dim=Length[basis],ind1,ind2,p1,p2,edatExtend,m,numbonds=0,
 bondlist=Table[Null,{Length[edgedat](Abs[Det[basis]])}],lenedge=Length[edgedat],
 unitcellsize=Max[edgedat[[All,1]]],cellchange,tabspec,
-tA,tU,tD,tV,tDvec,pts,p,y,pp,ptemp,ptemp2},
+tA,tU,tD,tV,tDvec,pts,p,y,pp,ptemp,ptemp2,periodic,pdirs,cellchangenew},
+periodic=If[BooleanQ[periodic0],Table[periodic0,{dim}],periodic0];
 tA=Transpose[basis];
 (* tA has the basis as _columns_ *)
 {tU,tD,tV}=smithNormalForm[tA];
@@ -1253,10 +1291,14 @@ ind2=unitcellsize(Position[pts,ptemp2][[1,1]]-1)+p2;
 
 (* to get cellchange, measure the integer parts ? use floor now *)
 cellchange=Floor[ptemp];
+pdirs=Flatten[SparseArray[cellchange]["NonzeroPositions"]];
+If[(And@@periodic[[pdirs]])||(cellchange==Table[0,{dim}]),
 
-If[periodic||(cellchange==Table[0,{dim}]),
+(* new cell change preserves ordering from original one but omits any directions 
+that were specified False in periodic *)
+cellchangenew=Flatten[Table[If[periodic[[j]],cellchange[[j]],{}],{j,dim}]];
 numbonds++;
-bondlist[[numbonds]]={{ind1,ind2},cellchange,edgedat[[i,3]]}
+bondlist[[numbonds]]={{ind1,ind2},cellchangenew,edgedat[[i,3]]}
 ];
 ,{k,Length[pts]},{i,lenedge}];
 bondlist[[1;;numbonds]]
@@ -1264,6 +1306,8 @@ bondlist[[1;;numbonds]]
 
 
 (* slice; remove vertices, edges under a certain condition *)
+(* if poscond is True when evaluated on vertex coordinates, KEEP the vertex;
+if indexcond is False when evaluated on the vertex index, KEEP the vertex *)
 (* return new edgedat and list of vertex indices *)
 SliceOffVerts[pos_,edgedat_,poscond_,indexcond_:(False&)]:=
 Module[{i,j,edgenew,keepers,numpartsold=Length[pos],throwers},
@@ -1274,6 +1318,37 @@ edgenew=Select[edgedat,Flatten[Intersection[#[[1]],throwers]]=={}&]; (* need to 
 edgenew=Table[{edgenew[[j,1]]/.Table[keepers[[j]]->j,{j,Length[keepers]}],
 edgenew[[j,2]],edgenew[[j,3]]},{j,Length[edgenew]}];
 {edgenew,keepers}];
+
+
+(* unwrap a periodic structure at the "seam", specified by the index seamdim *)
+(* can use to get boundary vertices too for input into HarmonicExtension, etc *)
+CutAtSeam[seamdim_,pos_,basis_,edgedat_]:=Module[{newedat,newpos,edatind,tempind,temp,j,pos1,pos2,
+seamvec},
+edatind=Flatten[Position[edgedat,_?(#[[2,seamdim]]!=0&),{1},Heads->False]];
+(* want to put in new fake vertices at both ends of these edges *)
+newedat=Join@@Table[If[MemberQ[edatind,j],
+tempind=Position[edatind,j][[1,1]];
+temp=edgedat[[j]];
+(* indices of new vertices are 
+Length[pos]+2tempind-1 (vertex that gets + seamvec.basis)
+and
+Length[pos]+2tempind (vertex that gets - seamvec.basis)
+*)
+{{{temp[[1,1]],Length[pos]+2tempind-1},{},temp[[3]]},
+{{Length[pos]+2tempind,temp[[1,2]]},{},temp[[3]]}}
+,
+{edgedat[[j]]}
+],{j,Length[edgedat]}];
+newpos=Join@@Table[
+temp=edgedat[[edatind[[j]]]];
+pos1=pos[[temp[[1,1]]]];
+pos2=pos[[temp[[1,2]]]];
+seamvec=temp[[2]];
+{pos2+seamvec.basis,pos1-seamvec.basis}
+,{j,Length[edatind]}];
+newpos=Join[pos,newpos];
+{newpos,newedat}
+]
 
 
 glueedges[botE_,topE_,botdims_,botsize_,topdims_,topsize_,face_,cellglue_]:=
@@ -1957,6 +2032,16 @@ Join[col,Table[If[Norm[realnv[[3i-2;;3i]]]>cutoff,
 }
 ,##]&@@tabspec
 ]];
+
+
+FirstBZ[basis_,xwind_,ywind_,opts_:{},maxcheck_:2,shift_:{0,0}]:=Module[{qx,qy,rec,reciplist,reciprocbasis},
+reciprocbasis={2\[Pi] {{0,1},{-1,0}}.basis[[2]]/(basis[[1]].({{0,1},{-1,0}}.basis[[2]])),
+2\[Pi] {{0,-1},{1,0}}.basis[[1]]/(basis[[2]].({{0,-1},{1,0}}.basis[[1]]))};
+reciplist=Union[Flatten[Table[If[{j,k}!={0,0},j reciprocbasis[[1]]+k reciprocbasis[[2]], reciprocbasis[[1]]+reciprocbasis[[2]]],
+{j,-maxcheck,maxcheck},{k,-maxcheck,maxcheck}],1]];(*Print[reciplist];*)
+RegionPlot[
+Norm[{qx,qy}-shift]<Min[Table[Norm[{qx,qy}-shift-reciplist[[j]]],{j,Length[reciplist]}]],
+{qx,xwind[[1]],xwind[[2]]},{qy,ywind[[1]],ywind[[2]]},opts]]
 
 
 BandPlot[{zx_,zy_},poly_,basis_:{{1,0},{0,1}},xwind_:{-\[Pi],\[Pi]},ywind_:{-\[Pi],\[Pi]},opts_:{MaxRecursion->Automatic}]:=

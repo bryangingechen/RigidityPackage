@@ -5052,7 +5052,29 @@ Cell[BoxData[{
   FontWeight->"Bold"], "\n", 
  StyleBox[
   RowBox[{"<<", "\"\<Rigidity.m\>\""}],
-  FontWeight->"Bold"]}], "Text"],
+  FontWeight->"Bold"]}], "Input"],
+
+Cell["\<\
+Alternatively, if the file is elsewhere on your computer, the following \
+commands will work:\
+\>", "Text"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Mac", " ", "OS", " ", 
+    RowBox[{"X", " ", "/", " ", "Linux"}]}], " ", "*)"}], "\n", 
+  RowBox[{
+   StyleBox[
+    RowBox[{"<<", "\"\</path/to/rigidity/package/Rigidity.m\>\""}],
+    FontWeight->"Bold"], 
+   StyleBox["\[IndentingNewLine]",
+    FontWeight->"Bold"], 
+   RowBox[{"(*", " ", "Windows", " ", "*)"}], "\n", 
+   StyleBox[
+    RowBox[{"<<", "\"\<C:\\path\\to\\rigidity\\package\\Rigidity.m\>\""}],
+    FontWeight->"Bold"]}]}]], "Input",
+ Evaluatable->False],
 
 Cell[TextData[{
  "If the file \[OpenCurlyDoubleQuote]Rigidity.m\[CloseCurlyDoubleQuote] is \
@@ -6350,6 +6372,18 @@ Cell["Here\[CloseCurlyQuote]s a minimal usage:", "Text"],
 
 Cell[BoxData[{
  RowBox[{
+  RowBox[{"squarepos", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "1"}], "}"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
   RowBox[{"squarepos2", "=", 
    RowBox[{"squarepos", "+", 
     RowBox[{"RandomReal", "[", 
@@ -7059,9 +7093,7 @@ Cell[TextData[{
 for zx, zy.  "
 }], "Text"],
 
-Cell["\<\
-Here\[CloseCurlyQuote]s the band structure of the tetrahelix:\
-\>", "Text"],
+Cell["Here\[CloseCurlyQuote]s the band structure of the tetrahelix:", "Text"],
 
 Cell[BoxData[{
  RowBox[{
@@ -7085,44 +7117,63 @@ Cell[BoxData[{
     RowBox[{
      RowBox[{
       RowBox[{"mathematica", ".", "stackexchange", ".", "com"}], "/", "a"}], 
+     "/", "8644"}]}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{"useful", " ", "function", " ", 
+     RowBox[{"from", " ", ":", " ", "http", ":"}]}], "//", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"mathematica", ".", "stackexchange", ".", "com"}], "/", "a"}], 
      "/", "8644"}]}], " ", "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
+  RowBox[{"SetAttributes", "[", 
+   RowBox[{"styleSplitter", ",", "HoldFirst"}], "]"}], 
+  "\n"}], "\[IndentingNewLine]", 
+ RowBox[{
   RowBox[{
-   RowBox[{"splitstyle", "[", "styles__", "]"}], ":=", 
-   RowBox[{"Module", "[", 
+   RowBox[{"styleSplitter", "[", 
+    RowBox[{"plot", ":", 
+     RowBox[{"h_", "[", 
+      RowBox[{"___", ",", 
+       RowBox[{"op", ":", 
+        RowBox[{"OptionsPattern", "[", "]"}]}]}], "]"}]}], "]"}], ":=", 
+   RowBox[{"MapAt", "[", 
     RowBox[{
-     RowBox[{"{", 
-      RowBox[{"st", "=", 
-       RowBox[{"Directive", "/@", 
-        RowBox[{"{", "styles", "}"}]}]}], "}"}], ",", 
      RowBox[{
-      RowBox[{"{", 
-       RowBox[{"{", 
+      RowBox[{
+       RowBox[{"ListLinePlot", "[", 
         RowBox[{
-         RowBox[{"Last", "[", 
-          RowBox[{"st", "=", 
-           RowBox[{"RotateLeft", "@", "st"}]}], "]"}], ",", "#"}], "}"}], 
-       "}"}], "&"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
- RowBox[{"Plot", "[", 
-  RowBox[{
-   RowBox[{"Evaluate", "[", 
-    RowBox[{"Sqrt", "[", 
-     RowBox[{"Eigenvalues", "[", "tetrahelixdyn", "]"}], "]"}], "]"}], ",", 
-   RowBox[{"{", 
-    RowBox[{"k", ",", 
-     RowBox[{"-", "\[Pi]"}], ",", "\[Pi]"}], "}"}], ",", 
-   RowBox[{"PlotStyle", "\[Rule]", 
-    RowBox[{"splitstyle", "@@", 
-     RowBox[{
-      RowBox[{"ColorData", "[", "1", "]"}], "/@", 
-      RowBox[{"Range", "[", 
-       RowBox[{"1", ",", "8"}], "]"}]}]}]}]}], "]"}]}], "Input"],
+         RowBox[{"Cases", "[", 
+          RowBox[{
+           RowBox[{"Normal", "@", "#"}], ",", 
+           RowBox[{
+            RowBox[{"Line", "[", "x__", "]"}], "\[RuleDelayed]", "x"}], ",", 
+           RowBox[{"-", "3"}]}], "]"}], ",", 
+         RowBox[{"PlotRange", "\[Rule]", "Full"}], ",", 
+         RowBox[{"PlotStyle", "\[Rule]", 
+          RowBox[{"OptionValue", "[", 
+           RowBox[{"h", ",", 
+            RowBox[{"{", "op", "}"}], ",", "PlotStyle"}], "]"}]}]}], "]"}], 
+       "[", 
+       RowBox[{"[", "1", "]"}], "]"}], "&"}], ",", "plot", ",", "1"}], 
+    "]"}]}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Plot", "[", 
+   RowBox[{
+    RowBox[{"Evaluate", "[", 
+     RowBox[{"Sqrt", "[", 
+      RowBox[{"Eigenvalues", "[", "tetrahelixdyn", "]"}], "]"}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"k", ",", 
+      RowBox[{"-", "\[Pi]"}], ",", "\[Pi]"}], "}"}]}], "]"}], "//", 
+  "styleSplitter"}]}], "Input"],
 
 Cell["\<\
 We can plot the eigenvectors near k=0 to see what the bands correspond to.  \
-Note that the upper band (magenta band above, ev1 and green below) is \
-approximately a vertical translation and the lower band (gold band above, ev2 \
-and red below) is approximately a rotation.\
+Note that the middle band (gold band above, ev1 and green below) is \
+approximately a vertical translation and the lower band (green band above, \
+ev2 and red below) is approximately a rotation.\
 \>", "Text"],
 
 Cell[BoxData[{
@@ -7161,9 +7212,11 @@ Cell[TextData[{
  StyleBox["RigidityMatrixT",
   FontFamily->"Courier",
   FontWeight->"Bold"],
- " currently does not compute the \[OpenCurlyDoubleQuote]fixed-lattice\
-\[CloseCurlyDoubleQuote] type [MT12] of rigidity matrix.  When I figure out \
-how this works, I\[CloseCurlyQuote]ll add it."
+ " can compute the \[OpenCurlyDoubleQuote]fixed-lattice\
+\[CloseCurlyDoubleQuote] type [MT12] of rigidity matrix.  There is some \
+amount of complexity to this because we must add a new column for each entry \
+in the matrices corresponding to the affine transformations.  See the \
+comments in the code for now."
 }], "Text"]
 }, Closed]]
 }, Closed]]
@@ -7598,6 +7651,91 @@ Cell[TextData[{
 
 Cell[BoxData[{
  RowBox[{
+  RowBox[{"squarepos", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"0", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "1"}], "}"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"squarepos2", "=", 
+   RowBox[{"squarepos", "+", 
+    RowBox[{"RandomReal", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"-", ".5"}], ",", ".5"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"4", ",", "2"}], "}"}]}], "]"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"squarebasis", "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"2", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "2"}], "}"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"squareedgedat", "=", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"1", ",", "2"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"1", ",", "3"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"2", ",", "4"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"3", ",", "4"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"2", ",", "1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"3", ",", "1"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"4", ",", "2"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "1"}], "}"}], ",", "1"}], "}"}], ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"4", ",", "3"}], "}"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "0"}], "}"}], ",", "1"}], "}"}]}], "}"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
   RowBox[{"squarecover", "=", 
    RowBox[{"CoveringFrameworkVerts", "[", 
     RowBox[{"squarepos2", ",", "squarebasis", ",", 
@@ -7650,6 +7788,66 @@ Cell[BoxData[{
  RowBox[{"Draw2DFramework", "[", 
   RowBox[{"squarecover", ",", "squarecovernonperiodicedgedat"}], 
   "]"}]}], "Input"],
+
+Cell[TextData[{
+ "In general, the last argument of ",
+ StyleBox["CoveringFrameworkEdges",
+  FontFamily->"Courier",
+  FontWeight->"Bold"],
+ " can either be a raw Boolean variable or a list of Booleans of length equal \
+to the number of periodic directions in the edge data list.  A False in a \
+certain slot means that edges that cross that direction will be removed:"
+}], "Text"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"periodicxbooleanlist", "=", 
+   RowBox[{"{", 
+    RowBox[{"True", ",", "False"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"squarecovernonperiodicedgedatx", "=", 
+   RowBox[{"CoveringFrameworkEdges", "[", 
+    RowBox[{"squareedgedat", ",", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", "2"}], "}"}], ",", "periodicxbooleanlist"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"squarebasisx", "=", 
+   RowBox[{"Pick", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"3", ",", "2"}], "}"}], "*", "squarebasis"}], ",", 
+     "periodicxbooleanlist"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"DrawPeriodic2DFramework", "[", 
+   RowBox[{
+   "squarecover", ",", "squarebasisx", ",", 
+    "squarecovernonperiodicedgedatx"}], "]"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"periodicybooleanlist", "=", 
+   RowBox[{"{", 
+    RowBox[{"False", ",", "True"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"squarecovernonperiodicedgedaty", "=", 
+   RowBox[{"CoveringFrameworkEdges", "[", 
+    RowBox[{"squareedgedat", ",", 
+     RowBox[{"{", 
+      RowBox[{"3", ",", "2"}], "}"}], ",", "periodicybooleanlist"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"squarebasisy", "=", 
+   RowBox[{"Pick", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"3", ",", "2"}], "}"}], "*", "squarebasis"}], ",", 
+     "periodicybooleanlist"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"DrawPeriodic2DFramework", "[", 
+  RowBox[{
+  "squarecover", ",", "squarebasisy", ",", "squarecovernonperiodicedgedaty"}],
+   "]"}]}], "Input"],
 
 Cell[TextData[{
  StyleBox["CoveringFrameworkVerts",
@@ -8757,9 +8955,7 @@ Cell[BoxData[
   
   RowBox[{
    RowBox[{"fourthrankindices", "[", "2", "]"}], "//", 
-   "MatrixForm"}]}]], "Input",
- CellChangeTimes->{{3.624008578048253*^9, 3.6240085993092747`*^9}, {
-  3.624020064929654*^9, 3.624020066365143*^9}}],
+   "MatrixForm"}]}]], "Input"],
 
 Cell[TextData[{
  "Below we give a few examples using ",
@@ -8798,9 +8994,7 @@ Cell[BoxData[
          RowBox[{"1", ",", "1"}], "}"}], ",", 
         RowBox[{"{", 
          RowBox[{"0", ",", "1"}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
-   "]"}]}]], "Input",
- CellChangeTimes->{{3.6239937583053093`*^9, 3.62399376435872*^9}, {
-  3.624003197190583*^9, 3.624003203911944*^9}}],
+   "]"}]}]], "Input"],
 
 Cell[BoxData[
  RowBox[{
@@ -8841,12 +9035,8 @@ Cell[BoxData[
          RowBox[{"1", ",", 
           RowBox[{"-", "1"}]}], "}"}], ",", "1"}], "}"}]}], "}"}], ",", 
     RowBox[{"{", 
-     RowBox[{"k", ",", "k", ",", "k1", ",", "k1"}], "}"}]}], "]"}]}]], "Input",
- CellChangeTimes->{{3.6239937583053093`*^9, 3.62399376435872*^9}, {
-  3.624003197190583*^9, 3.624003203911944*^9}, {3.624007230164887*^9, 
-  3.6240072698280687`*^9}, {3.624008340651676*^9, 3.624008341657263*^9}, {
-  3.6240193010890207`*^9, 3.62401931146844*^9}, {3.627335486306364*^9, 
-  3.627335488424776*^9}, {3.627337901119481*^9, 3.6273379045194483`*^9}}],
+     RowBox[{"k", ",", "k", ",", "k1", ",", "k1"}], "}"}]}], 
+   "]"}]}]], "Input"],
 
 Cell[BoxData[{
  RowBox[{
@@ -8979,10 +9169,7 @@ Cell[BoxData[
         RowBox[{"{", 
          RowBox[{"1", ",", 
           RowBox[{"-", "1"}]}], "}"}], ",", "1"}], "}"}]}], "}"}]}], 
-   "]"}]}]], "Input",
- CellChangeTimes->{{3.623970276753355*^9, 3.6239703158443193`*^9}, {
-  3.6239936709473953`*^9, 3.623993721592031*^9}, {3.6239964267758007`*^9, 
-  3.623996441152997*^9}, {3.624003207686376*^9, 3.624003211291597*^9}}],
+   "]"}]}]], "Input"],
 
 Cell[BoxData[{
  RowBox[{
@@ -9493,10 +9680,8 @@ Cell[TextData[{
 }, Closed]]
 }, Closed]],
 
-Cell["\<\
-The local \[OpenCurlyDoubleQuote]circle\[CloseCurlyDoubleQuote] mode basis \
-for bulk isostatic frameworks\
-\>", "Subsection"],
+Cell["The local \[OpenCurlyDoubleQuote]circle\[CloseCurlyDoubleQuote] mode \
+basis for bulk isostatic frameworks", "Subsection"],
 
 Cell["\<\
 The line-localized mode basis for line intersection frameworks\
@@ -9906,12 +10091,12 @@ vol. 372 no. 2008 20120030. http://arxiv.org/abs/1102.2744\
 },
 EvaluationCompletionAction->{},
 WindowSize->{867, 826},
-WindowMargins->{{Automatic, 117}, {Automatic, 0}},
+WindowMargins->{{Automatic, 57}, {45, Automatic}},
 PrivateNotebookOptions->{"FileOutlineCache"->False},
 TrackCellChangeTimes->False,
 Background->RGBColor[0.965927, 0.985016, 0.999908],
-FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
-2013)",
+FrontEndVersion->"10.3 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 10, \
+2015)",
 StyleDefinitions->Notebook[{
    Cell[
     StyleData[StyleDefinitions -> "Default.nb"]], 
@@ -9960,7 +10145,7 @@ StyleDefinitions->Notebook[{
     FontSlant -> "Plain", Background -> 
     RGBColor[0.774136, 0.774105, 0.774121]]}, Visible -> False, 
   FrontEndVersion -> 
-  "9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, 2013)", 
+  "10.3 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 10, 2015)", 
   StyleDefinitions -> "PrivateStylesheetFormatting.nb"]
 ]
 
