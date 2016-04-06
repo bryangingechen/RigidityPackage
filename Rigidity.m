@@ -730,6 +730,23 @@ Flatten[Table[
 +1/(2 Sqrt[3]Cos[th]) {Cos[\[Pi]/6+2 \[Pi]/3 i+th],Sin[\[Pi]/6+2 \[Pi]/3 i+th]}
 ,{m,1,xx},{n,0,yy-1},{i,3}],2]];
 
+(* perturbed kagome in the form of a rhombus. The three vertices per unit cell are inscribed 
+in a unit equilateral triangle (if t=0)
+notation:
+{s1,s2,s3} are parameters along the three edges of the equilateral triangle parallel to {1,0}, 
+{-1/2,Sqrt[3]/2} and {-1/2,-Sqrt[3]/2}, respectively.
+
+t displaces the s2 vertex in a direction perpendicular to that edge of the triangle
+ *)
+PKagLatticeRho[xx_,yy_,s1_,s2_,s3_,t_:0,r_:0]:=(* yy better be even? *)Module[{m,n,i},
+Flatten[Table[
+{(*Mod[m+1/2.n,xx]*)m+1/2 n,Sqrt[3]/2 n}
++If[r>0,RandomReal[{-r,r},2],{0,0}]
++If[i==1,(1-s3){1/2,Sqrt[3]/2},{0,0}]
++If[i==2,{s1,0},{0,0}]
++If[i==3,{1,0}+s2{-1/2,Sqrt[3]/2}+t{Sqrt[3]/2,1/2},{0,0}]
+,{m,0,xx-1},{n,0,yy-1},{i,3}],2]];
+
 (* kagome in the form of a rectangle *)
 KagLatticeRec[xx_,yy_,th_:0,r_:0]:=(* yy better be even? *) Module[{i,m,n},
 Flatten[Table[
