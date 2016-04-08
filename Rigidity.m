@@ -576,7 +576,7 @@ Join[nspp,nsp]
 (* need this to be cromulent with CoveringFrameworkVerts and CoveringFrameworkEdges *)
 CoveringMotion[mode_,cover_,dim0_:0,periodic_:False]:=Module[{i,j,dim,qdim=Length[cover],
 numparts,tabspec,m,ind},
-dim=If[dim0!=0,dim0,Length[cover]];
+dim=If[dim0!=0,dim0,qdim];
 (* dim*number of particles + dim qdim = length of mode vector*)
 If[Mod[(Length[mode]-dim qdim),dim]!=0,Print["bad mode length"];Abort[]];
 numparts=(Length[mode]-dim qdim)/dim; (* y then x *)
