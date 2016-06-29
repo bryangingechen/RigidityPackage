@@ -158,12 +158,35 @@ CompatibilityMatrix[z,posns,basis,edgedat,fixedperiodic];
 
 
 (* Generalized periodic Rigidity matrix*)
-(* fixed periodicity is not yet implemented *)
 
-RigidityMatrixT[z_,posns_,transformations_,edgedat_(*,fixedperiodic_:False*)]:=
-Module[{numbonds=Length[edgedat],qdim=Length[z],dim=Length[posns[[1]]],bcomponent,bvec,
+(* for fixed periodicity, the derivative of the transformation matrices is encoded in the last 
+qdim(dim(dim+1)) columns of the matrix as the nonredundant components of an element of 
+the Lie algebra to the dim-dimensional affine group
+
+Since T1.T2 = T2.T1 for all pairs, if t1 and t2 are the infinitesimal changes in T1 and T2, 
+we must have:
+
+t1.T2 + T1.t2 = T2.t1 + t2.T1 
+
+Fortunately, this is a linear condition on t1 and t2
+
+Order of components: for each j = 1 to qdim, 
+first the dim components of the translation
+then the dim^2 components of the transformation matrix
+
+*)
+
+(* With fixedperiodic, before taking the nullspace, may want to adjoin rows that constrain
+the entries of the derivatives of the transformation matrices, e.g. the commutation condition above,
+forcing them to be antisymmetric, etc.
+ *)
+Clear[RigidityMatrixT]
+
+RigidityMatrixT[z_,posns_,transformations_,edgedat_,fixedperiodic_:False]:=
+Module[{numbonds=Length[edgedat],qdim=Length[transformations],dim=Length[posns[[1]]],bcomponent,
+bvec,bmatrixcomponent,bcomponent2,bcoeff,tebond,
 numpart=Length[posns],part1,part2,ebond,kb,lattchange,zm,edatExtend,tmat,pv,
-fixedperiodic=False,k,j,i,ebondrot},
+k,j,i,ebondrot},
 SparseArray[Flatten[Table[part1=edgedat[[j,1,1]];
 part2=edgedat[[j,1,2]];
 kb=1;(*edgedat[[j,3]];*)
@@ -176,27 +199,56 @@ pv=tmat.Join[posns[[part2]],{1}];
 ebond=-posns[[part1]]+pv[[1;;dim]]; (* sign convention from malestein theran *)
 ebondrot=ebond.tmat[[;;dim,;;dim]];
 (* ebond=ebond/Norm[ebond];*)
-If[part1!=part2,(Join[
-Table[{j,dim (part1-1)+k}->-ebond[[k]],{k,dim}],
+If[part1!=part2,
+Join[Table[{j,dim (part1-1)+k}->-ebond[[k]],{k,dim}],
 Table[{j,dim (part2-1)+k}->zm ebondrot[[k]],{k,dim}],
 If[fixedperiodic,Flatten[
-Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
-,{bvec,qdim},{bcomponent,dim}]]
-,{}]
-]),
+Join[(* translational components *)
+tebond=Sum[MatrixPower[tmat[[;;dim,;;dim]],l],{l,edatExtend[[bvec]]-1}].tmat[[;;dim,dim+1]]
++tmat[[;;dim,dim+1]];
+Table[{j,dim numpart+(bvec-1) dim(dim+1)+bcomponent}->edatExtend[[bvec]] (tebond[[bcomponent]])
+,{bvec,qdim},{bcomponent,dim}],
+(* transformation matrix components  *)
+Table[
+bcomponent2=Ceiling[bmatrixcomponent/dim];
+bcomponent=Mod[bmatrixcomponent,dim,1];
+bcoeff=(ebond[[bcomponent]])(posns[[part2,bcomponent2]]);
+{j,dim numpart+(bvec-1) dim(dim+1)+dim+bmatrixcomponent}->edatExtend[[bvec]]bcoeff
+,{bvec,qdim},{bmatrixcomponent,dim^2}]
+]]
+,{}]]
+,
 (* part1\[Equal]part2*)
 Join[Table[{j,dim (part1-1)+k}->-ebond[[k]]+zm ebondrot[[k]],{k,dim}],
 If[fixedperiodic,Flatten[
-Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]](ebond[[bcomponent]])
-,{bvec,dim},{bcomponent,dim}]]
+Join[(* translational components *)
+Table[{j,dim numpart+(bvec-1) dim(dim+1)+bcomponent}->edatExtend[[bvec]] (ebond[[bcomponent]])
+,{bvec,qdim},{bcomponent,dim}],
+(* transformation matrix components  *)
+Table[
+bcomponent2=Ceiling[bmatrixcomponent/dim];
+bcomponent=Mod[bmatrixcomponent,dim,1];
+bcoeff=(ebond[[bcomponent]])(posns[[part2,bcomponent2]]);
+{j,dim numpart+(bvec-1) dim(dim+1)+dim+bmatrixcomponent}->edatExtend[[bvec]]bcoeff
+,{bvec,qdim},{bmatrixcomponent,dim^2}]
+]]
 ,{}]]
 ],
 {j,numbonds}]]
-,{numbonds,dim numpart+If[fixedperiodic,qdim*dim,0]}]
+,{numbonds,dim numpart+If[fixedperiodic,qdim*dim(dim+1),0]}]
 ];
 
-NRigidityMatrixT[z_?(VectorQ[#,NumericQ]&),posns_,transformations_,edgedat_(*,fixedperiodic_:False*)]:=
-RigidityMatrixT[z,posns,transformations,edgedat(*,fixedperiodic*)];
+NRigidityMatrixT[z_?(VectorQ[#,NumericQ]&),posns_,transformations_,edgedat_,fixedperiodic_:False]:=
+RigidityMatrixT[z,posns,transformations,edgedat,fixedperiodic];
+
+RigidityMatrix3I[z_,posns_,rodrig_,transl_,edgedat_,fixedperiodic_:False]:=Module[{transformations,A},
+(* cauchy transform *)
+transformations=Table[
+A={{0,rodrig[[j,3]],-rodrig[[j,2]]},{-rodrig[[j,3]],0,rodrig[[j,1]]},
+{rodrig[[j,2]],-rodrig[[j,1]],0}};
+ArrayFlatten[{{(IdentityMatrix[3]-A).Inverse[(IdentityMatrix[3]+A)],
+Transpose[{transl[[j]]}]},{0,1}}],{j,Length[rodrig]}];
+RigidityMatrixT[z,posns,transformations,edgedat,fixedperiodic]]
 
 
 EdgeLengthsSq[posns_,basis_,edgedat_]:=Module[{part1,part2,kb,lattchange,qdim=Length[basis],ebond,
@@ -225,6 +277,15 @@ ebond=-posns[[part1]]+pv[[;;dim]]; (* sign convention from malestein theran *)
 Norm[ebond]^2
 ,
 {j,numbonds}]];
+
+EdgeLengthsSq3I[posns_,rodrig_,transl_,edgedat_]:=Module[{transformations,A},
+(* cauchy transform *)
+transformations=Table[
+A={{0,rodrig[[j,3]],-rodrig[[j,2]]},{-rodrig[[j,3]],0,rodrig[[j,1]]},
+{rodrig[[j,2]],-rodrig[[j,1]],0}};
+ArrayFlatten[{{(IdentityMatrix[3]-A).Inverse[(IdentityMatrix[3]+A)],
+Transpose[{transl[[j]]}]},{0,1}}],{j,Length[rodrig]}];
+EdgeLengthsSqT[posns,transformations,edgedat]]
 
 
 (* don't trust this right now in full generality - gauge choices made in rigidity matrix functions may be inconsistent with it *)
@@ -571,6 +632,80 @@ If[Length[nspp]>0,bigrig=Join[bigrig,nspp=Table[Join[nspp[[j]],{0,0,0,0}],{j,Len
 nsp=NullSpace[bigrig];
 Join[nspp,nsp]
 ];
+
+
+(* some functions giving constraint rows on the deformations of transformation matrices *)
+
+(* ordering of columns, first the dim components of translations, then the dim^2 components of the 
+transformation matrix;
+
+{i,j} are the indices of a matrix entry (row, column), 1\[LessEqual]i\[LessEqual]dim, 1\[LessEqual]j\[LessEqual]dim+1
+ *)
+coeffindexT[i_,j_,dim_]:=Module[{},
+If[j==dim+1,i,
+i dim+j
+]
+];
+
+(* 
+
+t1.T2 + T1.t2 = T2.t1 + t2.T1 
+
+a_kl.B_lm + A_kl.b_lm - B_kl.a_lm - b_kl.A_lm = 0
+
+ *)
+commuteconstraintT[numparts_,transformations_]:=Module[
+{qdim=Length[transformations],dim,pairtab,temp,datavec
+i1,i2,j,k,l,m,coeffindex,rowind,colind,maxcol},
+temp=Dimensions[transformations[[1]]];
+If[(temp[[1]]!=temp[[2]]),Print["transformation matrix has wrong shape"];Abort[];,
+dim=temp[[1]]-1];(*Print[dim];*)
+maxcol=dim numparts+qdim dim (dim+1);
+(* one set of rows for each pair *)
+pairtab=Subsets[Range[qdim],{2}];Print[pairtab];
+Table[{i1,i2}=pairtab[[j]];
+Table[rowind=(j-1)dim(dim+1)+(m-1)(dim)+k;
+datavec=Table[0,{dim numparts+qdim dim(dim+1)}];
+Do[
+{(* a_kl entry *)
+If[l!=m,colind=dim numparts+(i1-1)dim(dim+1)+coeffindexT[k,l,dim];
+datavec[[colind]]+=transformations[[i2,l,m]];
+If[colind>maxcol,Print["too big akl ",i1,i2,k,l,m];];,
+(* a_km entry special *)
+colind=dim numparts+(i1-1)dim(dim+1)+coeffindexT[k,m,dim];
+datavec[[colind]]+=
+transformations[[i2,m,m]]-transformations[[i2,k,k]];
+If[colind>maxcol,Print["too big akm ",i1," ",i2," ",k," ",l," ",m];];
+],
+(* a_lm entry *)
+If[l!=k,colind=dim numparts+(i1-1)dim(dim+1)+coeffindexT[l,m,dim];
+datavec[[colind]]+=transformations[[i2,k,l]],{}];
+If[colind>maxcol,Print["too big alm ",i1," ",i2," ",k," ",l," ",m];];,
+(* b_kl entry *)
+If[l!=m,colind=dim numparts+(i2-1)dim(dim+1)+coeffindexT[k,l,dim];
+datavec[[colind]]+=transformations[[i1,l,m]];
+If[colind>maxcol,Print["too big bkl ",i1," ",i2," ",k," ",l," ",m];];,
+(* b_km entry special *)
+colind=dim numparts+(i2-1)dim(dim+1)+coeffindexT[k,m,dim];
+datavec[[colind]]+=
+transformations[[i1,m,m]]-transformations[[i1,k,k]];
+If[colind>maxcol,Print["too big bkm ",i1," ",i2," ",k," ",l," ",m];];
+],
+(* b_lm entry *)
+If[l!=k,colind=dim numparts+(i2-1)dim(dim+1)+coeffindexT[l,m,dim];
+datavec[[colind]]+=transformations[[i1,k,l]],{}];
+If[colind>maxcol,Print["too big blm ",i1," ",i2," ",k," ",l," ",m];];
+}
+,{l,dim+1}];datavec
+,{k,dim},{m,dim+1}]
+,{j,Length[pairtab]}]]
+(*,
+{Length[pairtab]dim(dim+1),dim numparts+qdim dim (dim+1)}
+]]*)
+
+
+(* for isometries, need a function to ensure that the dim^2 components correspond to
+entries of a matrix in so(d) *)
 
 
 (* need this to be cromulent with CoveringFrameworkVerts and CoveringFrameworkEdges *)
@@ -1147,7 +1282,7 @@ getatomindex2[Table[m[j],{j,qdim}],cellspec[[k,2]],cover,unitcellsize]
 (*Making new lattices from scratch and from old*)
 
 
-(*Function to make edges for points in "lattice" closer than "dis" *)
+(*Function to make edges for points in "pos" closer than "dis" *)
 DiskGraphEdges[pos_,dis_,basis_:{},maxwinding_:1]:=
 Module[{i,j,k,numverts=Length[pos],qdim=Length[basis],tabspec,m,cover},
 If[Length[basis]==0,
@@ -1393,6 +1528,23 @@ glueverts[botV_,topV_,vec_]:=Join[botV,topV+Table[vec,{Length[topV]}]];
 
 (* ::Section:: *)
 (*Graphics functions*)
+
+
+Label2DFramework[pos_,basis_,edat_,vpert_:{0,0},epert_:{0,0},vstyle_:{Black},estyle_:{Red}]:=
+Module[{ecent,edatExtend,qdim=Length[basis]},
+Graphics[Join[vstyle,Table[Text[j,pos[[j]]+vpert],{j,Length[pos]}],estyle,
+Table[
+edatExtend=Join[edat[[j,2,1;;Min[Length[edat[[j,2]]],qdim]]],Table[0,{qdim-Length[edat[[j,2]]]}]];
+ecent=(pos[[edat[[j,1,1]]]]+pos[[edat[[j,1,2]]]]+edatExtend.basis)/2;
+Text[j,ecent+epert],{j,Length[edat]}]]]]
+
+Label3DFramework[pos_,basis_,edat_,vpert_:{0,0,0},epert_:{0,0,0},vstyle_:{Black},estyle_:{Red}]:=
+Module[{ecent,edatExtend,qdim=Length[basis]},
+Graphics3D[Join[vstyle,Table[Text[j,pos[[j]]+vpert],{j,Length[pos]}],estyle,
+Table[
+edatExtend=Join[edat[[j,2,1;;Min[Length[edat[[j,2]]],qdim]]],Table[0,{qdim-Length[edat[[j,2]]]}]];
+ecent=(pos[[edat[[j,1,1]]]]+pos[[edat[[j,1,2]]]]+edatExtend.basis)/2;
+Text[j,ecent+epert],{j,Length[edat]}]]]]
 
 
 Draw2DFramework[p_,E_,pointstyle_:{},linestyle_:{}]:=Module[{i,j,e=Length[E]},
