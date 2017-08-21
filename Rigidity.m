@@ -112,7 +112,7 @@ Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]] (ebond[[bcompo
 Join[Table[{j,dim (part1-1)+k}->-ebond[[k]](1-zm),{k,dim}],
 If[fixedperiodic,Flatten[
 Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]](ebond[[bcomponent]])
-,{bvec,dim},{bcomponent,dim}]]
+,{bvec,qdim},{bcomponent,dim}]]
 ,{}]]
 ],
 {j,numbonds}]]
@@ -143,7 +143,7 @@ Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]] (ebond[[bcompo
 Join[Table[{j,dim (part1-1)+k}->-ebond[[k]](1-zm),{k,dim}],
 If[fixedperiodic,Flatten[
 Table[{j,dim numpart+(bvec-1) dim+bcomponent}->edatExtend[[bvec]](ebond[[bcomponent]])
-,{bvec,dim},{bcomponent,dim}]]
+,{bvec,qdim},{bcomponent,dim}]]
 ,{}]]
 ],
 {j,numbonds}]]
@@ -155,6 +155,31 @@ RigidityMatrix[z,posns,basis,edgedat,fixedperiodic];
 
 NCompatibilityMatrix[z_?(VectorQ[#,NumericQ]&),posns_,basis_,edgedat_,fixedperiodic_:False]:=
 CompatibilityMatrix[z,posns,basis,edgedat,fixedperiodic];
+
+IncidenceMat[z_,edgedat_,dim_,fixedperiodic_:False]:=
+Module[{numbonds=Length[edgedat],qdim=Length[z],bvec,
+numpart=Max[edgedat[[All,1]]],part1,part2,zm,edatExtend,k,j},
+ArrayFlatten[Table[part1=edgedat[[j,1,1]];
+part2=edgedat[[j,1,2]];
+edatExtend=Join[edgedat[[j,2,1;;Min[Length[edgedat[[j,2]]],qdim]]],
+Table[0,{qdim-Length[edgedat[[j,2]]]}]];
+zm=Product[z[[k]]^edatExtend[[k]],{k,qdim}];
+If[part1!=part2,Join[Table[
+If[k==part1,-IdentityMatrix[dim],
+If[k==part2, zm IdentityMatrix[dim],0]],{k,numpart}],
+If[fixedperiodic,
+Table[edatExtend[[bvec]]IdentityMatrix[dim],{bvec,qdim}],{}]
+],
+(* part1\[Equal]part2*)
+Join[Table[If[k==part1,-(1-zm)IdentityMatrix[dim],0],{k,numpart}],
+If[fixedperiodic,
+Table[edatExtend[[bvec]]IdentityMatrix[dim]
+,{bvec,qdim}]
+,{}]]
+],
+{j,numbonds}]]
+];
+
 
 
 (* Generalized periodic Rigidity matrix*)
@@ -323,12 +348,28 @@ NIntegrate[Im[D[Log[zz],t]],{t,0,2\[Pi]}]
 ];
 
 
+(* these are not correct: the true dynamical matrix should be R^T(-z).R(z) *)
+
 (* "dynamical matrix" shorthand function *)
 DynMat[rig_,kmat_:{}]:=Module[{},If[kmat=={},ConjugateTranspose[rig].rig,
 ConjugateTranspose[rig].kmat.rig]];
 
 (* "hamiltonian matrix" shorthand function *)
 HMat[rig_]:=ArrayFlatten[{{0,ConjugateTranspose[rig]},{rig,0}}];
+
+
+(* ::Section:: *)
+(*Stress matrices*)
+
+
+(* stress matrix function *)
+StressMatrix[stress_,edat_,dim_,fixedperiodic_:False]:=Module[{j,inc,
+qdim=Max[Length/@edat[[All,2]]]},
+inc=IncidenceMat[Table[1,{qdim}],edat,dim,fixedperiodic];
+Transpose[inc].DiagonalMatrix[Flatten[Table[{stress[[j]]}
+,{j,Length[stress]},{dim}]]].inc
+];
+
 
 
 (* ::Section:: *)
